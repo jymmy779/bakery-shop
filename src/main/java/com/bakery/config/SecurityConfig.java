@@ -20,17 +20,32 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-      .csrf(csrf -> csrf.disable())
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/", "/products/**", "/cart/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-        .requestMatchers("/checkout/**", "/orders/**", "/profile/**").hasAnyRole("CUSTOMER", "ADMIN")
-        .requestMatchers("/admin/**").hasRole("ADMIN")
+        .requestMatchers(
+            "/",
+            "/products/**",
+            "/cart/**",
+            "/register/**",
+            "/login",
+            "/forgot-password/**",
+            "/error",
+            "/css/**",
+            "/js/**",
+            "/images/**",
+            "/uploads/**").permitAll()
+        .requestMatchers("/checkout/**", "/orders/**", "/profile/**")
+            .hasRole("CUSTOMER")
+        .requestMatchers("/cms/accounts/**", "/cms/staff/**")
+            .hasRole("ADMIN")
+        .requestMatchers("/cms/**")
+            .hasAnyRole("STAFF", "ADMIN")
         .anyRequest().authenticated()
       )
       .formLogin(form -> form
         .loginPage("/login")
         .usernameParameter("email")
-        .defaultSuccessUrl("/", true)
+        .defaultSuccessUrl("/", false)
+        .failureUrl("/login?error")
         .permitAll()
       )
       .logout(logout -> logout

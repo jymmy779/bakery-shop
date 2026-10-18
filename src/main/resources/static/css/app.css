@@ -1,0 +1,37 @@
+:root {
+  color-scheme: light;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  color: #2f241f;
+  background: #fffaf5;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f2dfce;
+}
+
+.container {
+  width: min(1080px, calc(100% - 2rem));
+  margin: 2rem auto;
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+  max-width: 28rem;
+}
+
+label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.error {
+  color: #b42318;
+}

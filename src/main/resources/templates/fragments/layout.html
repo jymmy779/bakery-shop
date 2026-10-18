@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <header th:fragment="header">
+    <nav>
+      <a th:href="@{/}">Bakery Shop</a>
+      <a th:href="@{/products}">Sản phẩm</a>
+      <a th:href="@{/cart}">Giỏ hàng</a>
+      <a th:href="@{/orders}">Đơn hàng</a>
+      <a th:href="@{/login}">Đăng nhập</a>
+    </nav>
+  </header>
+
+  <footer th:fragment="footer">
+    <p>Bakery Shop</p>
+  </footer>
+</body>
+</html>
