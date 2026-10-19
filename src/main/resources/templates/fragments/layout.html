@@ -1,18 +1,35 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <body>
-  <header th:fragment="header">
-    <nav>
-      <a th:href="@{/}">Bakery Shop</a>
-      <a th:href="@{/products}">Sản phẩm</a>
+<header th:fragment="header" class="shop-header">
+  <div class="shop-masthead shop-width">
+    <a class="shop-brand" th:href="@{/}" aria-label="Bakery Shop - Trang chủ">
+      <span class="brand-emblem" aria-hidden="true">B</span>
+      <span><span class="brand-name">Bakery Shop</span><span class="brand-tagline">Ngọt ngào từng khoảnh khắc</span></span>
+    </a>
+    <p class="masthead-message">Bánh ngon mỗi ngày<span>Gửi trọn niềm vui trong từng chiếc bánh</span></p>
+    <div class="shop-shortcuts">
+      <a th:href="@{/login}"><span aria-hidden="true">♙</span> Đăng nhập</a>
+      <a th:href="@{/cart}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 3h2l3 12h11l2-8H6M9 20h.01M18 20h.01" stroke-linecap="round" stroke-linejoin="round"/></svg> Giỏ hàng</a>
+    </div>
+  </div>
+  <nav class="shop-navigation" aria-label="Điều hướng chính">
+    <div class="shop-width shop-menu">
+      <a th:href="@{/}">Trang chủ</a>
+      <a th:href="@{/products}" class="menu-products">Danh sách bánh</a>
       <a th:href="@{/cart}">Giỏ hàng</a>
       <a th:href="@{/orders}">Đơn hàng</a>
-      <a th:href="@{/login}">Đăng nhập</a>
-    </nav>
-  </header>
-
-  <footer th:fragment="footer">
-    <p>Bakery Shop</p>
-  </footer>
+      <a th:href="@{/profile}">Tài khoản</a>
+    </div>
+  </nav>
+</header>
+<footer th:fragment="footer" class="shop-footer">
+  <div class="shop-width footer-content">
+    <div><p class="footer-brand">Bakery Shop</p><p>Ngọt ngào từng khoảnh khắc.</p></div>
+    <div><h2>Khám phá</h2><a th:href="@{/products}">Danh sách bánh</a><a th:href="@{/cart}">Giỏ hàng của bạn</a></div>
+    <div><h2>Tài khoản</h2><a th:href="@{/login}">Đăng nhập</a><a th:href="@{/orders}">Đơn hàng của bạn</a></div>
+  </div>
+  <div class="footer-bottom">Bakery Shop · Bánh ngon cho những điều ngọt ngào</div>
+</footer>
 </body>
 </html>
