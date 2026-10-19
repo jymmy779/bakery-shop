@@ -2,9 +2,8 @@ package com.bakery.catalog.controller.web;
 
 import com.bakery.catalog.service.CatalogQueryService;
 import com.bakery.catalog.dto.ProductDetailResponse;
-import com.bakery.catalog.dto.ProductSummaryResponse;
+import com.bakery.catalog.dto.ProductListResponse;
 import com.bakery.common.exception.ResourceNotFoundException;
-import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -22,8 +22,12 @@ public class ProductController {
   private final CatalogQueryService catalog;
 
   @GetMapping
-  public List<ProductSummaryResponse> list() {
-    return catalog.list();
+  public ProductListResponse list(@RequestParam(defaultValue = "") String keyword) {
+    var products = catalog.list(keyword);
+    String message = products.isEmpty()
+        ? "Không tìm thấy sản phẩm phù hợp"
+        : "Tìm thấy " + products.size() + " sản phẩm";
+    return new ProductListResponse(message, products);
   }
 
   @GetMapping("/{productId}")

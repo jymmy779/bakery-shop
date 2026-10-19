@@ -52,7 +52,17 @@ public class CatalogQueryService {
 
   @Transactional(readOnly = true)
   public List<ProductSummaryResponse> list() {
-    List<Product> productList = products.findAll(Sort.by("name", "id"));
+    return list(null);
+  }
+
+  @Transactional(readOnly = true)
+  public List<ProductSummaryResponse> list(String keyword) {
+    Sort sort = Sort.by("name", "id");
+    List<Product> productList = keyword == null || keyword.isBlank()
+        ? products.findAll(sort)
+        : products.searchByNameOrDescription("%" + keyword.strip()
+            .replace('đ', 'd').replace('Đ', 'D')
+            .replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%");
     var primaryImages = new HashMap<Long, String>();
     if (!productList.isEmpty()) {
       images.findByProductIdInOrderByDisplayOrderAscIdAsc(productList.stream().map(Product::getId).toList())

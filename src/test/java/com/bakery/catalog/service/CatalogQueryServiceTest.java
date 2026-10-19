@@ -22,6 +22,55 @@ class CatalogQueryServiceTest {
   private final CatalogQueryService service = new CatalogQueryService(products, images);
 
   @Test
+  void searchesDatabaseUsingTrimmedKeyword() {
+    Category category = new Category();
+    category.setName("Cake");
+    Product product = new Product();
+    product.setId(10L);
+    product.setName("Tiramisu");
+    product.setCategory(category);
+    when(products.searchByNameOrDescription("%TIRA%"))
+        .thenReturn(List.of(product));
+    when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(10L))).thenReturn(List.of());
+
+    var result = service.list("  TIRA  ");
+
+    assertEquals(1, result.size());
+    assertEquals("Tiramisu", result.get(0).getName());
+    verify(products, never()).findAll(any(Sort.class));
+  }
+
+  @Test
+  void blankKeywordReturnsAllProducts() {
+    when(products.findAll(any(Sort.class))).thenReturn(List.of());
+    assertTrue(service.list("   ").isEmpty());
+    verify(products).findAll(Sort.by("name", "id"));
+    verify(products, never()).searchByNameOrDescription(anyString());
+  }
+
+  @Test
+  void noSearchMatchesReturnsEmptyList() {
+    when(products.searchByNameOrDescription("%missing%"))
+        .thenReturn(List.of());
+    assertTrue(service.list("missing").isEmpty());
+    verifyNoInteractions(images);
+  }
+
+  @Test
+  void treatsSqlWildcardsAsLiteralCharacters() {
+    when(products.searchByNameOrDescription("%50!%!_!!%")).thenReturn(List.of());
+    assertTrue(service.list("50%_!").isEmpty());
+    verify(products).searchByNameOrDescription("%50!%!_!!%");
+  }
+
+  @Test
+  void normalizesVietnameseDInBothCases() {
+    when(products.searchByNameOrDescription("%Dậu do%")).thenReturn(List.of());
+    service.list("Đậu đo");
+    verify(products).searchByNameOrDescription("%Dậu do%");
+  }
+
+  @Test
   void detailReturnsDatabaseDescriptionStockAndImages() {
     Category category = new Category();
     category.setId(1L);
