@@ -1,5 +1,89 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"><title>Đăng ký</title><link rel="stylesheet" th:href="@{/css/app.css}"></head>
-<body><main class="container"><h1>Đăng ký tài khoản</h1><p>Form đăng ký sẽ được hoàn thiện trong use case Authentication.</p></main></body>
+<head>
+  <th:block th:replace="~{fragments/layout :: head-meta('Đăng ký tài khoản')}"></th:block>
+  <meta name="description" content="Tạo tài khoản LUNE Bakery để đặt bánh và theo dõi đơn hàng." />
+</head>
+<body>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+  <header th:replace="~{fragments/layout :: header(currentPage='auth')}"></header>
+
+  <main class="standard-page">
+    <div class="wrap" style="max-width: 520px;">
+      <span class="eyebrow" style="margin-bottom:6px">JOIN LUNE</span>
+      <h1 class="page-title">Gia nhập LUNE ♡</h1>
+
+      <!-- Error messages -->
+      <div class="alert" th:if="${error}" th:text="${error}"></div>
+
+      <div class="panel">
+        <!-- Auth tab switch -->
+        <div class="auth-switch">
+          <a th:href="@{/login}" style="display:flex;align-items:center;justify-content:center;padding:13px;font-weight:600;font-size:14px;color:#9a8982;">Đăng nhập</a>
+          <button class="active" type="button">Đăng ký</button>
+        </div>
+
+        <form th:action="@{/register}" method="post" id="register-form" style="margin-top:4px">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
+                 th:if="${_csrf != null}" />
+
+          <div class="field">
+            <label for="reg-name">Họ và tên *</label>
+            <input type="text" id="reg-name" name="name"
+                   placeholder="Họ tên của bạn"
+                   maxlength="90"
+                   th:value="${formData?.name}"
+                   autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="reg-email">Địa chỉ email *</label>
+            <input type="email" id="reg-email" name="email"
+                   placeholder="email@example.com"
+                   th:value="${formData?.email}"
+                   autocomplete="email" required />
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="reg-password">Mật khẩu *</label>
+              <input type="password" id="reg-password" name="password"
+                     placeholder="Tối thiểu 8 ký tự"
+                     minlength="8"
+                     autocomplete="new-password" required />
+            </div>
+            <div class="field">
+              <label for="reg-confirm">Xác nhận mật khẩu *</label>
+              <input type="password" id="reg-confirm" name="confirmPassword"
+                     placeholder="Nhập lại mật khẩu"
+                     minlength="8"
+                     autocomplete="new-password" required />
+            </div>
+          </div>
+          <div class="field">
+            <label for="reg-phone">Số điện thoại</label>
+            <input type="tel" id="reg-phone" name="phone"
+                   placeholder="0xxxxxxxxx"
+                   pattern="0[0-9]{9}" maxlength="10"
+                   th:value="${formData?.phone}"
+                   autocomplete="tel" />
+            <span class="field-note">Không bắt buộc. Dùng để xác nhận đơn hàng.</span>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px">
+            Tạo tài khoản
+            <svg aria-hidden="true" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round">
+              <use href="#i-arrow"/>
+            </svg>
+          </button>
+        </form>
+
+        <div class="auth-bottom">
+          Đã có tài khoản?
+          <a th:href="@{/login}" class="inline-link">Đăng nhập ngay</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
 </html>

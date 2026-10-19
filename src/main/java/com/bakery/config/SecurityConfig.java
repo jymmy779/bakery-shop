@@ -23,7 +23,7 @@ public class SecurityConfig {
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(
             "/",
-            "/products/**",
+            "/api/products/**",
             "/cart/**",
             "/register/**",
             "/login",
@@ -32,6 +32,7 @@ public class SecurityConfig {
             "/css/**",
             "/js/**",
             "/images/**",
+            "/assets/**",
             "/uploads/**").permitAll()
         .requestMatchers("/checkout/**", "/orders/**", "/profile/**")
             .hasRole("CUSTOMER")

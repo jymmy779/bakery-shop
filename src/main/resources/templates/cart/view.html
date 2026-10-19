@@ -1,1 +1,96 @@
-<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><title>Giỏ hàng</title><link rel="stylesheet" th:href="@{/css/app.css}"></head><body><header th:replace="~{fragments/layout :: header}"></header><main class="container"><h1>Giỏ hàng</h1></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments/layout :: head-meta('Giỏ hàng')}"></th:block>
+</head>
+<body>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+  <header th:replace="~{fragments/layout :: header(currentPage='cart')}"></header>
+
+  <main class="standard-page">
+    <div class="wrap">
+      <span class="eyebrow">YOUR SWEET PICKS</span>
+      <h1 class="page-title">Giỏ bánh của bạn</h1>
+
+      <!-- If cart empty -->
+      <div th:if="${cartItems == null or #lists.isEmpty(cartItems)}" class="empty-state" style="margin-top:20px">
+        <span>🥐</span>
+        <h3>Giỏ bánh còn trống</h3>
+        <p>Hãy chọn một chiếc bánh thật ngon nhé!</p>
+        <a th:href="@{/products}" class="btn btn-primary" style="margin-top:16px">
+          Khám phá thực đơn
+          <svg aria-hidden="true" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round"><use href="#i-arrow"/></svg>
+        </a>
+      </div>
+
+      <!-- Cart content -->
+      <div class="two-col" th:unless="${cartItems == null or #lists.isEmpty(cartItems)}">
+        <!-- Cart items -->
+        <div class="panel">
+          <h3 th:text="${#lists.size(cartItems)} + ' sản phẩm trong giỏ'">0 sản phẩm trong giỏ</h3>
+
+          <div class="cart-item" th:each="item : ${cartItems}">
+            <div class="product-media"
+                 th:style="'width:86px;height:86px;aspect-ratio:auto;--tone:' + ${item.product.tone ?: '#f3e6df'}">
+              <span class="media-fallback" style="font-size:39px"
+                    th:text="${item.product.emoji ?: '🍰'}"></span>
+              <img th:if="${item.product.imageUrl != null}"
+                   th:src="${item.product.imageUrl}"
+                   th:alt="${item.product.name}"
+                   loading="lazy" />
+            </div>
+            <div>
+              <strong th:text="${item.product.name}">Tên bánh</strong>
+              <span class="unit-price"
+                    th:text="${#numbers.formatInteger(item.product.price, 0, 'COMMA') + ' ₫'}">0 ₫</span>
+              <!-- Qty stepper via POST form -->
+              <form th:action="@{/cart/update}" method="post" class="qty-stepper" style="margin-top:12px">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+                <input type="hidden" name="productId" th:value="${item.product.id}" />
+                <button type="submit" name="action" value="decrease" aria-label="Giảm số lượng">−</button>
+                <span th:text="${item.quantity}">1</span>
+                <button type="submit" name="action" value="increase" aria-label="Tăng số lượng">+</button>
+              </form>
+            </div>
+            <form th:action="@{/cart/remove}" method="post">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
+              <input type="hidden" name="productId" th:value="${item.product.id}" />
+              <button type="submit" class="remove" title="Xóa khỏi giỏ" aria-label="Xóa sản phẩm">
+                <svg aria-hidden="true" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round"><use href="#i-trash"/></svg>
+              </button>
+            </form>
+          </div>
+
+          <div style="margin-top:18px">
+            <a th:href="@{/products}" class="btn btn-plain">Tiếp tục mua sắm</a>
+          </div>
+        </div>
+
+        <!-- Order summary -->
+        <div class="panel order-summary">
+          <h3>Tổng đơn hàng</h3>
+          <div class="summary-line">
+            <span>Tạm tính</span>
+            <strong th:text="${#numbers.formatInteger(cartTotal, 0, 'COMMA') + ' ₫'}">0 ₫</strong>
+          </div>
+          <div class="summary-line">
+            <span>Phí giao hàng</span>
+            <span>Xác nhận sau</span>
+          </div>
+          <div class="summary-line total">
+            <span>Tổng tiền bánh</span>
+            <strong th:text="${#numbers.formatInteger(cartTotal, 0, 'COMMA') + ' ₫'}">0 ₫</strong>
+          </div>
+          <a th:href="@{/checkout}" class="btn btn-primary" style="width:100%;margin-top:8px">
+            Tiến hành thanh toán
+            <svg aria-hidden="true" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round"><use href="#i-arrow"/></svg>
+          </a>
+          <a th:href="@{/products}" class="btn btn-outline" style="width:100%;margin-top:10px">Tiếp tục mua sắm</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
