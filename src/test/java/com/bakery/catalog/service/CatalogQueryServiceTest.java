@@ -11,6 +11,8 @@ import java.util.Optional;
 import com.bakery.common.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -20,6 +22,34 @@ class CatalogQueryServiceTest {
   private final ProductRepository products = mock(ProductRepository.class);
   private final ProductImageRepository images = mock(ProductImageRepository.class);
   private final CatalogQueryService service = new CatalogQueryService(products, images);
+
+  @Test
+  void combinesFiltersAndKeepsDatabasePageTotal() {
+    var pageable = PageRequest.of(1, 2);
+    var min = new BigDecimal("25000");
+    var max = new BigDecimal("300000");
+    when(products.filter("%dâu%", 1L, min, max, "best_selling", pageable))
+        .thenReturn(new PageImpl<>(List.of(), pageable, 5));
+    var result = service.filter("  dâu  ", 1L, min, max, "best_selling", 1, 2);
+    assertEquals(5, result.getTotalElements());
+    assertEquals(3, result.getTotalPages());
+    verify(products).filter("%dâu%", 1L, min, max, "best_selling", pageable);
+  }
+
+  @Test
+  void rejectsInvalidPricePaginationAndSortBeforeQuerying() {
+    assertThrows(IllegalArgumentException.class, () ->
+        service.filter("", null, new BigDecimal("10"), BigDecimal.ONE, "name", 0, 12));
+    assertThrows(IllegalArgumentException.class, () ->
+        service.filter("", null, BigDecimal.valueOf(-1), null, "name", 0, 12));
+    assertThrows(IllegalArgumentException.class, () ->
+        service.filter("", null, null, null, "bad_sort", 0, 12));
+    assertThrows(IllegalArgumentException.class, () ->
+        service.filter("", null, null, null, "name", -1, 12));
+    assertThrows(IllegalArgumentException.class, () ->
+        service.filter("", null, null, null, "name", 0, 101));
+    verifyNoInteractions(products, images);
+  }
 
   @Test
   void searchesDatabaseUsingTrimmedKeyword() {

@@ -12,6 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import java.math.BigDecimal;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +25,33 @@ import org.springframework.transaction.annotation.Transactional;
 public class CatalogQueryService {
   private final ProductRepository products;
   private final ProductImageRepository images;
+
+  @Transactional(readOnly = true)
+  public Page<ProductSummaryResponse> filter(String keyword, Long categoryId,
+      BigDecimal minPrice, BigDecimal maxPrice, String sort, int page, int size) {
+    if (page < 0 || size < 1 || size > 100) {
+      throw new IllegalArgumentException("page phải từ 0, size phải từ 1 đến 100");
+    }
+    if (categoryId != null && categoryId <= 0) {
+      throw new IllegalArgumentException("categoryId phải lớn hơn 0");
+    }
+    if ((minPrice != null && minPrice.signum() < 0) || (maxPrice != null && maxPrice.signum() < 0)
+        || (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0)) {
+      throw new IllegalArgumentException("Khoảng giá không hợp lệ: 0 <= minPrice <= maxPrice");
+    }
+    if (!Set.of("name", "price_asc", "price_desc", "best_selling").contains(sort)) {
+      throw new IllegalArgumentException("sort phải là name, price_asc, price_desc hoặc best_selling");
+    }
+    String pattern = keyword == null || keyword.isBlank() ? null : searchPattern(keyword);
+    Page<Product> result = products.filter(pattern, categoryId, minPrice, maxPrice, sort,
+        PageRequest.of(page, size));
+    return new PageImpl<>(summaries(result.getContent()), result.getPageable(), result.getTotalElements());
+  }
+
+  private String searchPattern(String keyword) {
+    return "%" + keyword.strip().replace('đ', 'd').replace('Đ', 'D')
+        .replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%";
+  }
 
   @Transactional(readOnly = true)
   public ProductDetailResponse getById(Long productId) {
@@ -60,9 +92,11 @@ public class CatalogQueryService {
     Sort sort = Sort.by("name", "id");
     List<Product> productList = keyword == null || keyword.isBlank()
         ? products.findAll(sort)
-        : products.searchByNameOrDescription("%" + keyword.strip()
-            .replace('đ', 'd').replace('Đ', 'D')
-            .replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%");
+        : products.searchByNameOrDescription(searchPattern(keyword));
+    return summaries(productList);
+  }
+
+  private List<ProductSummaryResponse> summaries(List<Product> productList) {
     var primaryImages = new HashMap<Long, String>();
     if (!productList.isEmpty()) {
       images.findByProductIdInOrderByDisplayOrderAscIdAsc(productList.stream().map(Product::getId).toList())
