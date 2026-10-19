@@ -1,1 +1,31 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>CMS - Sản phẩm</title></head><body><main><h1>Quản lý sản phẩm</h1></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head-meta('Quản lý sản phẩm')}" /></head>
+<body>
+	<div th:replace="~{fragments/layout :: header}"></div>
+	<main class="wrap" style="padding: 4rem 0">
+		<h1 class="section-title">Quản lý <em>sản phẩm</em></h1>
+		<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+		<div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+		<form method="get" th:action="@{/admin/products}">
+			<input name="keyword" th:value="${keyword}" placeholder="Tìm theo tên">
+			<select name="categoryId"><option value="">Tất cả danh mục</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == categoryId}"></option></select>
+			<button class="btn" type="submit">Tìm kiếm</button>
+		</form>
+		<form method="post" enctype="multipart/form-data" th:action="@{/admin/products/add}" th:object="${createRequest}">
+			<input th:field="*{name}" placeholder="Tên sản phẩm" required><input th:field="*{price}" type="number" min="1" step="0.01" placeholder="Giá" required>
+			<input th:field="*{stockQuantity}" type="number" min="0" placeholder="Tồn kho" required><input th:field="*{preparationDays}" type="number" min="0" placeholder="Ngày chuẩn bị" required>
+			<select th:field="*{categoryId}" required><option value="">Chọn danh mục</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
+			<textarea th:field="*{description}" placeholder="Mô tả" required></textarea><input th:field="*{images}" type="file" multiple accept="image/*">
+			<button class="btn btn-primary" type="submit">Thêm sản phẩm</button>
+		</form>
+		<table><thead><tr><th>Sản phẩm</th><th>Danh mục</th><th>Giá</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+			<tbody><tr th:each="product : ${products.content}">
+				<td th:text="${product.name}">Tên</td><td th:text="${product.categoryName}">Danh mục</td><td th:text="${product.price}">0</td><td th:text="${product.stockQuantity}">0</td><td th:text="${product.status}">SELLING</td>
+				<td><form method="post" th:action="@{/admin/products/delete/{id}(id=${product.id})}"><button class="btn" type="submit">Xóa / ngừng bán</button></form></td>
+			</tr></tbody>
+		</table>
+		<nav th:if="${products.totalPages > 1}"><a th:if="${products.hasPrevious()}" th:href="@{/admin/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId})}">Trước</a> <span th:text="${products.number + 1} + ' / ' + ${products.totalPages}">1 / 1</span> <a th:if="${products.hasNext()}" th:href="@{/admin/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId})}">Sau</a></nav>
+	</main>
+	<div th:replace="~{fragments/layout :: footer}"></div><th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body></html>

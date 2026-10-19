@@ -10,11 +10,11 @@ public class AdminCatalogController {
 
   @GetMapping("/products")
   public String products() {
-    return "cms/product/list";
+    return "redirect:/admin/products";
   }
 
   @GetMapping("/categories")
   public String categories() {
-    return "cms/category/list";
+    return "redirect:/admin/categories";
   }
 }

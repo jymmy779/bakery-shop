@@ -1,1 +1,27 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>CMS - Danh mục</title></head><body><main><h1>Quản lý danh mục</h1></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head-meta('Quản lý danh mục')}" /></head>
+<body>
+	<div th:replace="~{fragments/layout :: header}"></div>
+	<main class="wrap" style="padding: 4rem 0">
+		<h1 class="section-title">Quản lý <em>danh mục</em></h1>
+		<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+		<div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+		<form method="post" th:action="@{/admin/categories/add}" th:object="${categoryRequest}">
+			<input type="text" th:field="*{name}" placeholder="Tên danh mục" required>
+			<input type="text" th:field="*{description}" placeholder="Mô tả">
+			<button class="btn btn-primary" type="submit">Thêm danh mục</button>
+		</form>
+		<table><thead><tr><th>Tên</th><th>Mô tả</th><th>Thao tác</th></tr></thead>
+			<tbody><tr th:each="category : ${categories}">
+				<form method="post" th:action="@{/admin/categories/update/{id}(id=${category.id})}">
+					<td><input name="name" th:value="${category.name}" required></td>
+					<td><input name="description" th:value="${category.description}"></td>
+					<td><button class="btn" type="submit">Lưu</button></form>
+						<form method="post" th:action="@{/admin/categories/delete/{id}(id=${category.id})}" style="display:inline"><button class="btn" type="submit">Xóa</button></form>
+					</td>
+			</tr></tbody>
+		</table>
+	</main>
+	<div th:replace="~{fragments/layout :: footer}"></div><th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body></html>
