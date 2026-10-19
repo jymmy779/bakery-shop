@@ -106,6 +106,7 @@ public class CatalogQueryService {
       var result = new ProductSummaryResponse();
       result.setId(product.getId());
       result.setName(product.getName());
+      result.setDescription(product.getDescription());
       result.setPrice(product.getPrice());
       result.setStockQuantity(product.getStockQuantity());
       result.setPreparationDays(product.getPreparationDays());
