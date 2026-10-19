@@ -1,0 +1,100 @@
+package com.bakery.catalog.service;
+
+import com.bakery.catalog.entity.Category;
+import com.bakery.catalog.entity.Product;
+import com.bakery.catalog.entity.ProductImage;
+import com.bakery.catalog.repository.ProductImageRepository;
+import com.bakery.catalog.repository.ProductRepository;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import com.bakery.common.exception.ResourceNotFoundException;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Sort;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+class CatalogQueryServiceTest {
+  private final ProductRepository products = mock(ProductRepository.class);
+  private final ProductImageRepository images = mock(ProductImageRepository.class);
+  private final CatalogQueryService service = new CatalogQueryService(products, images);
+
+  @Test
+  void detailReturnsDatabaseDescriptionStockAndImages() {
+    Category category = new Category();
+    category.setId(1L);
+    category.setName("Cake");
+    Product product = new Product();
+    product.setId(10L);
+    product.setName("Tiramisu");
+    product.setDescription("Coffee and mascarpone");
+    product.setPrice(new BigDecimal("65000"));
+    product.setStockQuantity(15);
+    product.setPreparationDays(1);
+    product.setCategory(category);
+    ProductImage image = new ProductImage();
+    image.setId(2L);
+    image.setImagePath("/uploads/tiramisu.jpg");
+    when(products.findById(10L)).thenReturn(Optional.of(product));
+    when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(10L))).thenReturn(List.of(image));
+
+    var result = service.getById(10L);
+
+    assertEquals("Tiramisu", result.getName());
+    assertEquals("Coffee and mascarpone", result.getDescription());
+    assertEquals(product.getPrice(), result.getPrice());
+    assertEquals(15, result.getStockQuantity());
+    assertEquals(1, result.getPreparationDays());
+    assertEquals("Cake", result.getCategory().getName());
+    assertEquals("/uploads/tiramisu.jpg", result.getImages().get(0).getImagePath());
+  }
+
+  @Test
+  void missingCakeReturnsNotFoundInsteadOfNullDetail() {
+    when(products.findById(999L)).thenReturn(Optional.empty());
+    assertThrows(ResourceNotFoundException.class, () -> service.getById(999L));
+    verifyNoInteractions(images);
+  }
+
+  @Test
+  void mapsDatabaseProductsWithCategoryAndFirstImage() {
+    Category category = new Category();
+    category.setId(1L);
+    category.setName("Bánh kem");
+    Product product = new Product();
+    product.setId(10L);
+    product.setName("Bánh dâu");
+    product.setCategory(category);
+    product.setPrice(new BigDecimal("150000"));
+    ProductImage first = new ProductImage();
+    first.setProduct(product);
+    first.setImagePath("/uploads/first.jpg");
+    ProductImage second = new ProductImage();
+    second.setProduct(product);
+    second.setImagePath("/uploads/second.jpg");
+    when(products.findAll(any(Sort.class)))
+        .thenReturn(List.of(product));
+    when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(10L)))
+        .thenReturn(List.of(first, second));
+
+    var result = service.list();
+
+    assertEquals(1, result.size());
+
+    assertEquals("Bánh kem", result.get(0).getCategoryName());
+    assertEquals("/uploads/first.jpg", result.get(0).getPrimaryImagePath());
+    assertEquals(product.getPrice(), result.get(0).getPrice());
+  }
+
+  @Test
+  void emptyDatabaseDoesNotQueryImages() {
+    when(products.findAll(any(Sort.class)))
+        .thenReturn(List.of());
+
+    assertTrue(service.list().isEmpty());
+    verifyNoInteractions(images);
+  }
+}
+
