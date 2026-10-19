@@ -144,6 +144,7 @@ public class ProductServiceImpl implements ProductService {
     ProductSummaryResponse response = new ProductSummaryResponse();
     response.setId(product.getId());
     response.setName(product.getName());
+    response.setDescription(product.getDescription());
     response.setPrice(product.getPrice());
     response.setStockQuantity(product.getStockQuantity());
     response.setPreparationDays(product.getPreparationDays());
