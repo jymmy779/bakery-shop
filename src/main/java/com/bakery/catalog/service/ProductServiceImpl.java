@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   @Transactional
-  public ProductDetailResponse create(ProductCreateRequest request) {
+  public ProductDetailResponse createProduct(ProductCreateRequest request) {
     Product product = new Product();
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), ProductStatus.SELLING,
@@ -52,7 +52,7 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   @Transactional
-  public ProductDetailResponse update(Long productId, ProductUpdateRequest request) {
+  public ProductDetailResponse updateProduct(Long productId, ProductUpdateRequest request) {
     Product product = find(productId);
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), request.getStatus(),
@@ -70,7 +70,7 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<ProductSummaryResponse> search(String keyword, Long categoryId,
+  public Page<ProductSummaryResponse> getAllProducts(String keyword, Long categoryId,
       ProductStatus status, Pageable pageable) {
     String normalized = keyword == null || keyword.isBlank() ? null : keyword.trim();
     Page<Product> page = products.searchAdmin(normalized, categoryId, status, pageable);
@@ -80,11 +80,18 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   @Transactional
-  public void deleteOrStopSelling(Long productId) {
+  public void stopSellingProduct(Long productId) {
+    Product product = find(productId);
+    product.setStatus(ProductStatus.STOPPED);
+  }
+
+  @Override
+  @Transactional
+  public void deleteProduct(Long productId) {
     Product product = find(productId);
     if (orderDetails.countByProductId(productId) > 0) {
-      product.setStatus(ProductStatus.STOPPED);
-      return;
+      throw new IllegalStateException(
+          "Sản phẩm đã từng có trong đơn hàng, hãy dùng chức năng Ngừng bán để bảo toàn lịch sử mua hàng");
     }
     List<ProductImage> productImages = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(productId));
     images.deleteAll(productImages);

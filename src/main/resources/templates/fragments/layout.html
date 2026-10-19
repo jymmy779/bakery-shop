@@ -172,8 +172,65 @@
         hdr.classList.toggle('scrolled', window.scrollY > 8);
       }, { passive: true });
     })();
+
+    /* CMS form confirmation */
+    (function () {
+      var backdrop = document.getElementById('confirm-backdrop');
+      var message = document.getElementById('confirm-message');
+      var confirmButton = document.getElementById('confirm-submit');
+      var cancelButton = document.getElementById('confirm-cancel');
+      if (!backdrop || !message || !confirmButton || !cancelButton) return;
+      var pendingForm = null;
+
+      function close() {
+        backdrop.classList.remove('is-open');
+        backdrop.setAttribute('aria-hidden', 'true');
+        pendingForm = null;
+      }
+
+      document.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (form.dataset.confirmed === 'true') {
+            form.dataset.confirmed = 'false';
+            return;
+          }
+          event.preventDefault();
+          pendingForm = form;
+          message.textContent = form.dataset.confirmMessage;
+          confirmButton.classList.toggle('danger', form.dataset.confirmDanger === 'true');
+          backdrop.classList.add('is-open');
+          backdrop.setAttribute('aria-hidden', 'false');
+          cancelButton.focus();
+        });
+      });
+
+      confirmButton.addEventListener('click', function () {
+        if (!pendingForm) return;
+        var form = pendingForm;
+        form.dataset.confirmed = 'true';
+        close();
+        form.submit();
+      });
+      cancelButton.addEventListener('click', close);
+      backdrop.addEventListener('click', function (event) { if (event.target === backdrop) close(); });
+      document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && backdrop.classList.contains('is-open')) close(); });
+    })();
   </script>
 </th:block>
+
+<div th:fragment="confirm-dialog" class="confirm-backdrop" id="confirm-backdrop"
+     aria-hidden="true" role="presentation">
+  <section class="confirm-dialog" role="dialog" aria-modal="true"
+           aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <span class="eyebrow">XÁC NHẬN THAO TÁC</span>
+    <h2 id="confirm-title">Bạn chắc chắn chứ?</h2>
+    <p id="confirm-message">Vui lòng xác nhận thao tác này.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-cancel" id="confirm-cancel" type="button">Hủy</button>
+      <button class="btn btn-confirm" id="confirm-submit" type="button">Xác nhận</button>
+    </div>
+  </section>
+</div>
 
 <!-- ========================================================
      FRAGMENT: head-meta  (Google Fonts + base meta)

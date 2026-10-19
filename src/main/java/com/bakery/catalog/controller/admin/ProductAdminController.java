@@ -1,6 +1,5 @@
 package com.bakery.catalog.controller.admin;
 
-import com.bakery.catalog.dto.CategoryResponse;
 import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductUpdateRequest;
 import com.bakery.catalog.entity.ProductStatus;
@@ -27,11 +26,11 @@ public class ProductAdminController {
   private final CategoryRepository categories;
 
   @GetMapping
-  public String list(@RequestParam(defaultValue = "0") int page,
+  public String getAllProducts(@RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(defaultValue = "") String keyword,
       @RequestParam(required = false) Long categoryId, Model model) {
-    model.addAttribute("products", productService.search(keyword, categoryId, null,
+    model.addAttribute("products", productService.getAllProducts(keyword, categoryId, null,
         PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100))));
     model.addAttribute("categories", categories.findAll());
     model.addAttribute("keyword", keyword);
@@ -41,11 +40,30 @@ public class ProductAdminController {
     return "cms/product/list";
   }
 
+  @GetMapping("/create")
+  public String showCreateForm(Model model) {
+    model.addAttribute("products", productService.getAllProducts(null, null, null, PageRequest.of(0, 10)));
+    model.addAttribute("keyword", "");
+    model.addAttribute("categoryId", null);
+    addFormData(model);
+    return "cms/product/list";
+  }
+
+  @GetMapping("/edit/{id}")
+  public String showEditForm(@PathVariable Long id, Model model) {
+    model.addAttribute("products", productService.getAllProducts(null, null, null, PageRequest.of(0, 10)));
+    model.addAttribute("keyword", "");
+    model.addAttribute("categoryId", null);
+    addFormData(model);
+    model.addAttribute("editProduct", productService.getById(id));
+    return "cms/product/list";
+  }
+
   @PostMapping(value = "/add", consumes = "multipart/form-data")
-  public String add(@Valid ProductCreateRequest request, BindingResult result, RedirectAttributes redirect) {
+  public String createProduct(@Valid ProductCreateRequest request, BindingResult result, RedirectAttributes redirect) {
     if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu sản phẩm không hợp lệ!");
     try {
-      productService.create(request);
+      productService.createProduct(request);
       redirect.addFlashAttribute("successMessage", "Thêm sản phẩm thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -54,11 +72,11 @@ public class ProductAdminController {
   }
 
   @PostMapping(value = "/update/{id}", consumes = "multipart/form-data")
-  public String update(@PathVariable Long id, @Valid ProductUpdateRequest request,
+  public String updateProduct(@PathVariable Long id, @Valid ProductUpdateRequest request,
       BindingResult result, RedirectAttributes redirect) {
     if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu sản phẩm không hợp lệ!");
     try {
-      productService.update(id, request);
+      productService.updateProduct(id, request);
       redirect.addFlashAttribute("successMessage", "Cập nhật sản phẩm thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -67,10 +85,21 @@ public class ProductAdminController {
   }
 
   @PostMapping("/delete/{id}")
-  public String delete(@PathVariable Long id, RedirectAttributes redirect) {
+  public String deleteProduct(@PathVariable Long id, RedirectAttributes redirect) {
     try {
-      productService.deleteOrStopSelling(id);
-      redirect.addFlashAttribute("successMessage", "Đã xử lý sản phẩm thành công!");
+      productService.deleteProduct(id);
+      redirect.addFlashAttribute("successMessage", "Xóa sản phẩm thành công");
+    } catch (RuntimeException exception) {
+      redirect.addFlashAttribute("errorMessage", exception.getMessage());
+    }
+    return "redirect:/admin/products";
+  }
+
+  @PostMapping("/stop-selling/{id}")
+  public String stopSellingProduct(@PathVariable Long id, RedirectAttributes redirect) {
+    try {
+      productService.stopSellingProduct(id);
+      redirect.addFlashAttribute("successMessage", "Sản phẩm đã được chuyển sang trạng thái Ngừng bán");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
     }
@@ -80,5 +109,11 @@ public class ProductAdminController {
   private String errorRedirect(RedirectAttributes redirect, String message) {
     redirect.addFlashAttribute("errorMessage", message);
     return "redirect:/admin/products";
+  }
+
+  private void addFormData(Model model) {
+    model.addAttribute("categories", categories.findAll());
+    model.addAttribute("createRequest", new ProductCreateRequest());
+    model.addAttribute("statuses", ProductStatus.values());
   }
 }

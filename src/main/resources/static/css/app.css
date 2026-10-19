@@ -1160,6 +1160,38 @@ h1, h2, h3, h4, h5, h6 { margin: 0; }
 .small-button:disabled { opacity: .4; cursor: not-allowed; }
 .cms-editor { max-width: 560px; }
 .cms-editor .form-grid { gap: 0 12px; }
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(42, 36, 34, .42);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+.confirm-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.confirm-dialog {
+  width: min(430px, 100%);
+  padding: 30px;
+  background: var(--paper);
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  transform: translateY(12px);
+  transition: transform var(--transition);
+}
+.confirm-backdrop.is-open .confirm-dialog { transform: translateY(0); }
+.confirm-dialog .eyebrow { margin-bottom: 9px; }
+.confirm-dialog h2 { font: 500 27px/1.2 var(--serif); color: var(--wine); }
+.confirm-dialog p { color: var(--muted); line-height: 1.7; margin: 12px 0 23px; }
+.confirm-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.confirm-actions .btn { padding: 11px 17px; }
+.confirm-actions .btn-cancel { background: #f6efea; color: var(--wine); }
+.confirm-actions .btn-confirm { background: var(--wine); color: #fff; }
+.confirm-actions .btn-confirm.danger { background: #9b514b; }
 .cms-card-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
 .cms-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 18px; }
 .cms-item-card { position: relative; border: 1px solid #ece3de; background: #fffdf9; border-radius: 4px; overflow: hidden; text-align: left; cursor: pointer; transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition); }
