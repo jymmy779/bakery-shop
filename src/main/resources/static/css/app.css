@@ -1201,15 +1201,24 @@ h1, h2, h3, h4, h5, h6 { margin: 0; }
 .cms-item-card .card-copy { padding: 16px; }
 .cms-item-card h3 { font: 500 20px/1.25 var(--serif); color: var(--ink); margin: 8px 0 7px; }
 .cms-item-card p { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 0; }
+.cms-item-card .product-status { display: inline-block; margin-top: 8px; font-size: 10px; font-weight: 700; }
+.cms-item-card .product-status.selling { color: #3f7a50; }
+.cms-item-card .product-status.stopped { color: #b04d4d; }
 .cms-item-card .card-price { color: var(--wine); font-weight: 700; margin-top: 12px; }
 .cms-side-panel { position: sticky; top: 140px; background: #fff; border: 1px solid #ece3de; border-radius: 6px; padding: 22px; }
 .cms-side-panel h2 { font: 500 25px var(--serif); color: var(--wine); margin-bottom: 8px; }
 .cms-side-panel .side-hint { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 0 0 18px; }
 .cms-side-panel form { display: grid; gap: 10px; }
+.cms-side-panel[hidden], .cms-side-panel form[hidden] { display: none !important; }
+.cms-side-panel label { color: var(--ink); font-size: 11px; font-weight: 700; margin-top: 2px; }
 .cms-side-panel input, .cms-side-panel select, .cms-side-panel textarea, .cms-toolbar input, .cms-toolbar select { width: 100%; border: 1px solid var(--stroke); background: #fffdf9; padding: 11px 12px; border-radius: 3px; color: var(--ink); }
 .cms-side-panel textarea { min-height: 90px; resize: vertical; }
+.price-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px; }
+.price-suggestion { border: 1px solid var(--rose); border-radius: 3px; background: var(--blush); color: var(--wine); padding: 6px 8px; font-size: 11px; cursor: pointer; }
+.price-suggestion:hover { background: var(--rose); }
 .cms-side-panel .danger-action { margin-top: 4px; background: #fff4f1; color: #9c4e49; border-color: #eacbc4; }
 .cms-filter { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.cms-filter-title { color: var(--muted); font-size: 11px; font-weight: 700; margin: 0 0 8px; }
 .cms-filter input { flex: 1 1 220px; }
 @media (max-width: 820px) { .cms-card-layout { grid-template-columns: 1fr; } .cms-side-panel { position: static; order: -1; } }
 

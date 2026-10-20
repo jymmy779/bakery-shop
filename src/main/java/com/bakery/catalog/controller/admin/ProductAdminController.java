@@ -21,7 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/admin/products")
 @RequiredArgsConstructor
-public class ProductAdminController {
+public class  ProductAdminController {
   private final ProductService productService;
   private final CategoryRepository categories;
 
@@ -29,12 +29,14 @@ public class ProductAdminController {
   public String getAllProducts(@RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(defaultValue = "") String keyword,
-      @RequestParam(required = false) Long categoryId, Model model) {
-    model.addAttribute("products", productService.getAllProducts(keyword, categoryId, null,
+      @RequestParam(required = false) Long categoryId,
+      @RequestParam(required = false) ProductStatus status, Model model) {
+    model.addAttribute("products", productService.getAllProducts(keyword, categoryId, status,
         PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100))));
     model.addAttribute("categories", categories.findAll());
     model.addAttribute("keyword", keyword);
     model.addAttribute("categoryId", categoryId);
+    model.addAttribute("status", status);
     model.addAttribute("createRequest", new ProductCreateRequest());
     model.addAttribute("statuses", ProductStatus.values());
     return "cms/product/list";
@@ -45,6 +47,7 @@ public class ProductAdminController {
     model.addAttribute("products", productService.getAllProducts(null, null, null, PageRequest.of(0, 10)));
     model.addAttribute("keyword", "");
     model.addAttribute("categoryId", null);
+    model.addAttribute("status", null);
     addFormData(model);
     return "cms/product/list";
   }
@@ -54,6 +57,7 @@ public class ProductAdminController {
     model.addAttribute("products", productService.getAllProducts(null, null, null, PageRequest.of(0, 10)));
     model.addAttribute("keyword", "");
     model.addAttribute("categoryId", null);
+    model.addAttribute("status", null);
     addFormData(model);
     model.addAttribute("editProduct", productService.getById(id));
     return "cms/product/list";

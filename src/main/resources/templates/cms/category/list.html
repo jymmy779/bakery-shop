@@ -20,15 +20,17 @@
 						</button>
 					</div>
 				</section>
-				<aside class="cms-side-panel" id="category-sidebar">
+				<aside class="cms-side-panel" id="category-sidebar" hidden>
 					<h2 id="category-sidebar-title">Thêm danh mục</h2><p class="side-hint" id="category-sidebar-hint">Chọn một card để chỉnh sửa hoặc xóa danh mục.</p>
 					<form method="post" th:action="@{/admin/categories/add}" th:object="${categoryRequest}" id="category-create-form" data-confirm-message="Bạn có muốn thêm danh mục này không?">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-						<input th:field="*{name}" placeholder="Tên danh mục" required><textarea th:field="*{description}" placeholder="Mô tả danh mục"></textarea><button class="btn btn-primary" type="submit">Lưu danh mục</button>
+						<label for="create-category-name">Tên danh mục</label><input id="create-category-name" th:field="*{name}" required>
+						<label for="create-category-description">Mô tả danh mục</label><textarea id="create-category-description" th:field="*{description}"></textarea><button class="btn btn-primary" type="submit">Lưu danh mục</button>
 					</form>
 					<form method="post" action="/admin/categories/update/0" id="category-update-form" hidden data-confirm-message="Bạn có muốn cập nhật danh mục này không?">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-						<input name="name" id="category-name" placeholder="Tên danh mục" required><textarea name="description" id="category-description" placeholder="Mô tả danh mục"></textarea><button class="btn btn-primary" type="submit">Cập nhật danh mục</button>
+						<label for="category-name">Tên danh mục</label><input name="name" id="category-name" required>
+						<label for="category-description">Mô tả danh mục</label><textarea name="description" id="category-description"></textarea><button class="btn btn-primary" type="submit">Cập nhật danh mục</button>
 					</form>
 					<form method="post" action="/admin/categories/delete/0" id="category-delete-form" hidden data-confirm-message="Danh mục sẽ bị xóa vĩnh viễn. Bạn có chắc chắn muốn tiếp tục?" data-confirm-danger="true"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn danger-action" type="submit">Xóa danh mục</button></form>
 				</aside>
@@ -37,7 +39,7 @@
 	</main>
 	<div th:replace="~{fragments/layout :: footer}"></div><div th:replace="~{fragments/layout :: confirm-dialog}"></div><th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 	<script>
-		function openCategoryCreate() { document.getElementById('category-sidebar-title').textContent = 'Thêm danh mục'; document.getElementById('category-sidebar-hint').textContent = 'Tạo một nhóm sản phẩm mới cho cửa hàng.'; document.getElementById('category-create-form').hidden = false; document.getElementById('category-update-form').hidden = true; document.getElementById('category-delete-form').hidden = true; }
-		function selectCategory(card) { document.querySelectorAll('.cms-item-card').forEach(function (item) { item.classList.remove('selected'); }); card.classList.add('selected'); document.getElementById('category-sidebar-title').textContent = 'Chỉnh sửa danh mục'; document.getElementById('category-sidebar-hint').textContent = 'Cập nhật thông tin hoặc xóa danh mục đã chọn.'; document.getElementById('category-create-form').hidden = true; document.getElementById('category-update-form').hidden = false; document.getElementById('category-delete-form').hidden = false; document.getElementById('category-update-form').action = '/admin/categories/update/' + card.dataset.id; document.getElementById('category-delete-form').action = '/admin/categories/delete/' + card.dataset.id; document.getElementById('category-name').value = card.dataset.name; document.getElementById('category-description').value = card.dataset.description || ''; }
+		function openCategoryCreate() { document.getElementById('category-sidebar').hidden = false; document.getElementById('category-sidebar-title').textContent = 'Thêm danh mục'; document.getElementById('category-sidebar-hint').textContent = 'Tạo một nhóm sản phẩm mới cho cửa hàng.'; document.getElementById('category-create-form').hidden = false; document.getElementById('category-update-form').hidden = true; document.getElementById('category-delete-form').hidden = true; }
+		function selectCategory(card) { document.querySelectorAll('.cms-item-card').forEach(function (item) { item.classList.remove('selected'); }); card.classList.add('selected'); document.getElementById('category-sidebar').hidden = false; document.getElementById('category-sidebar-title').textContent = 'Chỉnh sửa danh mục'; document.getElementById('category-sidebar-hint').textContent = 'Cập nhật thông tin hoặc xóa danh mục đã chọn.'; document.getElementById('category-create-form').hidden = true; document.getElementById('category-update-form').hidden = false; document.getElementById('category-delete-form').hidden = false; document.getElementById('category-update-form').action = '/admin/categories/update/' + card.dataset.id; document.getElementById('category-delete-form').action = '/admin/categories/delete/' + card.dataset.id; document.getElementById('category-name').value = card.dataset.name; document.getElementById('category-description').value = card.dataset.description || ''; }
 	</script>
 </body></html>
