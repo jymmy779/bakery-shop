@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/cms")
 public class AdminCatalogController {
 
+  //Lấy thẻ từ products
   @GetMapping("/products")
   public String products() {
     return "redirect:/admin/products";
