@@ -10,17 +10,36 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductService {
 
-  ProductDetailResponse create(ProductCreateRequest request);
+  Page<ProductSummaryResponse> getAllProducts(String keyword, Long categoryId,
+      ProductStatus status, Pageable pageable);
 
-  ProductDetailResponse update(Long productId, ProductUpdateRequest request);
+  ProductDetailResponse createProduct(ProductCreateRequest request);
+
+  ProductDetailResponse updateProduct(Long productId, ProductUpdateRequest request);
+
+  void stopSellingProduct(Long productId);
+
+  void deleteProduct(Long productId);
+
+  default ProductDetailResponse create(ProductCreateRequest request) {
+    return createProduct(request);
+  }
+
+  default ProductDetailResponse update(Long productId, ProductUpdateRequest request) {
+    return updateProduct(productId, request);
+  }
 
   ProductDetailResponse getById(Long productId);
 
-  Page<ProductSummaryResponse> search(
+  default Page<ProductSummaryResponse> search(
       String keyword,
       Long categoryId,
       ProductStatus status,
-      Pageable pageable);
+      Pageable pageable) {
+    return getAllProducts(keyword, categoryId, status, pageable);
+  }
 
-  void deleteOrStopSelling(Long productId);
+  default void deleteOrStopSelling(Long productId) {
+    deleteProduct(productId);
+  }
 }

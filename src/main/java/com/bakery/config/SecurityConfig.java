@@ -24,6 +24,7 @@ public class SecurityConfig {
         .requestMatchers(
             "/",
             "/api/products/**",
+            "/products",
             "/cart/**",
             "/register/**",
             "/login",
@@ -38,6 +39,8 @@ public class SecurityConfig {
             .hasRole("CUSTOMER")
         .requestMatchers("/cms/accounts/**", "/cms/staff/**")
             .hasRole("ADMIN")
+        .requestMatchers("/admin/**")
+          .hasAnyRole("STAFF", "ADMIN")
         .requestMatchers("/cms/**")
             .hasAnyRole("STAFF", "ADMIN")
         .anyRequest().authenticated()

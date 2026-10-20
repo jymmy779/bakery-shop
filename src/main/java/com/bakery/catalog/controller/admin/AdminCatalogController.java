@@ -8,14 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/cms")
 public class AdminCatalogController {
 
-  //Lấy thẻ từ products
   @GetMapping("/products")
   public String products() {
-    return "cms/product/list";
+    return "redirect:/admin/products";
   }
 
   @GetMapping("/categories")
   public String categories() {
-    return "cms/category/list";
+    return "redirect:/admin/categories";
   }
 }

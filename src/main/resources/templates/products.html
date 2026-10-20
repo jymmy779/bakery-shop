@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments/layout :: head-meta('Thực đơn')}" />
+</head>
+<body>
+  <div th:replace="~{fragments/layout :: header}"></div>
+  <main class="wrap" style="padding: 4rem 0">
+    <div class="section-head">
+      <div><span class="eyebrow">LUNE BAKERY</span><h1 class="section-title">Thực đơn <em>ngọt ngào</em></h1></div>
+    </div>
+    <form class="product-filters" method="get" th:action="@{/products}">
+      <input type="search" name="keyword" th:value="${keyword}" placeholder="Tìm tên bánh..." aria-label="Tìm sản phẩm">
+      <select name="categoryId" aria-label="Danh mục">
+        <option value="">Tất cả danh mục</option>
+        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == categoryId}"></option>
+      </select>
+      <input type="number" name="minPrice" th:value="${minPrice}" min="0" placeholder="Giá từ" aria-label="Giá thấp nhất">
+      <input type="number" name="maxPrice" th:value="${maxPrice}" min="0" placeholder="Giá đến" aria-label="Giá cao nhất">
+      <select name="sort" aria-label="Sắp xếp">
+        <option value="name" th:selected="${sort == 'name'}">Tên</option>
+        <option value="price_asc" th:selected="${sort == 'price_asc'}">Giá tăng dần</option>
+        <option value="price_desc" th:selected="${sort == 'price_desc'}">Giá giảm dần</option>
+        <option value="best_selling" th:selected="${sort == 'best_selling'}">Bán chạy</option>
+      </select>
+      <button class="btn btn-primary" type="submit">Lọc sản phẩm</button>
+    </form>
+    <div class="products-grid" th:if="${!#lists.isEmpty(products)}">
+      <article class="product-card" th:each="product : ${products}">
+        <div class="product-media"><img th:src="@{/assets/product-placeholder.svg}" th:alt="${product.name}"></div>
+        <div class="product-info">
+          <span class="eyebrow" th:text="${product.categoryName}">Danh mục</span>
+          <h2 th:text="${product.name}">Tên bánh</h2>
+          <p th:text="${product.price} + ' đ'">0 đ</p>
+          <small th:text="${product.stockQuantity > 0 ? 'Còn hàng' : 'Hết hàng'}">Còn hàng</small>
+        </div>
+      </article>
+    </div>
+    <p th:if="${#lists.isEmpty(products)}">Không tìm thấy sản phẩm phù hợp.</p>
+    <nav th:if="${productPage.totalPages > 1}" aria-label="Phân trang" style="margin-top: 2rem">
+      <a class="text-link" th:if="${productPage.hasPrevious()}" th:href="@{/products(page=${productPage.number - 1},size=${productPage.size},keyword=${keyword},categoryId=${categoryId},minPrice=${minPrice},maxPrice=${maxPrice},sort=${sort})}">Trang trước</a>
+      <span th:text="${productPage.number + 1} + ' / ' + ${productPage.totalPages}">1 / 1</span>
+      <a class="text-link" th:if="${productPage.hasNext()}" th:href="@{/products(page=${productPage.number + 1},size=${productPage.size},keyword=${keyword},categoryId=${categoryId},minPrice=${minPrice},maxPrice=${maxPrice},sort=${sort})}">Trang sau</a>
+    </nav>
+  </main>
+  <div th:replace="~{fragments/layout :: footer}"></div>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

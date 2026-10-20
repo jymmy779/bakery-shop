@@ -6,13 +6,27 @@ import java.util.List;
 
 public interface CategoryService {
 
-  CategoryResponse create(CategoryRequest request);
+  List<CategoryResponse> getAllCategories();
 
-  CategoryResponse update(Long categoryId, CategoryRequest request);
+  CategoryResponse createCategory(CategoryRequest request);
+
+  CategoryResponse updateCategory(Long categoryId, CategoryRequest request);
+
+  void deleteCategory(Long categoryId);
+
+  default CategoryResponse create(CategoryRequest request) {
+    return createCategory(request);
+  }
+
+  default CategoryResponse update(Long categoryId, CategoryRequest request) {
+    return updateCategory(categoryId, request);
+  }
 
   CategoryResponse getById(Long categoryId);
 
   List<CategoryResponse> findAllActive();
 
-  void delete(Long categoryId);
+  default void delete(Long categoryId) {
+    deleteCategory(categoryId);
+  }
 }
