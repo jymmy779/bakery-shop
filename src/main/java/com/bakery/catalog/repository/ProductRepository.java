@@ -12,19 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-  long countByCategoryId(Long categoryId);
-
-  @Query("""
-      SELECT p FROM Product p JOIN FETCH p.category c
-      WHERE (:status IS NULL OR p.status = :status)
-        AND (:categoryId IS NULL OR c.id = :categoryId)
-        AND (:keyword IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
-      ORDER BY p.name ASC, p.id ASC
-      """)
-  Page<Product> searchAdmin(@Param("keyword") String keyword,
-      @Param("categoryId") Long categoryId,
-      @Param("status") com.bakery.catalog.entity.ProductStatus status,
-      Pageable pageable);
   @Override
   @EntityGraph(attributePaths = "category")
   List<Product> findAll(Sort sort);

@@ -7,6 +7,9 @@ uploads/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Local Spring profile
+src/main/resources/application-dev.properties
+
 ### STS ###
 .apt_generated
 .classpath

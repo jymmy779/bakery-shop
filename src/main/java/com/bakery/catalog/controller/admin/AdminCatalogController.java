@@ -11,11 +11,11 @@ public class AdminCatalogController {
   //Lấy thẻ từ products
   @GetMapping("/products")
   public String products() {
-    return "redirect:/admin/products";
+    return "cms/product/list";
   }
 
   @GetMapping("/categories")
   public String categories() {
-    return "redirect:/admin/categories";
+    return "cms/category/list";
   }
 }
