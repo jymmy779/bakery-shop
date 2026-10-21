@@ -1268,6 +1268,9 @@ h1, h2, h3, h4, h5, h6 { margin: 0; }
 .price-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px; }
 .price-suggestion { border: 1px solid var(--rose); border-radius: 3px; background: var(--blush); color: var(--wine); padding: 6px 8px; font-size: 11px; cursor: pointer; }
 .price-suggestion:hover { background: var(--rose); }
+.image-upload-hint { display: block; margin-top: -6px; color: var(--muted); font-size: 11px; }
+.image-upload-preview { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 10px; }
+.image-upload-preview span { padding: 4px 7px; border: 1px solid var(--rose); border-radius: 3px; color: var(--wine); font-size: 10px; }
 .cms-side-panel .danger-action { margin-top: 4px; background: #fff4f1; color: #9c4e49; border-color: #eacbc4; }
 .cms-filter { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 .cms-filter-title { color: var(--muted); font-size: 11px; font-weight: 700; margin: 0 0 8px; }

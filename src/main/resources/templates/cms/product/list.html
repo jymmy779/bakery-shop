@@ -70,7 +70,10 @@
         <label>Số ngày chuẩn bị</label><input th:field="*{preparationDays}" type="number" min="0" required>
         <label>Danh mục</label><select th:field="*{categoryId}" required><option value="">Chọn danh mục</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
         <label>Mô tả</label><textarea th:field="*{description}" required></textarea>
-        <label>Hình ảnh</label><input th:field="*{images}" type="file" multiple accept="image/*">
+        <label>Hình ảnh</label>
+        <input th:field="*{images}" id="create-product-images" type="file" multiple accept="image/*">
+        <small class="image-upload-hint">Chọn từ 1 đến 4 ảnh. Có thể chọn nhiều ảnh cùng lúc hoặc chọn bổ sung.</small>
+        <div class="image-upload-preview" id="create-image-preview" aria-live="polite"></div>
         <button class="btn btn-primary" type="submit">Thêm sản phẩm</button>
       </form>
       <form method="post" enctype="multipart/form-data" action="/cms/products/update/0" id="product-update-form" hidden data-confirm-message="Bạn có muốn cập nhật sản phẩm này không?">
@@ -83,7 +86,10 @@
         <label>Danh mục</label><select name="categoryId" id="product-category" required><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
         <label>Trạng thái bán</label><select name="status" id="product-status" required><option value="SELLING">Đang bán</option><option value="STOPPED">Ngừng bán</option></select>
         <label>Mô tả</label><textarea name="description" id="product-description" required></textarea>
-        <label>Ảnh mới</label><input name="newImages" type="file" multiple accept="image/*">
+        <label>Ảnh mới</label>
+        <input name="newImages" id="update-product-images" type="file" multiple accept="image/*">
+        <small class="image-upload-hint">Chọn bổ sung ảnh mới. Backend sẽ kiểm tra tổng số ảnh không vượt quá 4.</small>
+        <div class="image-upload-preview" id="update-image-preview" aria-live="polite"></div>
         <button class="btn btn-primary" type="submit">Cập nhật sản phẩm</button>
       </form>
     </aside>
@@ -94,7 +100,35 @@
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
 <script>
 function openProductCreate() { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Thêm sản phẩm'; document.getElementById('product-create-form').hidden = false; document.getElementById('product-update-form').hidden = true; }
-function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-description').value = button.dataset.description || ''; updatePriceSuggestions('product-price', 'update-price-suggestions'); }
+function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-description').value = button.dataset.description || ''; document.getElementById('update-product-images').value = ''; document.getElementById('update-image-preview').replaceChildren(); updatePriceSuggestions('product-price', 'update-price-suggestions'); }
+function setupImagePicker(inputId, previewId, maxFiles) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  let selectedFiles = [];
+  input.addEventListener('change', function () {
+    selectedFiles = selectedFiles.concat(Array.from(input.files));
+    const uniqueFiles = [];
+    selectedFiles.forEach(function (file) {
+      if (!uniqueFiles.some(function (item) {
+        return item.name === file.name && item.size === file.size && item.lastModified === file.lastModified;
+      })) uniqueFiles.push(file);
+    });
+    selectedFiles = uniqueFiles;
+    if (selectedFiles.length > maxFiles) {
+      selectedFiles = selectedFiles.slice(0, maxFiles);
+      window.alert('Chỉ được chọn tối đa ' + maxFiles + ' ảnh.');
+    }
+    const transfer = new DataTransfer();
+    selectedFiles.forEach(function (file) { transfer.items.add(file); });
+    input.files = transfer.files;
+    preview.replaceChildren();
+    selectedFiles.forEach(function (file) {
+      const item = document.createElement('span');
+      item.textContent = file.name;
+      preview.appendChild(item);
+    });
+  });
+}
 function updatePriceSuggestions(inputId, suggestionsId) {
   const input = document.getElementById(inputId);
   const suggestions = document.getElementById(suggestionsId);
@@ -116,6 +150,8 @@ function updatePriceSuggestions(inputId, suggestionsId) {
 }
 document.getElementById('create-product-price').addEventListener('input', function () { updatePriceSuggestions('create-product-price', 'create-price-suggestions'); });
 document.getElementById('product-price').addEventListener('input', function () { updatePriceSuggestions('product-price', 'update-price-suggestions'); });
+setupImagePicker('create-product-images', 'create-image-preview', 4);
+setupImagePicker('update-product-images', 'update-image-preview', 4);
 </script>
 </body>
 </html>
