@@ -64,7 +64,8 @@
       <form method="post" enctype="multipart/form-data" th:action="@{/cms/products/add}" th:object="${createRequest}" id="product-create-form" data-confirm-message="Bạn có muốn thêm sản phẩm này không?">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <label>Tên sản phẩm</label><input th:field="*{name}" required>
-        <label>Giá (VNĐ)</label><input th:field="*{price}" type="number" min="1" required>
+        <label>Giá (VNĐ)</label><input th:field="*{price}" id="create-product-price" type="number" min="1" step="1" required>
+        <div class="price-suggestions" id="create-price-suggestions" aria-label="Gợi ý giá"></div>
         <label>Tồn kho</label><input th:field="*{stockQuantity}" type="number" min="0" required>
         <label>Số ngày chuẩn bị</label><input th:field="*{preparationDays}" type="number" min="0" required>
         <label>Danh mục</label><select th:field="*{categoryId}" required><option value="">Chọn danh mục</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
@@ -75,7 +76,8 @@
       <form method="post" enctype="multipart/form-data" action="/cms/products/update/0" id="product-update-form" hidden data-confirm-message="Bạn có muốn cập nhật sản phẩm này không?">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         <label>Tên sản phẩm</label><input name="name" id="product-name" required>
-        <label>Giá (VNĐ)</label><input name="price" id="product-price" type="number" min="1" required>
+        <label>Giá (VNĐ)</label><input name="price" id="product-price" type="number" min="1" step="1" required>
+        <div class="price-suggestions" id="update-price-suggestions" aria-label="Gợi ý giá"></div>
         <label>Tồn kho</label><input name="stockQuantity" id="product-stock" type="number" min="0" required>
         <label>Số ngày chuẩn bị</label><input name="preparationDays" id="product-preparation" type="number" min="0" required>
         <label>Danh mục</label><select name="categoryId" id="product-category" required><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
@@ -92,7 +94,28 @@
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
 <script>
 function openProductCreate() { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Thêm sản phẩm'; document.getElementById('product-create-form').hidden = false; document.getElementById('product-update-form').hidden = true; }
-function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-description').value = button.dataset.description || ''; }
+function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-description').value = button.dataset.description || ''; updatePriceSuggestions('product-price', 'update-price-suggestions'); }
+function updatePriceSuggestions(inputId, suggestionsId) {
+  const input = document.getElementById(inputId);
+  const suggestions = document.getElementById(suggestionsId);
+  const value = Number(input.value);
+  suggestions.replaceChildren();
+  if (!Number.isFinite(value) || value <= 0) return;
+  [100, 1000, 10000].forEach(function (multiplier) {
+    const suggestedValue = value * multiplier;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'price-suggestion';
+    button.textContent = suggestedValue.toLocaleString('vi-VN') + ' đ';
+    button.addEventListener('click', function () {
+      input.value = suggestedValue;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    suggestions.appendChild(button);
+  });
+}
+document.getElementById('create-product-price').addEventListener('input', function () { updatePriceSuggestions('create-product-price', 'create-price-suggestions'); });
+document.getElementById('product-price').addEventListener('input', function () { updatePriceSuggestions('product-price', 'update-price-suggestions'); });
 </script>
 </body>
 </html>
