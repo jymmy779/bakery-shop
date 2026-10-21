@@ -15,6 +15,7 @@ import com.bakery.catalog.repository.CategoryRepository;
 import com.bakery.catalog.repository.ProductImageRepository;
 import com.bakery.catalog.repository.ProductRepository;
 import com.bakery.order.repository.OrderDetailRepository;
+import com.bakery.order.entity.OrderDetail;
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -92,7 +93,9 @@ class ProductServiceImplTest {
   @Test
   void doesNotDeleteProductReferencedByOrder() {
     when(products.findById(5L)).thenReturn(Optional.of(product(5L)));
-    when(orderDetails.countByProductId(5L)).thenReturn(1L);
+    OrderDetail orderDetail = new OrderDetail();
+    orderDetail.setProduct(product(5L));
+    when(orderDetails.findAll()).thenReturn(java.util.List.of(orderDetail));
 
     assertThrows(IllegalStateException.class, () -> service.deleteProduct(5L));
   }
@@ -101,7 +104,7 @@ class ProductServiceImplTest {
   void deletesProductWithoutOrders() {
     Product product = product(5L);
     when(products.findById(5L)).thenReturn(Optional.of(product));
-    when(orderDetails.countByProductId(5L)).thenReturn(0L);
+    when(orderDetails.findAll()).thenReturn(java.util.List.of());
     when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(java.util.List.of(5L)))
         .thenReturn(java.util.List.of());
 

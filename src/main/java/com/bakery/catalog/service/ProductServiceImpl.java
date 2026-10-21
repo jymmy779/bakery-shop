@@ -28,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class ProductServiceImpl implements ProductService {
+public class ProductServiceImpl implements ProductService, CatalogAdminProductService {
   private final ProductRepository products;
   private final ProductImageRepository images;
   private final CategoryRepository categories;
@@ -89,14 +89,46 @@ public class ProductServiceImpl implements ProductService {
   @Transactional
   public void deleteProduct(Long productId) {
     Product product = find(productId);
-    if (orderDetails.countByProductId(productId) > 0) {
+    if (orderDetails.findAll().stream()
+        .anyMatch(orderDetail -> orderDetail.getProduct().getId().equals(productId))) {
       throw new IllegalStateException(
           "Sản phẩm đã từng có trong đơn hàng, hãy dùng chức năng Ngừng bán để bảo toàn lịch sử mua hàng");
     }
+
     List<ProductImage> productImages = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(productId));
     images.deleteAll(productImages);
     productImages.forEach(image -> deleteFile(image.getImagePath()));
     products.delete(product);
+  }
+
+  @Override
+  @Transactional
+  public ProductDetailResponse create(ProductCreateRequest request) {
+    return createProduct(request);
+  }
+
+  @Override
+  @Transactional
+  public ProductDetailResponse update(Long productId, ProductUpdateRequest request) {
+    return updateProduct(productId, request);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<ProductSummaryResponse> search(String keyword, Long categoryId,
+      ProductStatus status, Pageable pageable) {
+    return getAllProducts(keyword, categoryId, status, pageable);
+  }
+
+  @Override
+  @Transactional
+  public void deleteOrStopSelling(Long productId) {
+    if (orderDetails.findAll().stream()
+        .anyMatch(orderDetail -> orderDetail.getProduct().getId().equals(productId))) {
+      stopSellingProduct(productId);
+    } else {
+      deleteProduct(productId);
+    }
   }
 
   private void copy(Product product, String name, String description, java.math.BigDecimal price,
@@ -151,7 +183,6 @@ public class ProductServiceImpl implements ProductService {
     ProductSummaryResponse response = new ProductSummaryResponse();
     response.setId(product.getId());
     response.setName(product.getName());
-    response.setDescription(product.getDescription());
     response.setPrice(product.getPrice());
     response.setStockQuantity(product.getStockQuantity());
     response.setPreparationDays(product.getPreparationDays());

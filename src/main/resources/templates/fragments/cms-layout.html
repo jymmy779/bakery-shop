@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title}">Bakery CMS</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="cms-shell">
+<header th:fragment="header" class="cms-header">
+  <a class="cms-brand" th:href="@{/cms}">LUNE Bakery CMS</a>
+  <nav class="cms-nav" aria-label="Điều hướng quản trị">
+    <a th:href="@{/cms}">Tổng quan</a>
+    <a th:href="@{/cms/products}">Sản phẩm</a>
+    <a th:href="@{/cms/categories}">Danh mục</a>
+    <a th:href="@{/cms/orders}">Đơn hàng</a>
+    <a th:href="@{/logout}">Đăng xuất</a>
+  </nav>
+</header>
+<footer th:fragment="footer" class="cms-footer">
+  <span>LUNE Bakery CMS</span>
+</footer>
+<div th:fragment="confirm-dialog" id="confirm-dialog" hidden>
+  <div class="confirm-dialog__content">
+    <p id="confirm-dialog-message"></p>
+    <button type="button" data-confirm-cancel>Hủy</button>
+    <button type="button" data-confirm-submit>Xác nhận</button>
+  </div>
+</div>
+<th:block th:fragment="scripts">
+  <script>
+    document.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!window.confirm(form.dataset.confirmMessage)) {
+          event.preventDefault();
+        }
+      });
+    });
+  </script>
+</th:block>
+</body>
+</html>

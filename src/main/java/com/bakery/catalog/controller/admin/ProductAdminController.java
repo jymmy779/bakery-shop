@@ -3,8 +3,8 @@ package com.bakery.catalog.controller.admin;
 import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductUpdateRequest;
 import com.bakery.catalog.entity.ProductStatus;
-import com.bakery.catalog.repository.CategoryRepository;
-import com.bakery.catalog.service.ProductService;
+import com.bakery.catalog.service.CatalogAdminProductService;
+import com.bakery.catalog.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-@RequestMapping("/admin/products")
+@RequestMapping("/cms/products")
 @RequiredArgsConstructor
 public class  ProductAdminController {
-  private final ProductService productService;
-  private final CategoryRepository categories;
+  private final CatalogAdminProductService productService;
+  private final CategoryService categoryService;
 
   @GetMapping
   public String getAllProducts(@RequestParam(defaultValue = "0") int page,
@@ -33,7 +33,7 @@ public class  ProductAdminController {
       @RequestParam(required = false) ProductStatus status, Model model) {
     model.addAttribute("products", productService.getAllProducts(keyword, categoryId, status,
         PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100))));
-    model.addAttribute("categories", categories.findAll());
+    model.addAttribute("categories", categoryService.findAllActive());
     model.addAttribute("keyword", keyword);
     model.addAttribute("categoryId", categoryId);
     model.addAttribute("status", status);
@@ -72,7 +72,7 @@ public class  ProductAdminController {
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
     }
-    return "redirect:/admin/products";
+    return "redirect:/cms/products";
   }
 
   @PostMapping(value = "/update/{id}", consumes = "multipart/form-data")
@@ -85,7 +85,7 @@ public class  ProductAdminController {
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
     }
-    return "redirect:/admin/products";
+    return "redirect:/cms/products";
   }
 
   @PostMapping("/delete/{id}")
@@ -96,7 +96,7 @@ public class  ProductAdminController {
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
     }
-    return "redirect:/admin/products";
+    return "redirect:/cms/products";
   }
 
   @PostMapping("/stop-selling/{id}")
@@ -107,16 +107,16 @@ public class  ProductAdminController {
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
     }
-    return "redirect:/admin/products";
+    return "redirect:/cms/products";
   }
 
   private String errorRedirect(RedirectAttributes redirect, String message) {
     redirect.addFlashAttribute("errorMessage", message);
-    return "redirect:/admin/products";
+    return "redirect:/cms/products";
   }
 
   private void addFormData(Model model) {
-    model.addAttribute("categories", categories.findAll());
+    model.addAttribute("categories", categoryService.findAllActive());
     model.addAttribute("createRequest", new ProductCreateRequest());
     model.addAttribute("statuses", ProductStatus.values());
   }

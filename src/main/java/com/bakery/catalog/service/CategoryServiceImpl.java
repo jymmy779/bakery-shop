@@ -17,13 +17,13 @@ public class CategoryServiceImpl implements CategoryService {
   private final CategoryRepository categories;
   private final ProductRepository products;
 
-  @Override
   @Transactional
   public CategoryResponse createCategory(CategoryRequest request) {
     String name = request.getName().trim();
     if (categories.findByNameIgnoreCase(name).isPresent()) {
       throw new IllegalArgumentException("Tên danh mục đã tồn tại!");
     }
+
     Category category = new Category();
     category.setName(name);
     category.setDescription(request.getDescription());
@@ -32,6 +32,10 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
+  public CategoryResponse create(CategoryRequest request) {
+    return createCategory(request);
+  }
+
   @Transactional
   public CategoryResponse updateCategory(Long categoryId, CategoryRequest request) {
     Category category = find(categoryId);
@@ -44,12 +48,16 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
+  public CategoryResponse update(Long categoryId, CategoryRequest request) {
+    return updateCategory(categoryId, request);
+  }
+
+  @Override
   @Transactional(readOnly = true)
   public CategoryResponse getById(Long categoryId) {
     return toResponse(find(categoryId));
   }
 
-  @Override
   @Transactional(readOnly = true)
   public List<CategoryResponse> getAllCategories() {
     return categories.findAll().stream().map(this::toResponse).toList();
@@ -61,13 +69,18 @@ public class CategoryServiceImpl implements CategoryService {
     return categories.findAll().stream().filter(Category::isActive).map(this::toResponse).toList();
   }
 
-  @Override
   @Transactional
   public void deleteCategory(Long categoryId) {
     if (products.countByCategoryId(categoryId) > 0) {
       throw new IllegalStateException("Không thể xóa danh mục đang chứa sản phẩm!");
     }
+
     categories.delete(find(categoryId));
+  }
+
+  @Override
+  public void delete(Long categoryId) {
+    deleteCategory(categoryId);
   }
 
   private Category find(Long id) {
