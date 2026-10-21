@@ -39,16 +39,34 @@ public class BootstrapDataConfig implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
-    if (!enabled || accountRepository.existsByEmailIgnoreCase(adminEmail)) {
+    if (!enabled) {
       return;
     }
 
-    Account admin = new Account();
-    admin.setEmail(adminEmail.trim().toLowerCase());
-    admin.setPasswordHash(passwordEncoder.encode(adminPassword));
-    admin.setFullName(adminName);
-    admin.setRole(Role.ROLE_ADMIN);
-    admin.setStatus(AccountStatus.ACTIVE);
-    accountRepository.save(admin);
+    createAccountIfMissing(adminEmail, adminPassword, adminName, Role.ROLE_ADMIN);
+    createAccountIfMissing(
+        "staff@bakery.local",
+        "staff123",
+        "Nhân viên Demo",
+        Role.ROLE_STAFF);
+    createAccountIfMissing(
+        "customer@bakery.local",
+        "customer123",
+        "Khách hàng Demo",
+        Role.ROLE_CUSTOMER);
+  }
+
+  private void createAccountIfMissing(String email, String password, String name, Role role) {
+    if (accountRepository.existsByEmailIgnoreCase(email)) {
+      return;
+    }
+
+    Account account = new Account();
+    account.setEmail(email.trim().toLowerCase());
+    account.setPasswordHash(passwordEncoder.encode(password));
+    account.setFullName(name);
+    account.setRole(role);
+    account.setStatus(AccountStatus.ACTIVE);
+    accountRepository.save(account);
   }
 }

@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -27,6 +28,7 @@ public class SecurityConfig {
             "/cart/**",
             "/register/**",
             "/login",
+            "/cms/login",
             "/forgot-password/**",
             "/error",
             "/css/**",
@@ -42,11 +44,42 @@ public class SecurityConfig {
             .hasAnyRole("STAFF", "ADMIN")
         .anyRequest().authenticated()
       )
+      .exceptionHandling(exceptions -> exceptions
+        .authenticationEntryPoint((request, response, exception) -> {
+          String loginPage = request.getRequestURI().startsWith("/cms/")
+              ? "/cms/login"
+              : "/login";
+          response.sendRedirect(request.getContextPath() + loginPage);
+        })
+      )
       .formLogin(form -> form
         .loginPage("/login")
         .usernameParameter("email")
-        .defaultSuccessUrl("/", false)
-        .failureUrl("/login?error")
+        .successHandler((request, response, authentication) -> {
+          boolean cmsLogin = "cms".equals(request.getParameter("loginType"));
+          boolean customer = authentication.getAuthorities().stream()
+              .anyMatch(authority -> authority.getAuthority().equals("ROLE_CUSTOMER"));
+          boolean cmsUser = authentication.getAuthorities().stream()
+              .anyMatch(authority -> authority.getAuthority().equals("ROLE_STAFF")
+                  || authority.getAuthority().equals("ROLE_ADMIN"));
+
+          if ((cmsLogin && !cmsUser) || (!cmsLogin && !customer)) {
+            SecurityContextHolder.clearContext();
+            if (request.getSession(false) != null) {
+              request.getSession(false).invalidate();
+            }
+            response.sendRedirect(cmsLogin ? "/cms/login?roleError" : "/login?roleError");
+            return;
+          }
+
+          response.sendRedirect(cmsLogin ? "/cms" : "/");
+        })
+        .failureHandler((request, response, exception) -> {
+          String failureUrl = "cms".equals(request.getParameter("loginType"))
+              ? "/cms/login?error"
+              : "/login?error";
+          response.sendRedirect(failureUrl);
+        })
         .permitAll()
       )
       .logout(logout -> logout
