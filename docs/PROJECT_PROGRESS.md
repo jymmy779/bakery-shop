@@ -90,6 +90,12 @@ Mẫu một dòng cập nhật:
 | Lương Việt Thái | Giao diện chung và dữ liệu mẫu | Cập nhật layout, CSS, trang chủ, các trang auth/cart và tài nguyên giao diện | Đã merge | PR #3, `272b002` | Cần demo lại sau khi nối logic thật | Tiếp tục Security, Email, File Storage và hỗ trợ tích hợp |
 | Nguyễn Trần Thái Sơn | Catalog Admin | Bổ sung controller/service CRUD danh mục, sản phẩm và giao diện CMS | Chờ review lại | PR #4, `42dc259`; bị revert bởi PR #5 ngày 20/10 | Chưa được nghiệm thu trên `master` hiện tại | Sửa lỗi/xung đột, tạo PR mới và demo CRUD |
 
+### 21/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Lương Việt Thái | Giao diện chung, đăng nhập Customer và CMS | Sửa lỗi render trang chủ và border header; tách `/login` cho Customer, thêm `/cms/login` với layout riêng cho Staff/Admin, phân luồng Security theo vai trò và thêm tài khoản/nút đăng nhập demo | Đang làm | `master`; Chưa có | Maven compile/context test đạt; toàn bộ suite còn 4 test `ProductControllerTest` lỗi 404 không thuộc thay đổi này | Restart ứng dụng và demo `/`, `/login`, `/cms/login`; xử lý riêng 4 test Product Controller |
+
 ## Mẫu checkpoint sprint mới
 
 Sao chép khối dưới đây và đặt phía trên sprint cũ:
