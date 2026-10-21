@@ -3,8 +3,8 @@ package com.bakery.catalog.controller.admin;
 import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductUpdateRequest;
 import com.bakery.catalog.entity.ProductStatus;
-import com.bakery.catalog.service.CatalogAdminProductService;
 import com.bakery.catalog.service.CategoryService;
+import com.bakery.catalog.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/cms/products")
 @RequiredArgsConstructor
 public class  ProductAdminController {
-  private final CatalogAdminProductService productService;
+  private final ProductService productService;
   private final CategoryService categoryService;
 
   @GetMapping
@@ -31,7 +31,7 @@ public class  ProductAdminController {
       @RequestParam(defaultValue = "") String keyword,
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false) ProductStatus status, Model model) {
-    model.addAttribute("products", productService.getAllProducts(keyword, categoryId, status,
+    model.addAttribute("products", productService.search(keyword, categoryId, status,
         PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100))));
     model.addAttribute("categories", categoryService.findAllActive());
     model.addAttribute("keyword", keyword);
@@ -42,32 +42,11 @@ public class  ProductAdminController {
     return "cms/product/list";
   }
 
-  @GetMapping("/create")
-  public String showCreateForm(Model model) {
-    model.addAttribute("products", productService.getAllProducts(null, null, null, PageRequest.of(0, 10)));
-    model.addAttribute("keyword", "");
-    model.addAttribute("categoryId", null);
-    model.addAttribute("status", null);
-    addFormData(model);
-    return "cms/product/list";
-  }
-
-  @GetMapping("/edit/{id}")
-  public String showEditForm(@PathVariable Long id, Model model) {
-    model.addAttribute("products", productService.getAllProducts(null, null, null, PageRequest.of(0, 10)));
-    model.addAttribute("keyword", "");
-    model.addAttribute("categoryId", null);
-    model.addAttribute("status", null);
-    addFormData(model);
-    model.addAttribute("editProduct", productService.getById(id));
-    return "cms/product/list";
-  }
-
   @PostMapping(value = "/add", consumes = "multipart/form-data")
   public String createProduct(@Valid ProductCreateRequest request, BindingResult result, RedirectAttributes redirect) {
     if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu sản phẩm không hợp lệ!");
     try {
-      productService.createProduct(request);
+      productService.create(request);
       redirect.addFlashAttribute("successMessage", "Thêm sản phẩm thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -80,7 +59,7 @@ public class  ProductAdminController {
       BindingResult result, RedirectAttributes redirect) {
     if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu sản phẩm không hợp lệ!");
     try {
-      productService.updateProduct(id, request);
+      productService.update(id, request);
       redirect.addFlashAttribute("successMessage", "Cập nhật sản phẩm thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -91,7 +70,7 @@ public class  ProductAdminController {
   @PostMapping("/delete/{id}")
   public String deleteProduct(@PathVariable Long id, RedirectAttributes redirect) {
     try {
-      productService.deleteProduct(id);
+      productService.deleteOrStopSelling(id);
       redirect.addFlashAttribute("successMessage", "Xóa sản phẩm thành công");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -115,9 +94,4 @@ public class  ProductAdminController {
     return "redirect:/cms/products";
   }
 
-  private void addFormData(Model model) {
-    model.addAttribute("categories", categoryService.findAllActive());
-    model.addAttribute("createRequest", new ProductCreateRequest());
-    model.addAttribute("statuses", ProductStatus.values());
-  }
 }

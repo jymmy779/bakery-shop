@@ -1,7 +1,6 @@
-package com.bakery.catalog.service;
+package com.bakery.catalog.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,8 +13,9 @@ import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.repository.CategoryRepository;
 import com.bakery.catalog.repository.ProductImageRepository;
 import com.bakery.catalog.repository.ProductRepository;
-import com.bakery.order.repository.OrderDetailRepository;
-import com.bakery.order.entity.OrderDetail;
+import com.bakery.catalog.service.CatalogQueryService;
+import com.bakery.order.service.ProductOrderReferenceService;
+import com.bakery.storage.FileStorageService;
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,8 @@ class ProductServiceImplTest {
   @Mock ProductRepository products;
   @Mock ProductImageRepository images;
   @Mock CategoryRepository categories;
-  @Mock OrderDetailRepository orderDetails;
+  @Mock ProductOrderReferenceService orderReferences;
+  @Mock FileStorageService fileStorage;
   @Mock CatalogQueryService catalog;
 
   private ProductServiceImpl service;
@@ -39,8 +40,8 @@ class ProductServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    service = new ProductServiceImpl(products, images, categories, orderDetails, catalog);
-    ReflectionTestUtils.setField(service, "uploadDirectory", "target/test-uploads");
+    service = new ProductServiceImpl(products, images, categories, orderReferences, catalog,
+        fileStorage);
     category = new Category();
     category.setId(1L);
     category.setName("Bánh");
@@ -60,7 +61,7 @@ class ProductServiceImplTest {
     saved.setId(5L);
     when(products.save(any(Product.class))).thenReturn(saved);
 
-    service.createProduct(request);
+    service.create(request);
 
     verify(products).save(any(Product.class));
     verify(catalog).getById(5L);
@@ -73,7 +74,7 @@ class ProductServiceImplTest {
     when(categories.findById(1L)).thenReturn(Optional.of(category));
     ProductUpdateRequest request = updateRequest(ProductStatus.STOPPED);
 
-    service.updateProduct(5L, request);
+    service.update(5L, request);
 
     assertEquals("Bánh sửa", product.getName());
     assertEquals(ProductStatus.STOPPED, product.getStatus());
@@ -92,23 +93,25 @@ class ProductServiceImplTest {
 
   @Test
   void doesNotDeleteProductReferencedByOrder() {
-    when(products.findById(5L)).thenReturn(Optional.of(product(5L)));
-    OrderDetail orderDetail = new OrderDetail();
-    orderDetail.setProduct(product(5L));
-    when(orderDetails.findAll()).thenReturn(java.util.List.of(orderDetail));
+    Product product = product(5L);
+    when(products.findById(5L)).thenReturn(Optional.of(product));
+    when(orderReferences.hasOrders(5L)).thenReturn(true);
 
-    assertThrows(IllegalStateException.class, () -> service.deleteProduct(5L));
+    service.deleteOrStopSelling(5L);
+
+    assertEquals(ProductStatus.STOPPED, product.getStatus());
+    verify(products, org.mockito.Mockito.never()).delete(any(Product.class));
   }
 
   @Test
   void deletesProductWithoutOrders() {
     Product product = product(5L);
     when(products.findById(5L)).thenReturn(Optional.of(product));
-    when(orderDetails.findAll()).thenReturn(java.util.List.of());
+    when(orderReferences.hasOrders(5L)).thenReturn(false);
     when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(java.util.List.of(5L)))
         .thenReturn(java.util.List.of());
 
-    service.deleteProduct(5L);
+    service.deleteOrStopSelling(5L);
 
     verify(products).delete(product);
   }
@@ -119,7 +122,7 @@ class ProductServiceImplTest {
     when(products.searchAdmin("cake", 1L, ProductStatus.SELLING, pageable))
         .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of(), pageable, 0));
 
-    var result = service.getAllProducts(" cake ", 1L, ProductStatus.SELLING, pageable);
+    var result = service.search(" cake ", 1L, ProductStatus.SELLING, pageable);
 
     assertEquals(0, result.getTotalElements());
     verify(products).searchAdmin("cake", 1L, ProductStatus.SELLING, pageable);

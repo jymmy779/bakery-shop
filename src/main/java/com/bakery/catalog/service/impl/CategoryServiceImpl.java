@@ -1,4 +1,4 @@
-package com.bakery.catalog.service;
+package com.bakery.catalog.service.impl;
 
 import com.bakery.catalog.dto.CategoryRequest;
 import com.bakery.catalog.dto.CategoryResponse;
@@ -6,6 +6,7 @@ import com.bakery.catalog.entity.Category;
 import com.bakery.catalog.repository.CategoryRepository;
 import com.bakery.catalog.repository.ProductRepository;
 import com.bakery.common.exception.ResourceNotFoundException;
+import com.bakery.catalog.service.CategoryService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,8 @@ public class CategoryServiceImpl implements CategoryService {
   private final ProductRepository products;
 
   @Transactional
-  public CategoryResponse createCategory(CategoryRequest request) {
+  @Override
+  public CategoryResponse create(CategoryRequest request) {
     String name = request.getName().trim();
     if (categories.findByNameIgnoreCase(name).isPresent()) {
       throw new IllegalArgumentException("Tên danh mục đã tồn tại!");
@@ -31,13 +33,9 @@ public class CategoryServiceImpl implements CategoryService {
     return toResponse(categories.save(category));
   }
 
-  @Override
-  public CategoryResponse create(CategoryRequest request) {
-    return createCategory(request);
-  }
-
   @Transactional
-  public CategoryResponse updateCategory(Long categoryId, CategoryRequest request) {
+  @Override
+  public CategoryResponse update(Long categoryId, CategoryRequest request) {
     Category category = find(categoryId);
     String name = request.getName().trim();
     categories.findByNameIgnoreCase(name).filter(existing -> !existing.getId().equals(categoryId))
@@ -48,19 +46,9 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Override
-  public CategoryResponse update(Long categoryId, CategoryRequest request) {
-    return updateCategory(categoryId, request);
-  }
-
-  @Override
   @Transactional(readOnly = true)
   public CategoryResponse getById(Long categoryId) {
     return toResponse(find(categoryId));
-  }
-
-  @Transactional(readOnly = true)
-  public List<CategoryResponse> getAllCategories() {
-    return categories.findAll().stream().map(this::toResponse).toList();
   }
 
   @Override
@@ -70,17 +58,13 @@ public class CategoryServiceImpl implements CategoryService {
   }
 
   @Transactional
-  public void deleteCategory(Long categoryId) {
+  @Override
+  public void delete(Long categoryId) {
     if (products.countByCategoryId(categoryId) > 0) {
       throw new IllegalStateException("Không thể xóa danh mục đang chứa sản phẩm!");
     }
 
     categories.delete(find(categoryId));
-  }
-
-  @Override
-  public void delete(Long categoryId) {
-    deleteCategory(categoryId);
   }
 
   private Category find(Long id) {

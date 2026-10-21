@@ -1242,6 +1242,9 @@ h1, h2, h3, h4, h5, h6 { margin: 0; }
 .confirm-actions .btn-confirm { background: var(--wine); color: #fff; }
 .confirm-actions .btn-confirm.danger { background: #9b514b; }
 .cms-card-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+.cms-catalog-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; }
+.cms-catalog-layout > .cms-side-panel { grid-column: 1; grid-row: 1; }
+.cms-catalog-layout > .cms-panel { grid-column: 2; grid-row: 1; min-width: 0; }
 .cms-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 18px; }
 .cms-item-card { position: relative; border: 1px solid #ece3de; background: #fffdf9; border-radius: 4px; overflow: hidden; text-align: left; cursor: pointer; transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition); }
 .cms-item-card:hover, .cms-item-card.selected { transform: translateY(-3px); border-color: #c99691; box-shadow: var(--shadow-sm); }
@@ -1296,7 +1299,12 @@ h1, h2, h3, h4, h5, h6 { margin: 0; }
 .staff-update-form input { width: 100%; border: 1px solid var(--stroke); background: #fff; padding: 9px 10px; border-radius: 3px; color: var(--ink); }
 .staff-status-button { width: 100%; }
 .staff-empty { grid-column: 1 / -1; margin: 0; padding: 24px; color: var(--muted); text-align: center; background: #fffdf9; border: 1px solid var(--stroke); border-radius: 6px; }
-@media (max-width: 820px) { .cms-card-layout { grid-template-columns: 1fr; } .cms-side-panel { position: static; order: -1; } }
+@media (max-width: 820px) {
+  .cms-card-layout, .cms-catalog-layout { grid-template-columns: 1fr; }
+  .cms-catalog-layout > .cms-side-panel,
+  .cms-catalog-layout > .cms-panel { grid-column: 1; grid-row: auto; }
+  .cms-side-panel { position: static; order: -1; }
+}
 
 /* ====================================================
    TOAST

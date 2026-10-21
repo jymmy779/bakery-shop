@@ -23,4 +23,6 @@ public interface ProductService {
       Pageable pageable);
 
   void deleteOrStopSelling(Long productId);
+
+  void stopSellingProduct(Long productId);
 }

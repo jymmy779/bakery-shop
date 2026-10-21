@@ -1,4 +1,4 @@
-package com.bakery.catalog.service;
+package com.bakery.catalog.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,7 +40,7 @@ class CategoryServiceImplTest {
     when(categories.findByNameIgnoreCase("Bánh kem")).thenReturn(Optional.empty());
     when(categories.save(org.mockito.ArgumentMatchers.any(Category.class))).thenReturn(saved);
 
-    var result = service.createCategory(request);
+    var result = service.create(request);
 
     assertEquals(1L, result.getId());
     assertEquals("Bánh kem", result.getName());
@@ -53,7 +53,7 @@ class CategoryServiceImplTest {
     when(categories.findById(1L)).thenReturn(Optional.of(category));
     when(categories.findByNameIgnoreCase("Mới")).thenReturn(Optional.empty());
 
-    var result = service.updateCategory(1L, request("Mới", "Mô tả mới"));
+    var result = service.update(1L, request("Mới", "Mô tả mới"));
 
     assertEquals("Mới", result.getName());
     assertEquals("Mô tả mới", result.getDescription());
@@ -63,7 +63,7 @@ class CategoryServiceImplTest {
   void rejectsDeletingCategoryThatContainsProducts() {
     when(products.countByCategoryId(1L)).thenReturn(2L);
 
-    assertThrows(IllegalStateException.class, () -> service.deleteCategory(1L));
+    assertThrows(IllegalStateException.class, () -> service.delete(1L));
   }
 
   @Test
@@ -72,7 +72,7 @@ class CategoryServiceImplTest {
     when(products.countByCategoryId(1L)).thenReturn(0L);
     when(categories.findById(1L)).thenReturn(Optional.of(category));
 
-    service.deleteCategory(1L);
+    service.delete(1L);
 
     verify(categories).delete(category);
   }

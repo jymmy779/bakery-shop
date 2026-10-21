@@ -1,4 +1,4 @@
-package com.bakery.catalog.service;
+package com.bakery.catalog.service.impl;
 
 import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductDetailResponse;
@@ -11,13 +11,13 @@ import com.bakery.catalog.repository.CategoryRepository;
 import com.bakery.catalog.repository.ProductImageRepository;
 import com.bakery.catalog.repository.ProductRepository;
 import com.bakery.common.exception.ResourceNotFoundException;
-import com.bakery.order.repository.OrderDetailRepository;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.bakery.catalog.service.CatalogQueryService;
+import com.bakery.catalog.service.ProductService;
+import com.bakery.order.service.ProductOrderReferenceService;
+import com.bakery.storage.FileStorageService;
 import java.util.List;
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,19 +28,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class ProductServiceImpl implements ProductService, CatalogAdminProductService {
+public class ProductServiceImpl implements ProductService {
   private final ProductRepository products;
   private final ProductImageRepository images;
   private final CategoryRepository categories;
-  private final OrderDetailRepository orderDetails;
+  private final ProductOrderReferenceService orderReferences;
   private final CatalogQueryService catalog;
-
-  @Value("${app.upload-dir:uploads}")
-  private String uploadDirectory;
+  private final FileStorageService fileStorage;
 
   @Override
   @Transactional
-  public ProductDetailResponse createProduct(ProductCreateRequest request) {
+  public ProductDetailResponse create(ProductCreateRequest request) {
     Product product = new Product();
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), ProductStatus.SELLING,
@@ -52,7 +50,7 @@ public class ProductServiceImpl implements ProductService, CatalogAdminProductSe
 
   @Override
   @Transactional
-  public ProductDetailResponse updateProduct(Long productId, ProductUpdateRequest request) {
+  public ProductDetailResponse update(Long productId, ProductUpdateRequest request) {
     Product product = find(productId);
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), request.getStatus(),
@@ -70,11 +68,20 @@ public class ProductServiceImpl implements ProductService, CatalogAdminProductSe
 
   @Override
   @Transactional(readOnly = true)
-  public Page<ProductSummaryResponse> getAllProducts(String keyword, Long categoryId,
+  public Page<ProductSummaryResponse> search(String keyword, Long categoryId,
       ProductStatus status, Pageable pageable) {
     String normalized = keyword == null || keyword.isBlank() ? null : keyword.trim();
     Page<Product> page = products.searchAdmin(normalized, categoryId, status, pageable);
-    List<ProductSummaryResponse> summaries = page.getContent().stream().map(this::summary).toList();
+    List<Product> content = page.getContent();
+    var primaryImages = new HashMap<Long, String>();
+    if (!content.isEmpty()) {
+      images.findByProductIdInOrderByDisplayOrderAscIdAsc(
+          content.stream().map(Product::getId).toList())
+          .forEach(image -> primaryImages.putIfAbsent(
+              image.getProduct().getId(), image.getImagePath()));
+    }
+    List<ProductSummaryResponse> summaries = content.stream()
+        .map(product -> summary(product, primaryImages.get(product.getId()))).toList();
     return new PageImpl<>(summaries, page.getPageable(), page.getTotalElements());
   }
 
@@ -85,46 +92,24 @@ public class ProductServiceImpl implements ProductService, CatalogAdminProductSe
     product.setStatus(ProductStatus.STOPPED);
   }
 
-  @Override
   @Transactional
-  public void deleteProduct(Long productId) {
+  private void deleteProduct(Long productId) {
     Product product = find(productId);
-    if (orderDetails.findAll().stream()
-        .anyMatch(orderDetail -> orderDetail.getProduct().getId().equals(productId))) {
+    if (orderReferences.hasOrders(productId)) {
       throw new IllegalStateException(
           "Sản phẩm đã từng có trong đơn hàng, hãy dùng chức năng Ngừng bán để bảo toàn lịch sử mua hàng");
     }
 
     List<ProductImage> productImages = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(productId));
     images.deleteAll(productImages);
-    productImages.forEach(image -> deleteFile(image.getImagePath()));
+    productImages.forEach(image -> fileStorage.delete(image.getImagePath()));
     products.delete(product);
   }
 
   @Override
   @Transactional
-  public ProductDetailResponse create(ProductCreateRequest request) {
-    return createProduct(request);
-  }
-
-  @Override
-  @Transactional
-  public ProductDetailResponse update(Long productId, ProductUpdateRequest request) {
-    return updateProduct(productId, request);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public Page<ProductSummaryResponse> search(String keyword, Long categoryId,
-      ProductStatus status, Pageable pageable) {
-    return getAllProducts(keyword, categoryId, status, pageable);
-  }
-
-  @Override
-  @Transactional
   public void deleteOrStopSelling(Long productId) {
-    if (orderDetails.findAll().stream()
-        .anyMatch(orderDetail -> orderDetail.getProduct().getId().equals(productId))) {
+    if (orderReferences.hasOrders(productId)) {
       stopSellingProduct(productId);
     } else {
       deleteProduct(productId);
@@ -149,29 +134,14 @@ public class ProductServiceImpl implements ProductService, CatalogAdminProductSe
     for (MultipartFile file : files) {
       if (file == null || file.isEmpty() || !StringUtils.hasText(file.getOriginalFilename())) continue;
       try {
-        Path directory = Path.of(uploadDirectory).toAbsolutePath().normalize();
-        Files.createDirectories(directory);
-        String filename = product.getId() + "-" + java.util.UUID.randomUUID() + "-"
-            + Path.of(file.getOriginalFilename()).getFileName();
-        Files.copy(file.getInputStream(), directory.resolve(filename));
         ProductImage image = new ProductImage();
         image.setProduct(product);
-        image.setImagePath("/uploads/" + filename);
+        image.setImagePath(fileStorage.store(file));
         image.setDisplayOrder(order++);
         images.save(image);
-      } catch (IOException exception) {
+      } catch (RuntimeException exception) {
         throw new IllegalStateException("Không thể lưu hình ảnh sản phẩm", exception);
       }
-    }
-  }
-
-  private void deleteFile(String imagePath) {
-    if (imagePath == null || !imagePath.startsWith("/uploads/")) return;
-    try {
-      Files.deleteIfExists(Path.of(uploadDirectory).toAbsolutePath().normalize()
-          .resolve(imagePath.substring("/uploads/".length())).normalize());
-    } catch (IOException ignored) {
-      // The database operation remains valid even when an old file is already missing.
     }
   }
 
@@ -179,10 +149,12 @@ public class ProductServiceImpl implements ProductService, CatalogAdminProductSe
     return products.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
   }
 
-  private ProductSummaryResponse summary(Product product) {
+  private ProductSummaryResponse summary(Product product, String primaryImagePath) {
     ProductSummaryResponse response = new ProductSummaryResponse();
     response.setId(product.getId());
     response.setName(product.getName());
+    response.setDescription(product.getDescription());
+    response.setPrimaryImagePath(primaryImagePath);
     response.setPrice(product.getPrice());
     response.setStockQuantity(product.getStockQuantity());
     response.setPreparationDays(product.getPreparationDays());

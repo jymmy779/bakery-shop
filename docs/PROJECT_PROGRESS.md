@@ -80,7 +80,7 @@ Mẫu một dòng cập nhật:
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
 | --- | --- | --- | --- | --- | --- | --- |
-| Nguyễn Trần Thái Sơn | Catalog Admin | Giới hạn PR vào CMS Catalog; dùng route `/cms/**`, layout CMS riêng, controller gọi service và loại các thay đổi account/storefront ngoài phạm vi | Chờ review | `feature/admin-son`, PR #12, Chưa có commit | Compile và test Catalog cần chạy lại sau khi hoàn tất refactor phạm vi | Push bản cập nhật và chờ review |
+| Nguyễn Trần Thái Sơn | Catalog Admin | Chuyển trang sản phẩm/danh mục sang bảng CMS; đặt form thêm/chỉnh sửa trong sidebar bên trái; dọn route và method dư thừa, cập nhật test theo service contract | Chờ review | `feature/admin-son`, PR #12, Chưa có commit | `mvnw clean test`: 29 test đạt, gồm integration MySQL local | Kiểm tra runtime/Postman và push bản cập nhật |
 
 ### 19/10/2026
 
