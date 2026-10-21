@@ -29,7 +29,7 @@ class CategoryAdminControllerTest {
 
   @Test
   void rendersCmsCategoryTable() throws Exception {
-    when(categories.findAllActive()).thenReturn(List.of());
+    when(categories.findAll()).thenReturn(List.of());
 
     mvc.perform(get("/cms/categories"))
         .andExpect(status().isOk())

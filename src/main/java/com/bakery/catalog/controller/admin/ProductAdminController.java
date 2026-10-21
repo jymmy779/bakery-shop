@@ -5,6 +5,7 @@ import com.bakery.catalog.dto.ProductUpdateRequest;
 import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.service.CategoryService;
 import com.bakery.catalog.service.ProductService;
+import com.bakery.catalog.service.ProductRemovalResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -70,8 +71,21 @@ public class  ProductAdminController {
   @PostMapping("/delete/{id}")
   public String deleteProduct(@PathVariable Long id, RedirectAttributes redirect) {
     try {
-      productService.deleteOrStopSelling(id);
-      redirect.addFlashAttribute("successMessage", "Xóa sản phẩm thành công");
+      ProductRemovalResult result = productService.deleteOrStopSelling(id);
+      redirect.addFlashAttribute("successMessage", result == ProductRemovalResult.DELETED
+          ? "Xóa sản phẩm thành công."
+          : "Sản phẩm đã phát sinh đơn hàng nên được chuyển sang ngừng bán.");
+    } catch (RuntimeException exception) {
+      redirect.addFlashAttribute("errorMessage", exception.getMessage());
+    }
+    return "redirect:/cms/products";
+  }
+
+  @PostMapping("/toggle-status/{id}")
+  public String toggleProductStatus(@PathVariable Long id, RedirectAttributes redirect) {
+    try {
+      productService.toggleStatus(id);
+      redirect.addFlashAttribute("successMessage", "Đã cập nhật trạng thái sản phẩm.");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
     }

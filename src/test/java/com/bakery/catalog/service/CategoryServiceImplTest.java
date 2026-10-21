@@ -60,6 +60,28 @@ class CategoryServiceImplTest {
   }
 
   @Test
+  void togglesCategoryStatusInBothDirections() {
+    Category category = category(1L, "Bánh");
+    when(categories.findById(1L)).thenReturn(Optional.of(category));
+
+    service.toggleStatus(1L);
+    assertEquals(false, category.isActive());
+
+    service.toggleStatus(1L);
+    assertEquals(true, category.isActive());
+  }
+
+  @Test
+  void returnsInactiveCategoriesForCms() {
+    Category active = category(1L, "Đang bán");
+    Category inactive = category(2L, "Ngừng hoạt động");
+    inactive.setActive(false);
+    when(categories.findAll()).thenReturn(java.util.List.of(active, inactive));
+
+    assertEquals(2, service.findAll().size());
+  }
+
+  @Test
   void rejectsDeletingCategoryThatContainsProducts() {
     when(products.countByCategoryId(1L)).thenReturn(2L);
 

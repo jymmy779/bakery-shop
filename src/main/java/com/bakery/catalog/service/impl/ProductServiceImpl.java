@@ -13,10 +13,13 @@ import com.bakery.catalog.repository.ProductRepository;
 import com.bakery.common.exception.ResourceNotFoundException;
 import com.bakery.catalog.service.CatalogQueryService;
 import com.bakery.catalog.service.ProductService;
+import com.bakery.catalog.service.ProductRemovalResult;
 import com.bakery.order.service.ProductOrderReferenceService;
 import com.bakery.storage.FileStorageService;
 import java.util.List;
 import java.util.HashMap;
+import java.util.ArrayList;
+import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -29,6 +32,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+  private static final int MAX_IMAGE_COUNT = 4;
+  private static final long MAX_IMAGE_SIZE_BYTES = 5L * 1024 * 1024;
   private final ProductRepository products;
   private final ProductImageRepository images;
   private final CategoryRepository categories;
@@ -39,25 +44,40 @@ public class ProductServiceImpl implements ProductService {
   @Override
   @Transactional
   public ProductDetailResponse create(ProductCreateRequest request) {
+    List<MultipartFile> validImages = validateImages(request.getImages(), 0, true);
     Product product = new Product();
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), ProductStatus.SELLING,
         request.getCategoryId());
-    product = products.save(product);
-    saveImages(product, request.getImages());
-    return catalog.getById(product.getId());
+    List<String> storedPaths = new ArrayList<>();
+    try {
+      product = products.save(product);
+      saveImages(product, validImages, storedPaths);
+      return catalog.getById(product.getId());
+    } catch (RuntimeException exception) {
+      deleteStoredFiles(storedPaths, exception);
+      throw exception;
+    }
   }
 
   @Override
   @Transactional
   public ProductDetailResponse update(Long productId, ProductUpdateRequest request) {
     Product product = find(productId);
+    int existingImageCount = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(productId)).size();
+    List<MultipartFile> validImages = validateImages(request.getNewImages(), existingImageCount, false);
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), request.getStatus(),
         request.getCategoryId());
-    products.save(product);
-    saveImages(product, request.getNewImages());
-    return catalog.getById(productId);
+    List<String> storedPaths = new ArrayList<>();
+    try {
+      products.save(product);
+      saveImages(product, validImages, storedPaths);
+      return catalog.getById(productId);
+    } catch (RuntimeException exception) {
+      deleteStoredFiles(storedPaths, exception);
+      throw exception;
+    }
   }
 
   @Override
@@ -92,6 +112,14 @@ public class ProductServiceImpl implements ProductService {
     product.setStatus(ProductStatus.STOPPED);
   }
 
+  @Override
+  @Transactional
+  public void toggleStatus(Long productId) {
+    Product product = find(productId);
+    product.setStatus(product.getStatus() == ProductStatus.SELLING
+        ? ProductStatus.STOPPED : ProductStatus.SELLING);
+  }
+
   @Transactional
   private void deleteProduct(Long productId) {
     Product product = find(productId);
@@ -108,11 +136,13 @@ public class ProductServiceImpl implements ProductService {
 
   @Override
   @Transactional
-  public void deleteOrStopSelling(Long productId) {
+  public ProductRemovalResult deleteOrStopSelling(Long productId) {
     if (orderReferences.hasOrders(productId)) {
       stopSellingProduct(productId);
+      return ProductRemovalResult.STOPPED;
     } else {
       deleteProduct(productId);
+      return ProductRemovalResult.DELETED;
     }
   }
 
@@ -128,7 +158,7 @@ public class ProductServiceImpl implements ProductService {
         .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục")));
   }
 
-  private void saveImages(Product product, List<MultipartFile> files) {
+  private void saveImages(Product product, List<MultipartFile> files, List<String> storedPaths) {
     if (files == null) return;
     int order = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(product.getId())).size();
     for (MultipartFile file : files) {
@@ -137,10 +167,52 @@ public class ProductServiceImpl implements ProductService {
         ProductImage image = new ProductImage();
         image.setProduct(product);
         image.setImagePath(fileStorage.store(file));
+        storedPaths.add(image.getImagePath());
         image.setDisplayOrder(order++);
         images.save(image);
       } catch (RuntimeException exception) {
         throw new IllegalStateException("Không thể lưu hình ảnh sản phẩm", exception);
+      }
+    }
+  }
+
+  private List<MultipartFile> validateImages(List<MultipartFile> files, int existingCount,
+      boolean required) {
+    List<MultipartFile> validFiles = files == null ? List.of() : files.stream()
+        .filter(file -> file != null && !file.isEmpty())
+        .toList();
+    if (required && (validFiles.isEmpty() || validFiles.size() > MAX_IMAGE_COUNT)) {
+      throw new IllegalArgumentException("Sản phẩm cần từ 1 đến 4 hình ảnh thực sự hợp lệ");
+    }
+    if (!required && existingCount + validFiles.size() > MAX_IMAGE_COUNT) {
+      throw new IllegalArgumentException("Tổng số hình ảnh sản phẩm không được vượt quá 4");
+    }
+    for (MultipartFile file : validFiles) {
+      if (!StringUtils.hasText(file.getOriginalFilename())
+          || file.getSize() > MAX_IMAGE_SIZE_BYTES
+          || file.getContentType() == null
+          || !file.getContentType().toLowerCase().startsWith("image/")
+          || isNotImage(file)) {
+        throw new IllegalArgumentException("Tệp tải lên phải là hình ảnh không vượt quá 5 MB");
+      }
+    }
+    return validFiles;
+  }
+
+  private boolean isNotImage(MultipartFile file) {
+    try {
+      return ImageIO.read(file.getInputStream()) == null;
+    } catch (java.io.IOException exception) {
+      throw new IllegalArgumentException("Không thể đọc tệp hình ảnh", exception);
+    }
+  }
+
+  private void deleteStoredFiles(List<String> storedPaths, RuntimeException originalException) {
+    for (String path : storedPaths) {
+      try {
+        fileStorage.delete(path);
+      } catch (RuntimeException cleanupException) {
+        originalException.addSuppressed(cleanupException);
       }
     }
   }

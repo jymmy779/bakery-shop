@@ -23,8 +23,8 @@
             th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
             th:selected="${category.id == categoryId}"></option></select>
         <select name="status"><option value="">Tất cả trạng thái</option><option value="SELLING"
-            th:selected="${status != null and status.name() == 'SELLING'}">SELLING</option><option value="STOPPED"
-            th:selected="${status != null and status.name() == 'STOPPED'}">STOPPED</option></select>
+            th:selected="${status != null and status.name() == 'SELLING'}">Đang bán</option><option value="STOPPED"
+            th:selected="${status != null and status.name() == 'STOPPED'}">Ngừng bán</option></select>
         <button class="btn btn-plain" type="submit">Lọc</button>
       </form>
       <div class="cms-table-wrap">
@@ -37,10 +37,15 @@
             <td th:text="${product.categoryName}">Danh mục</td>
             <td th:text="${product.price} + ' đ'">0 đ</td>
             <td th:text="${product.stockQuantity}">0</td>
-            <td><span class="product-status" th:classappend="${product.status.name() == 'SELLING'} ? ' selling' : ' stopped'" th:text="${product.status}">SELLING</span></td>
+            <td><form method="post" th:action="@{/cms/products/toggle-status/{id}(id=${product.id})}"
+                    data-confirm-message="Bạn có chắc muốn thay đổi trạng thái sản phẩm này?">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+              <button class="product-status" type="submit"
+                      th:classappend="${product.status.name() == 'SELLING'} ? ' selling' : ' stopped'"
+                      th:text="${product.status.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}">Đang bán</button>
+            </form></td>
             <td class="cms-actions">
               <button class="btn btn-plain" type="button" th:attr="data-product-id=${product.id},data-name=${product.name},data-description=${product.description},data-price=${product.price},data-stock=${product.stockQuantity},data-preparation=${product.preparationDays},data-category=${product.categoryId},data-status=${product.status},data-image=${product.primaryImagePath}" onclick="selectProduct(this)">Sửa</button>
-              <form method="post" th:action="@{/cms/products/stop-selling/{id}(id=${product.id})}" th:if="${product.status.name() == 'SELLING'}" data-confirm-message="Chuyển sản phẩm sang STOPPED?"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn btn-plain" type="submit">Ngừng bán</button></form>
               <form method="post" th:action="@{/cms/products/delete/{id}(id=${product.id})}" data-confirm-message="Bạn có chắc muốn xóa sản phẩm này?" data-confirm-danger="true"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn danger-action" type="submit">Xóa</button></form>
             </td>
           </tr>
@@ -74,7 +79,7 @@
         <label>Tồn kho</label><input name="stockQuantity" id="product-stock" type="number" min="0" required>
         <label>Số ngày chuẩn bị</label><input name="preparationDays" id="product-preparation" type="number" min="0" required>
         <label>Danh mục</label><select name="categoryId" id="product-category" required><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
-        <label>Trạng thái bán</label><select name="status" id="product-status" required><option th:each="status : ${statuses}" th:value="${status}" th:text="${status}"></option></select>
+        <label>Trạng thái bán</label><select name="status" id="product-status" required><option value="SELLING">Đang bán</option><option value="STOPPED">Ngừng bán</option></select>
         <label>Mô tả</label><textarea name="description" id="product-description" required></textarea>
         <label>Ảnh mới</label><input name="newImages" type="file" multiple accept="image/*">
         <button class="btn btn-primary" type="submit">Cập nhật sản phẩm</button>

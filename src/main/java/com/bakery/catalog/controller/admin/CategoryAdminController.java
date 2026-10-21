@@ -21,9 +21,20 @@ public class CategoryAdminController {
 
   @GetMapping
   public String getAllCategories(Model model) {
-    model.addAttribute("categories", categoryService.findAllActive());
+    model.addAttribute("categories", categoryService.findAll());
     model.addAttribute("categoryRequest", new CategoryRequest());
     return "cms/category/list";
+  }
+
+  @PostMapping("/toggle-status/{id}")
+  public String toggleCategoryStatus(@PathVariable Long id, RedirectAttributes redirect) {
+    try {
+      categoryService.toggleStatus(id);
+      redirect.addFlashAttribute("successMessage", "Đã cập nhật trạng thái danh mục.");
+    } catch (RuntimeException exception) {
+      redirect.addFlashAttribute("errorMessage", exception.getMessage());
+    }
+    return "redirect:/cms/categories";
   }
 
   @PostMapping("/add")

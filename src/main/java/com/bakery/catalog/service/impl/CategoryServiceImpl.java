@@ -57,6 +57,19 @@ public class CategoryServiceImpl implements CategoryService {
     return categories.findAll().stream().filter(Category::isActive).map(this::toResponse).toList();
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public List<CategoryResponse> findAll() {
+    return categories.findAll().stream().map(this::toResponse).toList();
+  }
+
+  @Override
+  @Transactional
+  public void toggleStatus(Long categoryId) {
+    Category category = find(categoryId);
+    category.setActive(!category.isActive());
+  }
+
   @Transactional
   @Override
   public void delete(Long categoryId) {
