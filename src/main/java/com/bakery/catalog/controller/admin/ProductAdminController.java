@@ -22,7 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/cms/products")
 @RequiredArgsConstructor
-public class  ProductAdminController {
+public class ProductAdminController {
   private final ProductService productService;
   private final CategoryService categoryService;
 
@@ -92,11 +92,12 @@ public class  ProductAdminController {
     return "redirect:/cms/products";
   }
 
-  @PostMapping("/stop-selling/{id}")
-  public String stopSellingProduct(@PathVariable Long id, RedirectAttributes redirect) {
+  @PostMapping("/update/{productId}/images/{imageId}/delete")
+  public String deleteProductImage(@PathVariable Long productId, @PathVariable Long imageId,
+      RedirectAttributes redirect) {
     try {
-      productService.stopSellingProduct(id);
-      redirect.addFlashAttribute("successMessage", "Sản phẩm đã được chuyển sang trạng thái Ngừng bán");
+      productService.deleteImage(productId, imageId);
+      redirect.addFlashAttribute("successMessage", "Đã xóa ảnh sản phẩm.");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
     }

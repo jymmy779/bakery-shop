@@ -24,7 +24,7 @@ public interface ProductService {
 
   ProductRemovalResult deleteOrStopSelling(Long productId);
 
-  void stopSellingProduct(Long productId);
-
   void toggleStatus(Long productId);
+
+  void deleteImage(Long productId, Long imageId);
 }

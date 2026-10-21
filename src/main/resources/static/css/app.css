@@ -1271,6 +1271,15 @@ h1, h2, h3, h4, h5, h6 { margin: 0; }
 .image-upload-hint { display: block; margin-top: -6px; color: var(--muted); font-size: 11px; }
 .image-upload-preview { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 10px; }
 .image-upload-preview span { padding: 4px 7px; border: 1px solid var(--rose); border-radius: 3px; color: var(--wine); font-size: 10px; }
+.cms-image-carousel { position: relative; display: flex; align-items: center; justify-content: center; width: 72px; }
+.cms-image-carousel .cms-product-thumb { display: block; }
+.image-arrow { position: absolute; z-index: 1; width: 20px; height: 26px; padding: 0; border: 0; border-radius: 3px; background: rgba(63, 29, 38, .72); color: #fff; font-size: 20px; line-height: 20px; cursor: pointer; }
+.image-arrow.previous { left: 1px; }
+.image-arrow.next { right: 1px; }
+.edit-image-preview { display: flex; flex-wrap: wrap; gap: 6px; }
+.edit-image-item { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.edit-image-preview img { width: 52px; height: 52px; border: 1px solid var(--rose); border-radius: 3px; object-fit: cover; }
+.image-delete-button { padding: 3px 5px; border: 1px solid #eacbc4; border-radius: 3px; background: #fff4f1; color: #9c4e49; font-size: 10px; cursor: pointer; }
 .cms-side-panel .danger-action { margin-top: 4px; background: #fff4f1; color: #9c4e49; border-color: #eacbc4; }
 .cms-filter { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 .cms-filter-title { color: var(--muted); font-size: 11px; font-weight: 700; margin: 0 0 8px; }

@@ -93,23 +93,23 @@ public class ProductServiceImpl implements ProductService {
     String normalized = keyword == null || keyword.isBlank() ? null : keyword.trim();
     Page<Product> page = products.searchAdmin(normalized, categoryId, status, pageable);
     List<Product> content = page.getContent();
-    var primaryImages = new HashMap<Long, String>();
+    var productImages = new HashMap<Long, List<String>>();
+    var productImageIds = new HashMap<Long, List<Long>>();
     if (!content.isEmpty()) {
       images.findByProductIdInOrderByDisplayOrderAscIdAsc(
           content.stream().map(Product::getId).toList())
-          .forEach(image -> primaryImages.putIfAbsent(
-              image.getProduct().getId(), image.getImagePath()));
+          .forEach(image -> {
+            productImages.computeIfAbsent(image.getProduct().getId(),
+                ignored -> new ArrayList<>()).add(image.getImagePath());
+            productImageIds.computeIfAbsent(image.getProduct().getId(),
+                ignored -> new ArrayList<>()).add(image.getId());
+          });
     }
     List<ProductSummaryResponse> summaries = content.stream()
-        .map(product -> summary(product, primaryImages.get(product.getId()))).toList();
+        .map(product -> summary(product,
+            productImages.getOrDefault(product.getId(), List.of()),
+            productImageIds.getOrDefault(product.getId(), List.of()))).toList();
     return new PageImpl<>(summaries, page.getPageable(), page.getTotalElements());
-  }
-
-  @Override
-  @Transactional
-  public void stopSellingProduct(Long productId) {
-    Product product = find(productId);
-    product.setStatus(ProductStatus.STOPPED);
   }
 
   @Override
@@ -118,6 +118,24 @@ public class ProductServiceImpl implements ProductService {
     Product product = find(productId);
     product.setStatus(product.getStatus() == ProductStatus.SELLING
         ? ProductStatus.STOPPED : ProductStatus.SELLING);
+  }
+
+  @Override
+  @Transactional
+  public void deleteImage(Long productId, Long imageId) {
+    Product product = find(productId);
+    ProductImage image = images.findById(imageId)
+        .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy hình ảnh"));
+    if (!image.getProduct().getId().equals(product.getId())) {
+      throw new IllegalArgumentException("Hình ảnh không thuộc sản phẩm này");
+    }
+    List<ProductImage> productImages =
+        images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(productId));
+    if (productImages.size() <= 1) {
+      throw new IllegalStateException("Sản phẩm phải có tối thiểu một ảnh.");
+    }
+    fileStorage.delete(image.getImagePath());
+    images.delete(image);
   }
 
   @Transactional
@@ -138,7 +156,8 @@ public class ProductServiceImpl implements ProductService {
   @Transactional
   public ProductRemovalResult deleteOrStopSelling(Long productId) {
     if (orderReferences.hasOrders(productId)) {
-      stopSellingProduct(productId);
+      Product product = find(productId);
+      product.setStatus(ProductStatus.STOPPED);
       return ProductRemovalResult.STOPPED;
     } else {
       deleteProduct(productId);
@@ -221,12 +240,15 @@ public class ProductServiceImpl implements ProductService {
     return products.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
   }
 
-  private ProductSummaryResponse summary(Product product, String primaryImagePath) {
+  private ProductSummaryResponse summary(Product product, List<String> imagePaths,
+      List<Long> imageIds) {
     ProductSummaryResponse response = new ProductSummaryResponse();
     response.setId(product.getId());
     response.setName(product.getName());
     response.setDescription(product.getDescription());
-    response.setPrimaryImagePath(primaryImagePath);
+    response.setImagePaths(imagePaths);
+    response.setImageIds(imageIds);
+    response.setPrimaryImagePath(imagePaths.isEmpty() ? null : imagePaths.get(0));
     response.setPrice(product.getPrice());
     response.setStockQuantity(product.getStockQuantity());
     response.setPreparationDays(product.getPreparationDays());

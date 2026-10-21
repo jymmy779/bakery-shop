@@ -10,6 +10,7 @@ import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductUpdateRequest;
 import com.bakery.catalog.entity.Category;
 import com.bakery.catalog.entity.Product;
+import com.bakery.catalog.entity.ProductImage;
 import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.repository.CategoryRepository;
 import com.bakery.catalog.repository.ProductImageRepository;
@@ -86,16 +87,6 @@ class ProductServiceImplTest {
   }
 
   @Test
-  void stopsSellingProduct() {
-    Product product = product(5L);
-    when(products.findById(5L)).thenReturn(Optional.of(product));
-
-    service.stopSellingProduct(5L);
-
-    assertEquals(ProductStatus.STOPPED, product.getStatus());
-  }
-
-  @Test
   void doesNotDeleteProductReferencedByOrder() {
     Product product = product(5L);
     when(products.findById(5L)).thenReturn(Optional.of(product));
@@ -132,6 +123,60 @@ class ProductServiceImplTest {
 
     service.toggleStatus(5L);
     assertEquals(ProductStatus.SELLING, product.getStatus());
+  }
+
+  @Test
+  void deletesImageBelongingToProduct() {
+    Product product = product(5L);
+    ProductImage image = new ProductImage();
+    image.setId(9L);
+    image.setProduct(product);
+    image.setImagePath("/uploads/cake.png");
+    when(products.findById(5L)).thenReturn(Optional.of(product));
+    when(images.findById(9L)).thenReturn(Optional.of(image));
+    when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(5L)))
+        .thenReturn(List.of(image, new ProductImage()));
+
+    service.deleteImage(5L, 9L);
+
+    verify(fileStorage).delete("/uploads/cake.png");
+    verify(images).delete(image);
+  }
+
+  @Test
+  void rejectsDeletingLastImage() {
+    Product product = product(5L);
+    ProductImage image = new ProductImage();
+    image.setId(9L);
+    image.setProduct(product);
+    image.setImagePath("/uploads/cake.png");
+    when(products.findById(5L)).thenReturn(Optional.of(product));
+    when(images.findById(9L)).thenReturn(Optional.of(image));
+    when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(5L)))
+        .thenReturn(List.of(image));
+
+    IllegalStateException exception =
+        assertThrows(IllegalStateException.class, () -> service.deleteImage(5L, 9L));
+
+    assertEquals("Sản phẩm phải có tối thiểu một ảnh.", exception.getMessage());
+    verify(images, org.mockito.Mockito.never()).delete(image);
+    verify(fileStorage, org.mockito.Mockito.never()).delete("/uploads/cake.png");
+  }
+
+  @Test
+  void rejectsDeletingImageFromAnotherProduct() {
+    Product product = product(5L);
+    Product otherProduct = product(6L);
+    ProductImage image = new ProductImage();
+    image.setId(9L);
+    image.setProduct(otherProduct);
+    image.setImagePath("/uploads/cake.png");
+    when(products.findById(5L)).thenReturn(Optional.of(product));
+    when(images.findById(9L)).thenReturn(Optional.of(image));
+
+    assertThrows(IllegalArgumentException.class, () -> service.deleteImage(5L, 9L));
+    verify(images, org.mockito.Mockito.never()).delete(image);
+    verify(fileStorage, org.mockito.Mockito.never()).delete("/uploads/cake.png");
   }
 
   @Test

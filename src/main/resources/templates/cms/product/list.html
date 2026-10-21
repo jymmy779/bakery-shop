@@ -32,7 +32,15 @@
           <thead><tr><th>Ảnh</th><th>Sản phẩm</th><th>Danh mục</th><th>Giá</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
           <tbody>
           <tr th:each="product : ${products.content}">
-            <td><img class="cms-product-thumb" th:src="${product.primaryImagePath != null ? product.primaryImagePath : '/assets/product-placeholder.svg'}" th:alt="${product.name}"></td>
+            <td>
+              <div class="cms-image-carousel" th:attr="data-images=${product.imagePathsCsv}">
+                <button class="image-arrow previous" type="button" aria-label="Ảnh trước"
+                        th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, -1)">&#8249;</button>
+                <img class="cms-product-thumb" th:src="${product.primaryImagePath != null ? product.primaryImagePath : '/assets/product-placeholder.svg'}" th:alt="${product.name}">
+                <button class="image-arrow next" type="button" aria-label="Ảnh sau"
+                        th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, 1)">&#8250;</button>
+              </div>
+            </td>
             <td><strong th:text="${product.name}">Tên sản phẩm</strong><br><small th:text="${product.description}">Mô tả</small></td>
             <td th:text="${product.categoryName}">Danh mục</td>
             <td th:text="${product.price} + ' đ'">0 đ</td>
@@ -45,7 +53,7 @@
                       th:text="${product.status.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}">Đang bán</button>
             </form></td>
             <td class="cms-actions">
-              <button class="btn btn-plain" type="button" th:attr="data-product-id=${product.id},data-name=${product.name},data-description=${product.description},data-price=${product.price},data-stock=${product.stockQuantity},data-preparation=${product.preparationDays},data-category=${product.categoryId},data-status=${product.status},data-image=${product.primaryImagePath}" onclick="selectProduct(this)">Sửa</button>
+              <button class="btn btn-plain" type="button" th:attr="data-product-id=${product.id},data-name=${product.name},data-description=${product.description},data-price=${product.price},data-stock=${product.stockQuantity},data-preparation=${product.preparationDays},data-category=${product.categoryId},data-status=${product.status},data-image=${product.primaryImagePath},data-images=${product.imagePathsCsv},data-image-ids=${product.imageIdsCsv}" onclick="selectProduct(this)">Sửa</button>
               <form method="post" th:action="@{/cms/products/delete/{id}(id=${product.id})}" data-confirm-message="Bạn có chắc muốn xóa sản phẩm này?" data-confirm-danger="true"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn danger-action" type="submit">Xóa</button></form>
             </td>
           </tr>
@@ -92,6 +100,7 @@
         <div class="image-upload-preview" id="update-image-preview" aria-live="polite"></div>
         <button class="btn btn-primary" type="submit">Cập nhật sản phẩm</button>
       </form>
+      <div class="edit-image-preview" id="edit-image-preview" aria-live="polite"></div>
     </aside>
     </div>
   </div>
@@ -100,7 +109,47 @@
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
 <script>
 function openProductCreate() { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Thêm sản phẩm'; document.getElementById('product-create-form').hidden = false; document.getElementById('product-update-form').hidden = true; }
-function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-description').value = button.dataset.description || ''; document.getElementById('update-product-images').value = ''; document.getElementById('update-image-preview').replaceChildren(); updatePriceSuggestions('product-price', 'update-price-suggestions'); }
+function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-description').value = button.dataset.description || ''; document.getElementById('update-product-images').value = ''; document.getElementById('update-image-preview').replaceChildren(); renderEditImages(button.dataset.productId, button.dataset.images, button.dataset.imageIds); updatePriceSuggestions('product-price', 'update-price-suggestions'); }
+function renderEditImages(productId, imageCsv, imageIdsCsv) {
+  const preview = document.getElementById('edit-image-preview');
+  preview.replaceChildren();
+  const images = imageCsv ? imageCsv.split('|').filter(Boolean) : [];
+  const imageIds = imageIdsCsv ? imageIdsCsv.split('|').filter(Boolean) : [];
+  images.forEach(function (path, index) {
+    const item = document.createElement('div');
+    item.className = 'edit-image-item';
+    const image = document.createElement('img');
+    image.src = path;
+    image.alt = 'Ảnh sản phẩm ' + (index + 1);
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/cms/products/update/' + productId + '/images/' + imageIds[index] + '/delete';
+    form.dataset.confirmMessage = 'Bạn có chắc muốn xóa ảnh này không?';
+    const csrf = document.querySelector('#product-update-form input[name="_csrf"]').cloneNode(true);
+    const button = document.createElement('button');
+    button.type = 'submit';
+    button.className = 'image-delete-button';
+    button.textContent = 'Xóa ảnh';
+    form.append(csrf, button);
+    item.append(image, form);
+    preview.appendChild(item);
+  });
+  preview.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+      if (!window.confirm(form.dataset.confirmMessage)) event.preventDefault();
+    });
+  });
+}
+function moveProductImage(button, direction) {
+  const carousel = button.parentElement;
+  const image = carousel.querySelector('img');
+  const paths = (carousel.dataset.images || '').split('|').filter(Boolean);
+  if (paths.length < 2) return;
+  const current = Number(carousel.dataset.index || 0);
+  const next = (current + direction + paths.length) % paths.length;
+  carousel.dataset.index = next;
+  image.src = paths[next];
+}
 function setupImagePicker(inputId, previewId, maxFiles) {
   const input = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
