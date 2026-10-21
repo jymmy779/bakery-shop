@@ -87,6 +87,7 @@ Mẫu một dòng cập nhật:
 | Nguyễn Trần Thái Sơn | Hiển thị lỗi form thêm nhân viên | Giữ nguyên binding form, hiển thị lỗi validation theo từng trường trong bảng cảnh báo sau khi submit | Đang làm | Chưa có | Chưa chạy test sau thay đổi | Kiểm tra bằng dữ liệu trống, email sai và số điện thoại sai |
 | Nguyễn Trần Thái Sơn | Xác nhận thao tác quản lý nhân viên | Thêm hộp thoại xác nhận trước khi sửa thông tin hoặc khóa/mở khóa tài khoản nhân viên | Đang làm | Chưa có | Chưa chạy test sau thay đổi | Demo các thao tác trên trang `/admin/staffs` |
 | Nguyễn Trần Thái Sơn | Bổ sung kiểm thử và xử lý feedback PR #12 | Bổ sung test CRUD danh mục/sản phẩm, chặn xóa dữ liệu đang được tham chiếu, lọc sản phẩm và kiểm tra quyền STAFF/ADMIN; cập nhật test API sản phẩm theo mapping `/api/products`; loại cấu hình local và `DataInitializer` khỏi PR | Chờ review | `feature/admin-son`, PR #12, Chưa có commit | `mvnw test` đạt: 30 test, 0 lỗi; compile đạt | Push thay đổi lên PR #12 và demo với MySQL local |
+| Nguyễn Trần Thái Sơn | Bổ sung kiểm thử quản lý tài khoản customer/staff | Thêm test service cho tạo customer/staff, BCrypt, email trùng, cập nhật staff, khóa/mở khóa và tìm kiếm; thêm test controller cho danh sách, validation, flash message và thao tác customer/staff | Chờ review | `feature/admin-son`, PR #12, Chưa có commit | Test tài khoản đạt: 17 test, 0 lỗi; cần chạy lại toàn bộ sau khi tích hợp | Push bổ sung lên PR #12 và chờ review |
 
 ### 19/10/2026
 
