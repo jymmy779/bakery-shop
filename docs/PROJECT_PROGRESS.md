@@ -76,6 +76,17 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 21/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Nguyễn Trần Thái Sơn | Quản lý tài khoản khách hàng và nhân viên CMS (Use case 3.2.5.5, 3.2.5.6) | Bổ sung tìm kiếm theo role, khóa/mở khóa khách hàng và nhân viên, tạo nhân viên với BCrypt, cập nhật thông tin nhân viên và giao diện Thymeleaf không hiển thị password | Đang làm | Chưa có | Maven compile đã chạy thành công; chưa nghiệm thu luồng trên MySQL | Cần demo với tài khoản Admin và tạo PR để review |
+| Nguyễn Trần Thái Sơn | Cải thiện giao diện quản lý nhân viên | Chuyển danh sách nhân viên từ bảng cuộn ngang sang các card responsive, giữ nguyên chức năng sửa và khóa/mở khóa | Đang làm | Chưa có | Chưa chạy test sau thay đổi giao diện | Demo lại trang `/admin/staffs` trên trình duyệt |
+| Nguyễn Trần Thái Sơn | Sidebar thêm nhân viên | Đưa form thêm nhân viên vào sidebar ẩn mặc định và thêm nút mở form cạnh danh sách card | Đang làm | Chưa có | Chưa chạy test sau thay đổi giao diện | Demo lại thao tác mở sidebar và tạo nhân viên |
+| Nguyễn Trần Thái Sơn | Hiển thị cố định form thêm nhân viên | Để form thêm nhân viên luôn hiển thị trong sidebar, bỏ thao tác bấm để mở form | Đang làm | Chưa có | Chưa chạy test sau thay đổi giao diện | Demo lại trang `/admin/staffs` |
+| Nguyễn Trần Thái Sơn | Hiển thị lỗi form thêm nhân viên | Giữ nguyên binding form, hiển thị lỗi validation theo từng trường trong bảng cảnh báo sau khi submit | Đang làm | Chưa có | Chưa chạy test sau thay đổi | Kiểm tra bằng dữ liệu trống, email sai và số điện thoại sai |
+| Nguyễn Trần Thái Sơn | Xác nhận thao tác quản lý nhân viên | Thêm hộp thoại xác nhận trước khi sửa thông tin hoặc khóa/mở khóa tài khoản nhân viên | Đang làm | Chưa có | Chưa chạy test sau thay đổi | Demo các thao tác trên trang `/admin/staffs` |
+
 ### 19/10/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
