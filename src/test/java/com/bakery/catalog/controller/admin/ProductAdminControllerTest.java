@@ -8,8 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.bakery.catalog.entity.ProductStatus;
-import com.bakery.catalog.service.CategoryService;
-import com.bakery.catalog.service.ProductService;
+import com.bakery.catalog.service.CategoryAdminService;
+import com.bakery.catalog.service.ProductAdminService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,21 +23,22 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @ExtendWith(MockitoExtension.class)
 class ProductAdminControllerTest {
 
-  @Mock ProductService products;
-  @Mock CategoryService categories;
+  @Mock ProductAdminService productAdminService;
+  @Mock CategoryAdminService categoryAdminService;
   private MockMvc mvc;
 
   @BeforeEach
   void setUp() {
-    mvc = MockMvcBuilders.standaloneSetup(new ProductAdminController(products, categories)).build();
+    mvc = MockMvcBuilders.standaloneSetup(
+        new ProductAdminController(productAdminService, categoryAdminService)).build();
   }
 
   @Test
   void rendersCmsProductTableWithFilters() throws Exception {
-    when(products.search("cake", 2L, ProductStatus.SELLING,
+    when(productAdminService.search("cake", 2L, ProductStatus.SELLING,
         org.springframework.data.domain.PageRequest.of(0, 10)))
         .thenReturn(new PageImpl<>(List.of()));
-    when(categories.findAllActive()).thenReturn(List.of());
+    when(categoryAdminService.findAllActive()).thenReturn(List.of());
 
     mvc.perform(get("/cms/products").param("keyword", "cake")
             .param("categoryId", "2").param("status", "SELLING"))

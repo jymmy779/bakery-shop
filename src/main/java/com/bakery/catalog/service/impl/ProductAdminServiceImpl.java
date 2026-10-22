@@ -11,8 +11,8 @@ import com.bakery.catalog.repository.CategoryRepository;
 import com.bakery.catalog.repository.ProductImageRepository;
 import com.bakery.catalog.repository.ProductRepository;
 import com.bakery.common.exception.ResourceNotFoundException;
-import com.bakery.catalog.service.CatalogQueryService;
-import com.bakery.catalog.service.ProductService;
+import com.bakery.catalog.service.ProductQueryService;
+import com.bakery.catalog.service.ProductAdminService;
 import com.bakery.catalog.service.ProductRemovalResult;
 import com.bakery.order.service.ProductOrderReferenceService;
 import com.bakery.storage.FileStorageService;
@@ -31,14 +31,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class ProductServiceImpl implements ProductService {
+public class ProductAdminServiceImpl implements ProductAdminService {
   private static final int MAX_IMAGE_COUNT = 4;
   private static final long MAX_IMAGE_SIZE_BYTES = 5L * 1024 * 1024;
   private final ProductRepository products;
   private final ProductImageRepository images;
   private final CategoryRepository categories;
   private final ProductOrderReferenceService orderReferences;
-  private final CatalogQueryService catalog;
+  private final ProductQueryService productQueryService;
   private final FileStorageService fileStorage;
 
   @Override
@@ -53,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
     try {
       product = products.save(product);
       saveImages(product, validImages, storedPaths);
-      return catalog.getById(product.getId());
+      return productQueryService.getById(product.getId());
     } catch (RuntimeException exception) {
       deleteStoredFiles(storedPaths, exception);
       throw exception;
@@ -73,7 +73,7 @@ public class ProductServiceImpl implements ProductService {
     try {
       products.save(product);
       saveImages(product, validImages, storedPaths);
-      return catalog.getById(productId);
+      return productQueryService.getById(productId);
     } catch (RuntimeException exception) {
       deleteStoredFiles(storedPaths, exception);
       throw exception;
@@ -83,7 +83,7 @@ public class ProductServiceImpl implements ProductService {
   @Override
   @Transactional(readOnly = true)
   public ProductDetailResponse getById(Long productId) {
-    return catalog.getById(productId);
+    return productQueryService.getById(productId);
   }
 
   @Override

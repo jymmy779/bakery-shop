@@ -6,7 +6,7 @@ import com.bakery.catalog.entity.Category;
 import com.bakery.catalog.repository.CategoryRepository;
 import com.bakery.catalog.repository.ProductRepository;
 import com.bakery.common.exception.ResourceNotFoundException;
-import com.bakery.catalog.service.CategoryService;
+import com.bakery.catalog.service.CategoryAdminService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CategoryServiceImpl implements CategoryService {
+public class CategoryAdminServiceImpl implements CategoryAdminService {
   private final CategoryRepository categories;
   private final ProductRepository products;
 

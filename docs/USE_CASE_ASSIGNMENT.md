@@ -79,8 +79,8 @@ Service cần triển khai:
 CartService
 ```
 
-Phần đọc sản phẩm dùng `ProductService`; phối hợp với người phụ trách Catalog,
-không tạo thêm Product service khác.
+Phần đọc sản phẩm dùng `ProductQueryService`; phối hợp với người phụ trách Catalog,
+không tạo thêm service truy vấn sản phẩm khác.
 
 ## Phạm Nhật Hưng — Checkout, Order và Payment
 
@@ -143,8 +143,8 @@ templates/cms/category
 Service cần triển khai:
 
 ```text
-ProductService
-CategoryService
+ProductAdminService
+CategoryAdminService
 ```
 
 Upload ảnh gọi `FileStorageService`; không tự ghi file trực tiếp trong
