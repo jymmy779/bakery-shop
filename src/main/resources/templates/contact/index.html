@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head-meta('Liên hệ')}"></th:block></head>
+<body>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+  <header th:replace="~{fragments/layout :: header(currentPage='contact')}"></header>
+  <main class="standard-page">
+    <section class="wrap contact-heading"><span class="eyebrow">COME SAY HELLO</span><h1 class="page-title">Ghé thăm LUNE</h1><p>Cần tư vấn chọn bánh hoặc đặt bánh cho dịp đặc biệt? Tiệm luôn sẵn lòng lắng nghe.</p></section>
+    <section class="wrap contact-layout">
+      <div class="contact-details">
+        <article><small>ĐỊA CHỈ</small><h2>LUNE Bakery</h2><p>12 Nguyễn Văn Bảo, Phường 4<br>Gò Vấp, TP. Hồ Chí Minh</p></article>
+        <article><small>GIỜ MỞ CỬA</small><h2>Mỗi ngày</h2><p>08:00 – 21:00<br>Nhận đơn online đến 20:30</p></article>
+        <article><small>LIÊN HỆ</small><h2>Trò chuyện với tiệm</h2><p>Hotline: 0900 123 456<br>Email: hello@lunebakery.local</p></article>
+      </div>
+      <form class="panel contact-form" action="#" method="post">
+        <div><label for="contact-name">Họ và tên</label><input id="contact-name" name="name" required placeholder="Tên của bạn"></div>
+        <div><label for="contact-email">Email</label><input id="contact-email" name="email" type="email" required placeholder="email@example.com"></div>
+        <div><label for="contact-phone">Số điện thoại</label><input id="contact-phone" name="phone" placeholder="0900 000 000"></div>
+        <div><label for="contact-topic">Bạn cần hỗ trợ</label><select id="contact-topic" name="topic"><option>Tư vấn chọn bánh</option><option>Đặt bánh sự kiện</option><option>Góp ý dịch vụ</option><option>Khác</option></select></div>
+        <div class="contact-message"><label for="contact-message">Lời nhắn</label><textarea id="contact-message" name="message" rows="5" required placeholder="LUNE có thể giúp gì cho bạn?"></textarea></div>
+        <button class="btn btn-primary" type="button">Gửi lời nhắn</button>
+        <p class="form-note">Giao diện mẫu — chức năng gửi liên hệ sẽ được kết nối sau.</p>
+      </form>
+    </section>
+  </main>
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

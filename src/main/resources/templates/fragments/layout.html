@@ -28,9 +28,9 @@
          data-nav="home">Trang chủ</a>
       <a th:href="@{/products}"
          th:classappend="${currentPage == 'shop'} ? ' active'"
-         data-nav="shop">Thực đơn</a>
-      <a href="#about">Về LUNE</a>
-      <a href="#footer">Liên hệ</a>
+         data-nav="shop">Sản phẩm</a>
+      <a th:href="@{/about}" th:classappend="${currentPage == 'about'} ? ' active'">Về LUNE</a>
+      <a th:href="@{/contact}" th:classappend="${currentPage == 'contact'} ? ' active'">Liên hệ</a>
     </nav>
 
     <!-- Header Actions -->
@@ -40,7 +40,7 @@
         <svg aria-hidden="true"><use href="#i-search"/></svg>
       </a>
       <!-- User / Login -->
-      <a th:href="@{/cms/login}" class="icon-button user-action" aria-label="Đăng nhập"
+      <a th:href="@{/login}" class="icon-button user-action" aria-label="Đăng nhập"
          th:if="${session.user == null}">
         <svg aria-hidden="true"><use href="#i-user"/></svg>
       </a>
@@ -65,8 +65,9 @@
   <!-- Mobile Navigation -->
   <nav class="mobile-nav" id="mobile-nav" aria-label="Menu di động">
     <a th:href="@{/}">Trang chủ</a>
-    <a th:href="@{/products}">Thực đơn</a>
-    <a href="#about">Về LUNE</a>
+    <a th:href="@{/products}">Sản phẩm</a>
+    <a th:href="@{/about}">Về LUNE</a>
+    <a th:href="@{/contact}">Liên hệ</a>
     <a th:href="@{/orders}">Đơn hàng</a>
     <a th:href="@{/cart}">Giỏ hàng</a>
     <a th:href="@{/login}" th:if="${session.user == null}">Đăng nhập</a>
@@ -97,7 +98,8 @@
       <h4>Hỗ trợ</h4>
       <a th:href="@{/orders}">Đơn hàng của tôi</a>
       <a th:href="@{/profile}">Tài khoản</a>
-      <a href="#about">Câu chuyện của LUNE</a>
+      <a th:href="@{/about}">Câu chuyện của LUNE</a>
+      <a th:href="@{/contact}">Liên hệ với tiệm</a>
       <a th:href="@{/admin}"
          th:if="${session.user != null and (session.user.role.name() == 'ADMIN' or session.user.role.name() == 'STAFF')}">
         Khu vực quản trị

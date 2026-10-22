@@ -81,6 +81,7 @@ Mẫu một dòng cập nhật:
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
 | --- | --- | --- | --- | --- | --- | --- |
 | Lương Việt Thái | Chuẩn hóa service Catalog | Tách `ProductQueryService`/`ProductQueryServiceImpl` cho storefront; đổi service CMS thành `ProductAdminService`/`ProductAdminServiceImpl` và `CategoryAdminService`/`CategoryAdminServiceImpl`; đồng bộ controller, test và tài liệu, không đổi nghiệp vụ | Đã merge | PR #14, commit `b93274f`, merge commit `8595e2b` | Chưa chạy lại test do môi trường terminal không khởi động được Maven Wrapper và không có Maven cài sẵn | Chạy toàn bộ test bằng IntelliJ; tiếp tục hoàn thiện UI |
+| Lương Việt Thái | UI storefront sản phẩm và quyền truy cập Guest | Public các trang storefront; nối danh sách responsive với API Catalog; tách `product-list.js`; làm đầy trang chủ bằng khu vực dịp sử dụng và combo mẫu; tách riêng giao diện `/about`, `/contact`; chuẩn hóa nhãn sản phẩm và mở rộng SQL lên 60 sản phẩm thuộc 6 danh mục | Đang làm | Branch `Thai`; PR/commit: Chưa có | `git diff --check` và kiểm tra cú pháp `product-list.js` đạt; SQL chưa chạy trên MySQL; Maven test chưa chạy được do wrapper lỗi khởi động và Maven hệ thống bị từ chối đọc file bảo mật của JDK | Chạy SQL mẫu, demo runtime các trang public và nối chi tiết/giỏ hàng/liên hệ với logic thật. OPEN QUESTION/backlog: sản phẩm nổi bật và đánh giá sản phẩm cần nhóm duyệt, cập nhật requirement, phân công, class/database diagram trước khi làm |
 
 ### 21/10/2026
 

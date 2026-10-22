@@ -50,9 +50,9 @@
     <!-- Desktop Nav -->
     <nav class="nav-links" aria-label="Điều hướng chính">
       <a th:href="@{/}" class="active" data-nav="home">Trang chủ</a>
-      <a th:href="@{/products}" data-nav="shop">Thực đơn</a>
-      <a href="#about">Về LUNE</a>
-      <a href="#footer">Liên hệ</a>
+      <a th:href="@{/products}" data-nav="shop">Sản phẩm</a>
+      <a th:href="@{/about}">Về LUNE</a>
+      <a th:href="@{/contact}">Liên hệ</a>
     </nav>
 
     <!-- Actions -->
@@ -87,8 +87,9 @@
   <!-- Mobile Nav -->
   <nav class="mobile-nav" id="mobile-nav" aria-label="Menu di động">
     <a th:href="@{/}">Trang chủ</a>
-    <a th:href="@{/products}">Thực đơn</a>
-    <a href="#about">Về LUNE</a>
+    <a th:href="@{/products}">Sản phẩm</a>
+    <a th:href="@{/about}">Về LUNE</a>
+    <a th:href="@{/contact}">Liên hệ</a>
     <a href="#footer">Liên hệ</a>
     <a th:href="@{/orders}">Đơn hàng</a>
     <a th:href="@{/cart}">Giỏ hàng</a>
@@ -112,10 +113,10 @@
       </p>
       <div class="hero-buttons">
         <a th:href="@{/products}" class="btn btn-primary" id="hero-cta-shop">
-          Khám phá thực đơn
+          Khám phá các loại bánh
           <svg aria-hidden="true"><use href="#i-arrow"/></svg>
         </a>
-        <a href="#about" class="text-link">
+        <a th:href="@{/about}" class="text-link">
           Câu chuyện của LUNE
           <svg aria-hidden="true"><use href="#i-arrow"/></svg>
         </a>
@@ -448,38 +449,46 @@
   </section>
 
   <!-- ============================
-       ABOUT BAND
+       SHOP BY OCCASION
        ============================ -->
-  <section class="about-band" id="about" aria-labelledby="about-heading">
-    <div class="about-inner wrap">
-      <!-- Photo -->
-      <div class="about-photo">
-        <img src="https://images.unsplash.com/photo-1483695028939-5bb13f8648b0?auto=format&fit=crop&w=900&q=80"
-             th:src="@{/assets/about-bakery.svg}"
-             alt="Những chiếc bánh được làm tươi tại tiệm LUNE"
-             onerror="this.onerror=null;this.src='/assets/about-bakery.svg'" />
-        <span class="about-photo-overlay">made with love ♡</span>
+  <section class="occasion-section" aria-labelledby="occasion-heading">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">SWEET MOMENTS</span>
+          <h2 class="section-title" id="occasion-heading">Chọn bánh cho <em>từng khoảnh khắc</em></h2>
+        </div>
+        <a th:href="@{/products}" class="text-link">Khám phá tất cả <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
-
-      <!-- Copy -->
-      <div class="about-copy">
-        <span class="eyebrow">OUR STORY · CÂU CHUYỆN NHỎ</span>
-        <h2 class="section-title" id="about-heading">
-          Một chiếc bánh ngon.<br>
-          <em>Một ngày thật dịu dàng.</em>
-        </h2>
-        <p>
-          LUNE bắt đầu từ tình yêu dành cho những mùi hương thân thuộc: bơ tan trong lò nướng,
-          bánh mì giòn ấm, và lớp kem nhẹ như mây.
-        </p>
-        <p>
-          Chúng mình tin rằng một chiếc bánh có thể thay lời yêu thương, trở thành lời cảm ơn,
-          lời chúc mừng, hay đơn giản chỉ là món quà dành cho chính bạn.
-        </p>
-        <a th:href="@{/products}" class="text-link">
-          Chọn bánh cho hôm nay
-          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+      <div class="occasion-grid">
+        <a th:href="@{/products(keyword='sinh nhật')}" class="occasion-card occasion-birthday">
+          <span>01</span><div><small>SINH NHẬT</small><h3>Ngày vui thêm rực rỡ</h3><p>Bánh kem và set tiệc cho những lời chúc thật ngọt.</p></div>
         </a>
+        <a th:href="@{/products(keyword='combo')}" class="occasion-card occasion-party">
+          <span>02</span><div><small>TIỆC &amp; SỰ KIỆN</small><h3>Chia sẻ niềm vui</h3><p>Combo bánh nhỏ vừa đủ cho buổi họp mặt ấm cúng.</p></div>
+        </a>
+        <a th:href="@{/products(keyword='hộp')}" class="occasion-card occasion-gift">
+          <span>03</span><div><small>QUÀ TẶNG</small><h3>Thay lời muốn nói</h3><p>Hộp bánh chỉn chu dành tặng người bạn thương.</p></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       COMBO HIGHLIGHT
+       ============================ -->
+  <section class="combo-section" aria-labelledby="combo-heading">
+    <div class="wrap combo-layout">
+      <div class="combo-copy">
+        <span class="eyebrow">LUNE COMBO</span>
+        <h2 class="section-title" id="combo-heading">Một hộp nhỏ.<br><em>Nhiều niềm vui.</em></h2>
+        <p>Những set bánh được tuyển chọn sẵn cho buổi trà chiều, sinh nhật mini hay món quà bất ngờ.</p>
+        <div class="combo-price"><span>Từ</span><strong>149.000 ₫</strong></div>
+        <a th:href="@{/products(keyword='combo')}" class="btn btn-primary">Xem các combo <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="combo-cards">
+        <article><img th:src="@{/assets/product-placeholder.svg}" alt="Combo Sweet Afternoon"><small>SET 4 BÁNH</small><h3>Sweet Afternoon</h3><strong>189.000 ₫</strong></article>
+        <article><img th:src="@{/assets/hero-cake.svg}" alt="Combo Birthday Mini"><small>SINH NHẬT MINI</small><h3>Little Celebration</h3><strong>259.000 ₫</strong></article>
       </div>
     </div>
   </section>
@@ -543,7 +552,8 @@
       <h4>Hỗ trợ</h4>
       <a th:href="@{/orders}">Đơn hàng của tôi</a>
       <a th:href="@{/profile}">Tài khoản</a>
-      <a href="#about">Câu chuyện của LUNE</a>
+      <a th:href="@{/about}">Câu chuyện của LUNE</a>
+      <a th:href="@{/contact}">Liên hệ với tiệm</a>
       <a th:href="@{/admin}" th:if="${session.user != null and (session.user.role == 'ADMIN' or session.user.role == 'STAFF')}">
         Khu vực quản trị
       </a>
