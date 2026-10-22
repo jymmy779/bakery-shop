@@ -4,7 +4,7 @@ import com.bakery.catalog.dto.CategoryRequest;
 import com.bakery.catalog.dto.CategoryResponse;
 import java.util.List;
 
-public interface CategoryService {
+public interface CategoryAdminService {
 
   CategoryResponse create(CategoryRequest request);
 

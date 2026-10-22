@@ -1,31 +1,33 @@
-package com.bakery.catalog.service;
+package com.bakery.catalog.service.impl;
 
-import com.bakery.catalog.dto.ProductSummaryResponse;
+import com.bakery.catalog.dto.CategoryResponse;
 import com.bakery.catalog.dto.ProductDetailResponse;
 import com.bakery.catalog.dto.ProductImageResponse;
-import com.bakery.catalog.dto.CategoryResponse;
-import com.bakery.common.exception.ResourceNotFoundException;
+import com.bakery.catalog.dto.ProductSummaryResponse;
 import com.bakery.catalog.entity.Product;
 import com.bakery.catalog.repository.ProductImageRepository;
 import com.bakery.catalog.repository.ProductRepository;
+import com.bakery.catalog.service.ProductQueryService;
+import com.bakery.common.exception.ResourceNotFoundException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import java.math.BigDecimal;
-import java.util.Set;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CatalogQueryService {
+public class ProductQueryServiceImpl implements ProductQueryService {
   private final ProductRepository products;
   private final ProductImageRepository images;
 
+  @Override
   @Transactional(readOnly = true)
   public Page<ProductSummaryResponse> filter(String keyword, Long categoryId,
       BigDecimal minPrice, BigDecimal maxPrice, String sort, int page, int size) {
@@ -53,6 +55,7 @@ public class CatalogQueryService {
         .replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%";
   }
 
+  @Override
   @Transactional(readOnly = true)
   public ProductDetailResponse getById(Long productId) {
     Product product = products.findById(productId)
@@ -82,11 +85,13 @@ public class CatalogQueryService {
     return result;
   }
 
+  @Override
   @Transactional(readOnly = true)
   public List<ProductSummaryResponse> list() {
     return list(null);
   }
 
+  @Override
   @Transactional(readOnly = true)
   public List<ProductSummaryResponse> list(String keyword) {
     Sort sort = Sort.by("name", "id");

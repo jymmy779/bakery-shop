@@ -17,16 +17,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryServiceImplTest {
+class CategoryAdminServiceImplTest {
 
   @Mock CategoryRepository categories;
   @Mock ProductRepository products;
 
-  private CategoryServiceImpl service;
+  private CategoryAdminServiceImpl service;
 
   @BeforeEach
   void setUp() {
-    service = new CategoryServiceImpl(categories, products);
+    service = new CategoryAdminServiceImpl(categories, products);
   }
 
   @Test

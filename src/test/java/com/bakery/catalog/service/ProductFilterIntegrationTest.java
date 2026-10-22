@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class ProductFilterIntegrationTest {
   @Autowired EntityManager em;
-  @Autowired CatalogQueryService catalog;
+  @Autowired ProductQueryService productQueryService;
 
   @Test
   void bestSellingCountsOnlyDeliveredQuantitiesAndCombinesFilters() {
@@ -49,14 +49,14 @@ class ProductFilterIntegrationTest {
     order(account, unsold, OrderStatus.PENDING, 200);
     em.flush();
 
-    var first = catalog.filter(marker, category.getId(), new BigDecimal("100000"),
+    var first = productQueryService.filter(marker, category.getId(), new BigDecimal("100000"),
         new BigDecimal("200000"), "best_selling", 0, 1);
     assertEquals(2, first.getTotalElements());
     assertEquals(sold.getId(), first.getContent().get(0).getId());
-    var second = catalog.filter(marker, category.getId(), new BigDecimal("100000"),
+    var second = productQueryService.filter(marker, category.getId(), new BigDecimal("100000"),
         new BigDecimal("200000"), "best_selling", 1, 1);
     assertEquals(unsold.getId(), second.getContent().get(0).getId());
-    assertEquals(unsold.getId(), catalog.filter(marker, category.getId(), null, null,
+    assertEquals(unsold.getId(), productQueryService.filter(marker, category.getId(), null, null,
         "price_asc", 0, 1).getContent().get(0).getId());
   }
 

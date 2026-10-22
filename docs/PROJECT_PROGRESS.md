@@ -97,6 +97,12 @@ Mẫu một dòng cập nhật:
 | --- | --- | --- | --- | --- | --- | --- |
 | Lương Việt Thái | Giao diện chung, đăng nhập Customer và CMS | Sửa lỗi render trang chủ và border header; tách `/login` cho Customer, thêm `/cms/login` với layout riêng cho Staff/Admin, phân luồng Security theo vai trò và thêm tài khoản/nút đăng nhập demo | Đang làm | `master`; Chưa có | Maven compile/context test đạt; toàn bộ suite còn 4 test `ProductControllerTest` lỗi 404 không thuộc thay đổi này | Restart ứng dụng và demo `/`, `/login`, `/cms/login`; xử lý riêng 4 test Product Controller |
 
+### 22/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Lương Việt Thái | Chuẩn hóa service Catalog | Tách `ProductQueryService`/`ProductQueryServiceImpl` cho storefront; đổi service CMS thành `ProductAdminService`/`ProductAdminServiceImpl` và `CategoryAdminService`/`CategoryAdminServiceImpl`; đồng bộ controller, test và tài liệu, không đổi nghiệp vụ | Chờ review | `Thai`; Chưa có | Chưa chạy được test do môi trường hiện tại không khởi động được Maven Wrapper và không có Maven cài sẵn | Chạy toàn bộ test bằng IntelliJ trước khi tạo PR |
+
 ## Mẫu checkpoint sprint mới
 
 Sao chép khối dưới đây và đặt phía trên sprint cũ:

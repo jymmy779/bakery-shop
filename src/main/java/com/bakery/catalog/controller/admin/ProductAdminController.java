@@ -3,8 +3,8 @@ package com.bakery.catalog.controller.admin;
 import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductUpdateRequest;
 import com.bakery.catalog.entity.ProductStatus;
-import com.bakery.catalog.service.CategoryService;
-import com.bakery.catalog.service.ProductService;
+import com.bakery.catalog.service.CategoryAdminService;
+import com.bakery.catalog.service.ProductAdminService;
 import com.bakery.catalog.service.ProductRemovalResult;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/cms/products")
 @RequiredArgsConstructor
 public class ProductAdminController {
-  private final ProductService productService;
-  private final CategoryService categoryService;
+  private final ProductAdminService productAdminService;
+  private final CategoryAdminService categoryAdminService;
 
   @GetMapping
   public String getAllProducts(@RequestParam(defaultValue = "0") int page,
@@ -32,9 +32,9 @@ public class ProductAdminController {
       @RequestParam(defaultValue = "") String keyword,
       @RequestParam(required = false) Long categoryId,
       @RequestParam(required = false) ProductStatus status, Model model) {
-    model.addAttribute("products", productService.search(keyword, categoryId, status,
+    model.addAttribute("products", productAdminService.search(keyword, categoryId, status,
         PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100))));
-    model.addAttribute("categories", categoryService.findAllActive());
+    model.addAttribute("categories", categoryAdminService.findAllActive());
     model.addAttribute("keyword", keyword);
     model.addAttribute("categoryId", categoryId);
     model.addAttribute("status", status);
@@ -47,7 +47,7 @@ public class ProductAdminController {
   public String createProduct(@Valid ProductCreateRequest request, BindingResult result, RedirectAttributes redirect) {
     if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu sản phẩm không hợp lệ!");
     try {
-      productService.create(request);
+      productAdminService.create(request);
       redirect.addFlashAttribute("successMessage", "Thêm sản phẩm thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -60,7 +60,7 @@ public class ProductAdminController {
       BindingResult result, RedirectAttributes redirect) {
     if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu sản phẩm không hợp lệ!");
     try {
-      productService.update(id, request);
+      productAdminService.update(id, request);
       redirect.addFlashAttribute("successMessage", "Cập nhật sản phẩm thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -71,7 +71,7 @@ public class ProductAdminController {
   @PostMapping("/delete/{id}")
   public String deleteProduct(@PathVariable Long id, RedirectAttributes redirect) {
     try {
-      ProductRemovalResult result = productService.deleteOrStopSelling(id);
+      ProductRemovalResult result = productAdminService.deleteOrStopSelling(id);
       redirect.addFlashAttribute("successMessage", result == ProductRemovalResult.DELETED
           ? "Xóa sản phẩm thành công."
           : "Sản phẩm đã phát sinh đơn hàng nên được chuyển sang ngừng bán.");
@@ -84,7 +84,7 @@ public class ProductAdminController {
   @PostMapping("/toggle-status/{id}")
   public String toggleProductStatus(@PathVariable Long id, RedirectAttributes redirect) {
     try {
-      productService.toggleStatus(id);
+      productAdminService.toggleStatus(id);
       redirect.addFlashAttribute("successMessage", "Đã cập nhật trạng thái sản phẩm.");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -96,7 +96,7 @@ public class ProductAdminController {
   public String deleteProductImage(@PathVariable Long productId, @PathVariable Long imageId,
       RedirectAttributes redirect) {
     try {
-      productService.deleteImage(productId, imageId);
+      productAdminService.deleteImage(productId, imageId);
       redirect.addFlashAttribute("successMessage", "Đã xóa ảnh sản phẩm.");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());

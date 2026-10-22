@@ -1,7 +1,7 @@
 package com.bakery.catalog.controller.admin;
 
 import com.bakery.catalog.dto.CategoryRequest;
-import com.bakery.catalog.service.CategoryService;
+import com.bakery.catalog.service.CategoryAdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -17,11 +17,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/cms/categories")
 @RequiredArgsConstructor
 public class CategoryAdminController {
-  private final CategoryService categoryService;
+  private final CategoryAdminService categoryAdminService;
 
   @GetMapping
   public String getAllCategories(Model model) {
-    model.addAttribute("categories", categoryService.findAll());
+    model.addAttribute("categories", categoryAdminService.findAll());
     model.addAttribute("categoryRequest", new CategoryRequest());
     return "cms/category/list";
   }
@@ -29,7 +29,7 @@ public class CategoryAdminController {
   @PostMapping("/toggle-status/{id}")
   public String toggleCategoryStatus(@PathVariable Long id, RedirectAttributes redirect) {
     try {
-      categoryService.toggleStatus(id);
+      categoryAdminService.toggleStatus(id);
       redirect.addFlashAttribute("successMessage", "Đã cập nhật trạng thái danh mục.");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -41,7 +41,7 @@ public class CategoryAdminController {
   public String createCategory(@Valid CategoryRequest request, BindingResult result, RedirectAttributes redirect) {
     if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu danh mục không hợp lệ!");
     try {
-      categoryService.create(request);
+      categoryAdminService.create(request);
       redirect.addFlashAttribute("successMessage", "Thêm danh mục thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -54,7 +54,7 @@ public class CategoryAdminController {
       RedirectAttributes redirect) {
     if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu danh mục không hợp lệ!");
     try {
-      categoryService.update(id, request);
+      categoryAdminService.update(id, request);
       redirect.addFlashAttribute("successMessage", "Cập nhật danh mục thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
@@ -65,7 +65,7 @@ public class CategoryAdminController {
   @PostMapping("/delete/{id}")
   public String deleteCategory(@PathVariable Long id, RedirectAttributes redirect) {
     try {
-      categoryService.delete(id);
+      categoryAdminService.delete(id);
       redirect.addFlashAttribute("successMessage", "Xóa danh mục thành công!");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());

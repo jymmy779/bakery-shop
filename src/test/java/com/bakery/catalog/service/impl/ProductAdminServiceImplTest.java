@@ -15,7 +15,7 @@ import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.repository.CategoryRepository;
 import com.bakery.catalog.repository.ProductImageRepository;
 import com.bakery.catalog.repository.ProductRepository;
-import com.bakery.catalog.service.CatalogQueryService;
+import com.bakery.catalog.service.ProductQueryService;
 import com.bakery.order.service.ProductOrderReferenceService;
 import com.bakery.storage.FileStorageService;
 import java.math.BigDecimal;
@@ -30,21 +30,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class ProductServiceImplTest {
+class ProductAdminServiceImplTest {
 
   @Mock ProductRepository products;
   @Mock ProductImageRepository images;
   @Mock CategoryRepository categories;
   @Mock ProductOrderReferenceService orderReferences;
   @Mock FileStorageService fileStorage;
-  @Mock CatalogQueryService catalog;
+  @Mock ProductQueryService productQueryService;
 
-  private ProductServiceImpl service;
+  private ProductAdminServiceImpl service;
   private Category category;
 
   @BeforeEach
   void setUp() {
-    service = new ProductServiceImpl(products, images, categories, orderReferences, catalog,
+    service = new ProductAdminServiceImpl(products, images, categories, orderReferences, productQueryService,
         fileStorage);
     category = new Category();
     category.setId(1L);
@@ -69,7 +69,7 @@ class ProductServiceImplTest {
     service.create(request);
 
     verify(products).save(any(Product.class));
-    verify(catalog).getById(5L);
+    verify(productQueryService).getById(5L);
   }
 
   @Test

@@ -8,7 +8,7 @@ import com.bakery.catalog.entity.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface ProductService {
+public interface ProductAdminService {
 
   ProductDetailResponse create(ProductCreateRequest request);
 

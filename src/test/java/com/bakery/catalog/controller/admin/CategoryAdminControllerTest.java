@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import com.bakery.catalog.service.CategoryService;
+import com.bakery.catalog.service.CategoryAdminService;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,17 +19,17 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @ExtendWith(MockitoExtension.class)
 class CategoryAdminControllerTest {
 
-  @Mock CategoryService categories;
+  @Mock CategoryAdminService categoryAdminService;
   private MockMvc mvc;
 
   @BeforeEach
   void setUp() {
-    mvc = MockMvcBuilders.standaloneSetup(new CategoryAdminController(categories)).build();
+    mvc = MockMvcBuilders.standaloneSetup(new CategoryAdminController(categoryAdminService)).build();
   }
 
   @Test
   void rendersCmsCategoryTable() throws Exception {
-    when(categories.findAll()).thenReturn(List.of());
+    when(categoryAdminService.findAll()).thenReturn(List.of());
 
     mvc.perform(get("/cms/categories"))
         .andExpect(status().isOk())
