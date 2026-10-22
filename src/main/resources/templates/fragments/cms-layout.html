@@ -1,25 +1,65 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<body>
-  <th:block th:fragment="head-meta(title)">
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#3f1d26" />
-    <title th:text="${title} + ' — LUNE CMS'">LUNE CMS</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet" />
-    <link rel="stylesheet" th:href="@{/css/app.css}" />
-  </th:block>
-
-  <aside th:fragment="login-brand" class="cms-login-brand">
-    <a th:href="@{/}" class="cms-brand-logo">LUNE<span>.</span></a>
-    <div class="cms-brand-copy">
-      <span class="cms-kicker">BAKERY MANAGEMENT</span>
-      <h1>Vận hành tiệm bánh<br /><em>gọn gàng mỗi ngày.</em></h1>
-      <p>Khu vực làm việc dành riêng cho Staff và Admin của LUNE Bakery.</p>
-    </div>
-    <small>© 2026 LUNE Bakery</small>
-  </aside>
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3f1d26">
+  <title th:text="${title} + ' — LUNE CMS'">LUNE CMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<th:block th:fragment="head-meta(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#3f1d26">
+  <title th:text="${title} + ' — LUNE CMS'">LUNE CMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</th:block>
+<body class="cms-shell">
+<header th:fragment="header" class="cms-header">
+  <a class="cms-brand" th:href="@{/cms}">LUNE Bakery CMS</a>
+  <nav class="cms-nav" aria-label="Điều hướng quản trị">
+    <a th:href="@{/cms}">Tổng quan</a>
+    <a th:href="@{/cms/products}">Sản phẩm</a>
+    <a th:href="@{/cms/categories}">Danh mục</a>
+    <a th:href="@{/cms/orders}">Đơn hàng</a>
+    <a th:href="@{/logout}">Đăng xuất</a>
+  </nav>
+</header>
+<footer th:fragment="footer" class="cms-footer">
+  <span>LUNE Bakery CMS</span>
+</footer>
+<div th:fragment="confirm-dialog" id="confirm-dialog" hidden>
+  <div class="confirm-dialog__content">
+    <p id="confirm-dialog-message"></p>
+    <button type="button" data-confirm-cancel>Hủy</button>
+    <button type="button" data-confirm-submit>Xác nhận</button>
+  </div>
+</div>
+<th:block th:fragment="scripts">
+  <script>
+    document.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!window.confirm(form.dataset.confirmMessage)) {
+          event.preventDefault();
+        }
+      });
+    });
+  </script>
+</th:block>
+<aside th:fragment="login-brand" class="cms-login-brand">
+  <a th:href="@{/}" class="cms-brand-logo">LUNE<span>.</span></a>
+  <div class="cms-brand-copy">
+    <span class="cms-kicker">BAKERY MANAGEMENT</span>
+    <h1>Vận hành tiệm bánh<br><em>gọn gàng mỗi ngày.</em></h1>
+    <p>Khu vực làm việc dành riêng cho Staff và Admin của LUNE Bakery.</p>
+  </div>
+  <small>© 2026 LUNE Bakery</small>
+</aside>
 </body>
 </html>

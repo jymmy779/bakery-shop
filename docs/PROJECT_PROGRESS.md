@@ -76,6 +76,13 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 21/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Nguyễn Trần Thái Sơn | Catalog Admin | Chuyển trang sản phẩm/danh mục sang bảng CMS; đặt form thêm/chỉnh sửa trong sidebar bên trái; dọn route và method dư thừa, cập nhật test theo service contract | Chờ review | `feature/admin-son`, PR #12, Chưa có commit | `mvnw clean test`: 29 test đạt, gồm integration MySQL local | Kiểm tra runtime/Postman và push bản cập nhật |
+| Nguyễn Trần Thái Sơn | Catalog Admin | Phân biệt kết quả xóa sản phẩm, bổ sung toggle trạng thái sản phẩm/danh mục, hiển thị toàn bộ danh mục CMS, chuẩn hóa nhãn tiếng Việt, kiểm tra và dọn file ảnh upload, khôi phục gợi ý giá, bổ sung carousel/danh sách ảnh khi chỉnh sửa và xóa ảnh có xác nhận, chặn xóa ảnh cuối để sản phẩm luôn có tối thiểu một ảnh, giữ CMS giới hạn cho Staff/Admin, xóa code lặp và loại bỏ endpoint ngừng bán cũ bị trùng với toggle | Chờ review | `feature/admin-son`, PR #12, Chưa có commit | `mvnw.cmd clean test`: 39 test đạt, 0 failure, 0 error | Không tạo PR mới; kiểm tra runtime trên CMS |
+
 ### 19/10/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |

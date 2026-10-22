@@ -2,6 +2,8 @@ package com.bakery.catalog.dto;
 
 import com.bakery.catalog.entity.ProductStatus;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +15,7 @@ public class ProductSummaryResponse {
 
   private Long id;
   private String name;
+  private String description;
   private BigDecimal price;
   private int stockQuantity;
   private int preparationDays;
@@ -20,4 +23,14 @@ public class ProductSummaryResponse {
   private Long categoryId;
   private String categoryName;
   private String primaryImagePath;
+  private List<String> imagePaths = new ArrayList<>();
+  private List<Long> imageIds = new ArrayList<>();
+
+  public String getImagePathsCsv() {
+    return String.join("|", imagePaths);
+  }
+
+  public String getImageIdsCsv() {
+    return imageIds.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining("|"));
+  }
 }

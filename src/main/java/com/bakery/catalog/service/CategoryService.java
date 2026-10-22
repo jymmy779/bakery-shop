@@ -14,5 +14,9 @@ public interface CategoryService {
 
   List<CategoryResponse> findAllActive();
 
+  List<CategoryResponse> findAll();
+
+  void toggleStatus(Long categoryId);
+
   void delete(Long categoryId);
 }

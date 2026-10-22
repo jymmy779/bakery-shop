@@ -22,5 +22,9 @@ public interface ProductService {
       ProductStatus status,
       Pageable pageable);
 
-  void deleteOrStopSelling(Long productId);
+  ProductRemovalResult deleteOrStopSelling(Long productId);
+
+  void toggleStatus(Long productId);
+
+  void deleteImage(Long productId, Long imageId);
 }
