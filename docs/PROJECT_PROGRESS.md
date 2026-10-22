@@ -58,13 +58,13 @@ Mẫu một dòng cập nhật:
 | Product browsing | Trần Chí Quốc | Đã merge | PR #2, commit `af86b21`; có code danh sách, chi tiết, tìm kiếm, lọc, phân trang và test | Chạy nghiệm thu với MySQL local, sửa các lỗi phát hiện nếu có |
 | Cart | Trần Chí Quốc | Chưa có bản merge được ghi nhận | Chưa thấy phần xử lý Cart được merge trong ngày 19/10 | Triển khai thêm/cập nhật/xóa sản phẩm trong giỏ Session |
 | Checkout, Order và Payment | Phạm Nhật Hưng | Chưa có bản merge được ghi nhận | Chưa có PR merge trong ngày 19/10 | Cập nhật nhánh/PR và các use case đã làm |
-| Catalog Admin | Nguyễn Trần Thái Sơn | Chờ review lại | PR #4 từng merge tại `42dc259`, sau đó bị revert bởi PR #5 ngày 20/10 | Sửa trên nhánh, review và merge lại; chỉ đánh dấu hoàn thành sau khi demo CRUD đạt |
+| Catalog Admin | Nguyễn Trần Thái Sơn | Đã merge | PR #12, commit `87b1373`, merge commit `2f9378b`; theo bàn giao có 39 test đạt | Nghiệm thu runtime các luồng CRUD, trạng thái và quản lý ảnh trên CMS; hoàn thiện UI còn lại |
 | Giao diện chung và dữ liệu mẫu | Lương Việt Thái | Đã merge | PR #3, commit `272b002`; cập nhật layout, trang chủ, auth/cart và dữ liệu mẫu | Kiểm tra lại khi ghép với logic thật của từng module |
 | Security, Email và File Storage | Lương Việt Thái | Đang làm | Đã có cấu hình và service contract nền trong project | Bổ sung implementation, tích hợp và kiểm thử theo use case |
 
 **Vấn đề/rủi ro đang theo dõi:**
 
-- Catalog Admin đã từng merge nhưng bị revert, vì vậy chưa được tính là hoàn thành.
+- Bản Catalog Admin tại PR #4 từng bị revert; phiên bản thay thế đã được hoàn thiện và merge bằng PR #12. Hiện vẫn cần nghiệm thu runtime trước khi chuyển sang `Hoàn thành`.
 - Các trang giao diện đã merge có thể vẫn đang dùng dữ liệu mẫu; cần kiểm tra lại sau
   khi nối service và database.
 - Các phần chưa có PR merge cần thành viên tự bổ sung branch/PR để checkpoint phản ánh
@@ -76,12 +76,19 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 22/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Lương Việt Thái | Chuẩn hóa service Catalog | Tách `ProductQueryService`/`ProductQueryServiceImpl` cho storefront; đổi service CMS thành `ProductAdminService`/`ProductAdminServiceImpl` và `CategoryAdminService`/`CategoryAdminServiceImpl`; đồng bộ controller, test và tài liệu, không đổi nghiệp vụ | Đã merge | PR #14, commit `b93274f`, merge commit `8595e2b` | Chưa chạy lại test do môi trường terminal không khởi động được Maven Wrapper và không có Maven cài sẵn | Chạy toàn bộ test bằng IntelliJ; tiếp tục hoàn thiện UI |
+
 ### 21/10/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
 | --- | --- | --- | --- | --- | --- | --- |
-| Nguyễn Trần Thái Sơn | Catalog Admin | Chuyển trang sản phẩm/danh mục sang bảng CMS; đặt form thêm/chỉnh sửa trong sidebar bên trái; dọn route và method dư thừa, cập nhật test theo service contract | Chờ review | `feature/admin-son`, PR #12, Chưa có commit | `mvnw clean test`: 29 test đạt, gồm integration MySQL local | Kiểm tra runtime/Postman và push bản cập nhật |
-| Nguyễn Trần Thái Sơn | Catalog Admin | Phân biệt kết quả xóa sản phẩm, bổ sung toggle trạng thái sản phẩm/danh mục, hiển thị toàn bộ danh mục CMS, chuẩn hóa nhãn tiếng Việt, kiểm tra và dọn file ảnh upload, khôi phục gợi ý giá, bổ sung carousel/danh sách ảnh khi chỉnh sửa và xóa ảnh có xác nhận, chặn xóa ảnh cuối để sản phẩm luôn có tối thiểu một ảnh, giữ CMS giới hạn cho Staff/Admin, xóa code lặp và loại bỏ endpoint ngừng bán cũ bị trùng với toggle | Chờ review | `feature/admin-son`, PR #12, Chưa có commit | `mvnw.cmd clean test`: 39 test đạt, 0 failure, 0 error | Không tạo PR mới; kiểm tra runtime trên CMS |
+| Nguyễn Trần Thái Sơn | Catalog Admin | Chuyển trang sản phẩm/danh mục sang bảng CMS; đặt form thêm/chỉnh sửa trong sidebar; dọn route và method dư thừa, cập nhật test theo service contract | Đã merge | PR #12, commit cuối `87b1373`, merge commit `2f9378b` | Giai đoạn này ghi nhận `mvnw clean test`: 29 test đạt, gồm integration MySQL local | Được hoàn thiện tiếp trong commit cuối của PR #12 |
+| Nguyễn Trần Thái Sơn | Catalog Admin | Hoàn thiện xóa hoặc ngừng bán theo lịch sử đơn hàng; toggle trạng thái sản phẩm/danh mục; quản lý từ 1 đến 4 ảnh; carousel, xóa từng ảnh và chặn xóa ảnh cuối; chuẩn hóa nhãn tiếng Việt và giới hạn CMS cho Staff/Admin | Đã merge | PR #12, commit `87b1373`, merge commit `2f9378b` | Theo bàn giao PR: `mvnw.cmd clean test`, 39 test đạt, 0 failure, 0 error; người tích hợp chưa chạy lại do môi trường Maven | Nghiệm thu runtime các luồng CMS và xử lý các lỗi UI còn lại nếu có |
+| Lương Việt Thái | Giao diện chung, đăng nhập Customer và CMS | Sửa lỗi render trang chủ và border header; tách `/login` cho Customer, thêm `/cms/login` với layout riêng cho Staff/Admin, phân luồng Security theo vai trò và thêm tài khoản/nút đăng nhập demo | Đã merge | PR #13, commit `eef59ab`, merge commit `81f36b1` | Maven compile/context test đạt tại thời điểm triển khai; toàn bộ suite khi đó còn 4 test `ProductControllerTest` lỗi 404 | Nghiệm thu lại đăng nhập Customer/CMS sau khi tích hợp các module |
 
 ### 19/10/2026
 
@@ -89,19 +96,7 @@ Mẫu một dòng cập nhật:
 | --- | --- | --- | --- | --- | --- | --- |
 | Trần Chí Quốc | Product browsing | Bổ sung API danh sách và chi tiết sản phẩm; tìm kiếm không dấu; lọc danh mục/giá; sắp xếp; phân trang; dữ liệu mẫu và test liên quan | Đã merge | PR #2, `af86b21` | Có test controller, service và integration trong source | Nghiệm thu với MySQL local; tiếp tục phần Cart |
 | Lương Việt Thái | Giao diện chung và dữ liệu mẫu | Cập nhật layout, CSS, trang chủ, các trang auth/cart và tài nguyên giao diện | Đã merge | PR #3, `272b002` | Cần demo lại sau khi nối logic thật | Tiếp tục Security, Email, File Storage và hỗ trợ tích hợp |
-| Nguyễn Trần Thái Sơn | Catalog Admin | Bổ sung controller/service CRUD danh mục, sản phẩm và giao diện CMS | Chờ review lại | PR #4, `42dc259`; bị revert bởi PR #5 ngày 20/10 | Chưa được nghiệm thu trên `master` hiện tại | Sửa lỗi/xung đột, tạo PR mới và demo CRUD |
-
-### 21/10/2026
-
-| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
-| --- | --- | --- | --- | --- | --- | --- |
-| Lương Việt Thái | Giao diện chung, đăng nhập Customer và CMS | Sửa lỗi render trang chủ và border header; tách `/login` cho Customer, thêm `/cms/login` với layout riêng cho Staff/Admin, phân luồng Security theo vai trò và thêm tài khoản/nút đăng nhập demo | Đang làm | `master`; Chưa có | Maven compile/context test đạt; toàn bộ suite còn 4 test `ProductControllerTest` lỗi 404 không thuộc thay đổi này | Restart ứng dụng và demo `/`, `/login`, `/cms/login`; xử lý riêng 4 test Product Controller |
-
-### 22/10/2026
-
-| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
-| --- | --- | --- | --- | --- | --- | --- |
-| Lương Việt Thái | Chuẩn hóa service Catalog | Tách `ProductQueryService`/`ProductQueryServiceImpl` cho storefront; đổi service CMS thành `ProductAdminService`/`ProductAdminServiceImpl` và `CategoryAdminService`/`CategoryAdminServiceImpl`; đồng bộ controller, test và tài liệu, không đổi nghiệp vụ | Chờ review | `Thai`; Chưa có | Chưa chạy được test do môi trường hiện tại không khởi động được Maven Wrapper và không có Maven cài sẵn | Chạy toàn bộ test bằng IntelliJ trước khi tạo PR |
+| Nguyễn Trần Thái Sơn | Catalog Admin | Bổ sung controller/service CRUD danh mục, sản phẩm và giao diện CMS | Chờ review lại | PR #4, `42dc259`; bị revert bởi PR #5 ngày 20/10 | Chưa được nghiệm thu trên `master` tại thời điểm đó | Lịch sử được giữ lại; phần Catalog Admin sau đó được hoàn thiện và merge bằng PR #12 |
 
 ## Mẫu checkpoint sprint mới
 
