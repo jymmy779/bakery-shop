@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head-meta('Về LUNE')}"></th:block></head>
+<body>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+  <header th:replace="~{fragments/layout :: header(currentPage='about')}"></header>
+  <main>
+    <section class="story-hero">
+      <div class="wrap story-hero-grid">
+        <div><span class="eyebrow">OUR LITTLE STORY</span><h1>Một chiếc bánh ngon.<br><em>Một ngày dịu dàng.</em></h1><p>LUNE ra đời từ niềm vui được làm bánh và mong muốn biến những khoảnh khắc bình thường thành kỷ niệm thật ngọt.</p></div>
+        <img th:src="@{/assets/about-bakery.svg}" alt="Không gian làm bánh tại LUNE Bakery">
+      </div>
+    </section>
+    <section class="wrap story-values">
+      <article><span>01</span><h2>Làm mới mỗi ngày</h2><p>Bánh được chuẩn bị theo mẻ nhỏ để giữ độ tươi, hương thơm và kết cấu trọn vẹn.</p></article>
+      <article><span>02</span><h2>Nguyên liệu chọn lọc</h2><p>Chúng mình ưu tiên nguyên liệu rõ nguồn gốc và cân chỉnh độ ngọt phù hợp khẩu vị Việt.</p></article>
+      <article><span>03</span><h2>Chăm chút thủ công</h2><p>Từng lớp kem, phần trang trí và hộp bánh đều được hoàn thiện cẩn thận trước khi giao.</p></article>
+    </section>
+    <section class="story-cta"><div class="wrap"><span class="eyebrow">BAKED WITH LOVE</span><h2>Để LUNE góp một chút ngọt ngào<br>vào ngày đặc biệt của bạn.</h2><a th:href="@{/products}" class="btn btn-light">Khám phá sản phẩm</a></div></section>
+  </main>
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <th:block th:replace="~{fragments/layout :: head-meta('Sản phẩm')}"></th:block>
+</head>
+<body>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+  <header th:replace="~{fragments/layout :: header(currentPage='shop')}"></header>
+
+  <main class="standard-page">
+    <section class="wrap catalog-heading">
+      <span class="eyebrow">FRESHLY BAKED FOR YOU</span>
+      <h1 class="page-title">Bộ sưu tập bánh</h1>
+      <p>Mỗi chiếc bánh là một niềm vui nhỏ, được làm mới tại tiệm mỗi ngày.</p>
+    </section>
+
+    <section class="wrap catalog-layout">
+      <aside class="panel catalog-filter">
+        <form id="catalog-filter-form">
+          <label for="keyword">Tìm món bạn thích</label>
+          <div class="catalog-search">
+            <input id="keyword" name="keyword" type="search" placeholder="Tên bánh, hương vị...">
+            <button type="submit">Tìm</button>
+          </div>
+          <hr>
+          <label for="category">Danh mục</label>
+          <select id="category" name="categoryId">
+            <option value="">Tất cả sản phẩm</option>
+          </select>
+          <label for="sort">Sắp xếp</label>
+          <select id="sort" name="sort">
+            <option value="name">Tên A–Z</option>
+            <option value="price_asc">Giá thấp đến cao</option>
+            <option value="price_desc">Giá cao đến thấp</option>
+          </select>
+          <button class="btn btn-primary" type="submit">Áp dụng bộ lọc</button>
+        </form>
+      </aside>
+
+      <div>
+        <div class="catalog-toolbar"><strong id="catalog-count">Đang tải sản phẩm...</strong><span>12 sản phẩm mỗi trang</span></div>
+        <div id="catalog-grid" class="catalog-grid" aria-live="polite">
+          <div class="catalog-loading">Đang chuẩn bị những chiếc bánh ngon...</div>
+        </div>
+        <div id="catalog-empty" class="empty-state" hidden>
+          <span>♡</span>
+          <h3>Chưa tìm thấy món bánh phù hợp</h3>
+          <p>Thử đổi từ khóa hoặc chọn một danh mục khác nhé.</p>
+        </div>
+        <nav id="catalog-pagination" class="catalog-pagination" aria-label="Phân trang"></nav>
+      </div>
+    </section>
+  </main>
+
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+  <script th:src="@{/js/product-list.js}" defer></script>
+</body>
+</html>

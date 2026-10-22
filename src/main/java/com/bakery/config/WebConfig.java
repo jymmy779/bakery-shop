@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -28,5 +29,13 @@ public class WebConfig implements WebMvcConfigurer {
     registry
         .addResourceHandler("/uploads/**")
         .addResourceLocations(uploadPath.toUri().toString());
+  }
+
+  @Override
+  public void addViewControllers(ViewControllerRegistry registry) {
+    registry.addViewController("/products").setViewName("product/list");
+    registry.addViewController("/products/{productId}").setViewName("product/detail");
+    registry.addViewController("/about").setViewName("about/index");
+    registry.addViewController("/contact").setViewName("contact/index");
   }
 }

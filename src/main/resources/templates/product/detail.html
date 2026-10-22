@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><th:block th:replace="~{fragments/layout :: head-meta('Chi tiết bánh')}"></th:block></head>
+<body>
+  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+  <header th:replace="~{fragments/layout :: header(currentPage='shop')}"></header>
+  <main class="standard-page">
+    <div class="wrap">
+      <nav class="breadcrumb"><a th:href="@{/}">Trang chủ</a><span>/</span><a th:href="@{/products}">Sản phẩm</a><span>/</span><span>Bánh kem dâu mùa hè</span></nav>
+      <section class="product-detail-grid">
+        <div class="product-gallery">
+          <div class="product-main-image"><img src="/assets/hero-cake.svg" alt="Bánh kem dâu mùa hè"></div>
+          <div class="product-thumbnails">
+            <button class="active"><img src="/assets/hero-cake.svg" alt="Ảnh bánh chính"></button>
+            <button><img src="/assets/product-placeholder.svg" alt="Ảnh bánh thứ hai"></button>
+          </div>
+        </div>
+        <div class="product-detail-copy">
+          <span class="eyebrow">BÁNH KEM · LUNE SIGNATURE</span>
+          <h1>Bánh kem dâu mùa hè</h1>
+          <p class="detail-price">189.000 ₫</p>
+          <p class="detail-description">Cốt bánh vanilla mềm ẩm, xen giữa là lớp kem sữa thanh nhẹ và dâu tây tươi. Một lựa chọn dịu dàng cho sinh nhật, buổi hẹn hoặc một ngày bạn muốn tự thưởng cho mình.</p>
+          <div class="product-facts">
+            <div><span>Thời gian chuẩn bị</span><strong>1 ngày</strong></div>
+            <div><span>Tình trạng</span><strong>Còn 12 phần</strong></div>
+          </div>
+          <form class="product-add-form" action="/cart" method="get">
+            <label for="quantity">Số lượng</label>
+            <input id="quantity" type="number" name="quantity" min="1" max="12" value="1">
+            <button class="btn btn-primary" type="submit">Thêm vào giỏ hàng</button>
+          </form>
+          <p class="product-note">Bánh được đóng gói cẩn thận. Tiệm sẽ xác nhận thời gian giao sau khi nhận đơn.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+  <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
