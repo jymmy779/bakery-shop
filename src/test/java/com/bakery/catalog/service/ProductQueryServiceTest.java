@@ -5,6 +5,7 @@ import com.bakery.catalog.entity.Product;
 import com.bakery.catalog.entity.ProductImage;
 import com.bakery.catalog.repository.ProductImageRepository;
 import com.bakery.catalog.repository.ProductRepository;
+import com.bakery.catalog.service.impl.ProductQueryServiceImpl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -18,10 +19,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-class CatalogQueryServiceTest {
+class ProductQueryServiceTest {
   private final ProductRepository products = mock(ProductRepository.class);
   private final ProductImageRepository images = mock(ProductImageRepository.class);
-  private final CatalogQueryService service = new CatalogQueryService(products, images);
+  private final ProductQueryService service = new ProductQueryServiceImpl(products, images);
 
   @Test
   void combinesFiltersAndKeepsDatabasePageTotal() {

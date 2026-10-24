@@ -76,7 +76,7 @@ Admin<Feature>Controller Controller CMS
 
 Các service nghiệp vụ dùng interface đã được định nghĩa sẵn làm hợp đồng giữa
 các phân hệ. Implementation đặt trong package `service.impl` và dùng hậu tố
-`Impl`, ví dụ `ProductServiceImpl`.
+`Impl`, ví dụ `ProductAdminServiceImpl`.
 
 ## Quy tắc làm việc nhóm
 

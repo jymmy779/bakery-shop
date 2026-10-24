@@ -1,17 +1,795 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bakery Shop</title>
-  <link rel="stylesheet" th:href="@{/css/app.css}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#fcf8f3" />
+  <meta name="description" content="LUNE Bakery — Bánh tươi mỗi ngày, đặt bánh online tiện lợi tại TP. Hồ Chí Minh." />
+  <title>LUNE. — Tiệm bánh của những ngày dịu dàng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/app.css}" />
 </head>
 <body>
-  <header th:replace="~{fragments/layout :: header}"></header>
-  <main class="container">
-    <h1>Bakery Shop</h1>
-    <p>Trang chủ đang được xây dựng.</p>
-  </main>
-  <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<!-- SVG Icon Symbols -->
+<svg xmlns="http://www.w3.org/2000/svg" class="symbols" aria-hidden="true">
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M4 8h16l-1.1 12H5.1L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5.3 20v-1.2a6.7 6.7 0 0 1 13.4 0V20"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 5 5"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-7-7 7 7-7 7"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M4 12h16"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 6h16M9 6V4h6v2M7 6l1 14h8l1-14M10 10v7m4-7v7"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h13v12H2zM15 10h3.5l3.5 4v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.7 5.7c-1.8-1.8-4.8-1.8-6.6 0L12 7.8 9.9 5.7C8.1 3.9 5.1 3.9 3.3 5.7s-1.8 4.8 0 6.6L12 21l8.7-8.7c1.8-1.8 1.8-4.8 0-6.6Z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3L22 9.3l-5 4.9 1.2 6.9L12 18l-6.2 3.1L7 14.2 2 9.3l6.9-1L12 2Z"/></symbol>
+</svg>
+
+<!-- ===== ANNOUNCEMENT BAR ===== -->
+<div class="announcement">
+  <span class="announcement-star">✳</span>
+  Nướng mới mỗi ngày, ngọt lành trong từng khoảnh khắc
+  <span class="announcement-star">✳</span>
+</div>
+
+<!-- ===== HEADER ===== -->
+<header class="site-header" id="site-header">
+  <div class="header-inner wrap">
+    <!-- Brand -->
+    <a th:href="@{/}" class="brand" aria-label="LUNE Bakery - Trang chủ">
+      LUNE<span class="brand-dot">.</span><small>BAKERY &amp; PATISSERIE</small>
+    </a>
+
+    <!-- Desktop Nav -->
+    <nav class="nav-links" aria-label="Điều hướng chính">
+      <a th:href="@{/}" class="active" data-nav="home">Trang chủ</a>
+      <a th:href="@{/products}" data-nav="shop">Thực đơn</a>
+      <a href="#about">Về LUNE</a>
+      <a href="#footer">Liên hệ</a>
+    </nav>
+
+    <!-- Actions -->
+    <div class="header-actions">
+      <a th:href="@{/products}" class="icon-button desktop-search" aria-label="Tìm bánh">
+        <svg aria-hidden="true"><use href="#i-search"/></svg>
+      </a>
+      <!-- Not logged in -->
+      <a th:href="@{/login}" class="icon-button user-action" aria-label="Đăng nhập"
+         th:if="${session.user == null}">
+        <svg aria-hidden="true"><use href="#i-user"/></svg>
+      </a>
+      <!-- Logged in -->
+      <a th:href="@{/profile}" class="icon-button user-action" aria-label="Tài khoản"
+         th:if="${session.user != null}">
+        <svg aria-hidden="true"><use href="#i-user"/></svg>
+      </a>
+      <!-- Cart -->
+      <a th:href="@{/cart}" class="icon-button cart-button" aria-label="Giỏ hàng">
+        <svg aria-hidden="true"><use href="#i-bag"/></svg>
+        <span class="cart-count" id="cart-count"
+              th:text="${session.cartCount != null ? session.cartCount : 0}">0</span>
+      </a>
+      <!-- Mobile Menu Toggle -->
+      <button class="icon-button mobile-menu" type="button" aria-label="Mở menu"
+              id="mobile-menu-btn" aria-expanded="false" aria-controls="mobile-nav">
+        <svg aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Nav -->
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Menu di động">
+    <a th:href="@{/}">Trang chủ</a>
+    <a th:href="@{/products}">Thực đơn</a>
+    <a href="#about">Về LUNE</a>
+    <a href="#footer">Liên hệ</a>
+    <a th:href="@{/orders}">Đơn hàng</a>
+    <a th:href="@{/cart}">Giỏ hàng</a>
+  </nav>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main id="home">
+
+  <!-- ============================
+       HERO SECTION
+       ============================ -->
+  <section class="hero" aria-label="Banner chào mừng">
+    <!-- Left: Copy -->
+    <div class="hero-content">
+      <span class="eyebrow">✳ &nbsp; TIỆM BÁNH NHỎ, NIỀM VUI TO</span>
+      <h1>Gửi chút ngọt<br>vào <em>ngày của bạn.</em></h1>
+      <p class="hero-description">
+        Có những niềm vui giản dị bắt đầu từ một chiếc bánh ngon.
+        Ghé LUNE, chọn chiếc bánh bạn thương, chúng mình sẽ chuẩn bị thật chỉn chu.
+      </p>
+      <div class="hero-buttons">
+        <a th:href="@{/products}" class="btn btn-primary" id="hero-cta-shop">
+          Khám phá thực đơn
+          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+        <a href="#about" class="text-link">
+          Câu chuyện của LUNE
+          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+      </div>
+      <div class="hero-trust">
+        <span>
+          <svg aria-hidden="true"><use href="#i-check"/></svg>
+          Bánh làm tươi mỗi ngày
+        </span>
+        <span>
+          <svg aria-hidden="true"><use href="#i-heart"/></svg>
+          Chăm chút từng chiếc bánh
+        </span>
+      </div>
+    </div>
+
+    <!-- Right: Visual -->
+    <div class="hero-visual" aria-hidden="true">
+      <img th:src="@{/assets/hero-cake.svg}" alt="Bánh kem dâu tây đặc trưng của LUNE Bakery" />
+      <div class="hero-stamp">
+        <span class="stamp-big">fresh</span>
+        <span>BAKED WITH LOVE</span>
+      </div>
+      <div class="hero-float">
+        <span class="sparkle">✳</span>
+        <span>
+          <strong>Sweet little moments</strong>
+          Niềm vui đến từ điều giản dị
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       FEATURES STRIP
+       ============================ -->
+  <section class="features-strip" aria-label="Điểm nổi bật">
+    <div class="features-inner wrap">
+      <div class="feature">
+        <span aria-hidden="true">♡</span>
+        <div>
+          <strong>Tươi mới mỗi ngày</strong>
+          <small>Nướng với sự tận tâm</small>
+        </div>
+      </div>
+      <div class="feature">
+        <span aria-hidden="true">✳</span>
+        <div>
+          <strong>Nguyên liệu chọn lọc</strong>
+          <small>Chỉn chu từ những điều nhỏ nhất</small>
+        </div>
+      </div>
+      <div class="feature">
+        <span aria-hidden="true">✧</span>
+        <div>
+          <strong>Đặt bánh dễ dàng</strong>
+          <small>Mua sắm chỉ với vài thao tác</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       CATEGORIES SECTION
+       ============================ -->
+  <section class="categories-section" aria-labelledby="cat-heading">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">A LITTLE SOMETHING FOR EVERYONE</span>
+          <h2 class="section-title" id="cat-heading">Bạn muốn ăn <em>bánh gì?</em></h2>
+        </div>
+        <a th:href="@{/products}" class="text-link">
+          Xem toàn bộ
+          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+      </div>
+
+      <div class="categories-grid">
+        <!-- Bánh kem -->
+        <a th:href="@{/products(category='Bánh kem')}" class="category-card" id="cat-banh-kem">
+          <span>
+            <span class="cat-name">Bánh kem</span>
+            <span class="cat-count">Bánh kem cho dịp đặc biệt</span>
+          </span>
+          <span class="category-art" aria-hidden="true">🍰</span>
+        </a>
+        <!-- Bánh ngọt -->
+        <a th:href="@{/products(category='Bánh ngọt')}" class="category-card" id="cat-banh-ngot">
+          <span>
+            <span class="cat-name">Bánh ngọt</span>
+            <span class="cat-count">Ngọt ngào mỗi ngày</span>
+          </span>
+          <span class="category-art" aria-hidden="true">🥐</span>
+        </a>
+        <!-- Bánh mì -->
+        <a th:href="@{/products(category='Bánh mì')}" class="category-card" id="cat-banh-mi">
+          <span>
+            <span class="cat-name">Bánh mì</span>
+            <span class="cat-count">Thơm mùi bơ mới</span>
+          </span>
+          <span class="category-art" aria-hidden="true">🥖</span>
+        </a>
+        <!-- Cookies -->
+        <a th:href="@{/products(category='Cookies')}" class="category-card" id="cat-cookies">
+          <span>
+            <span class="cat-name">Cookies</span>
+            <span class="cat-count">Nhỏ xinh để sẻ chia</span>
+          </span>
+          <span class="category-art" aria-hidden="true">🍪</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       FEATURED PRODUCTS
+       ============================ -->
+  <section class="product-section" aria-labelledby="products-heading">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">MADE FRESH, MADE WITH LOVE</span>
+          <h2 class="section-title" id="products-heading">
+            Những chiếc bánh <em>được yêu thích</em>
+          </h2>
+        </div>
+        <a th:href="@{/products}" class="text-link">
+          Tất cả sản phẩm
+          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+      </div>
+
+      <!-- Products Grid — rendered by Thymeleaf from featuredProducts model attribute -->
+      <div class="products-grid" id="featured-products">
+
+        <!-- If featuredProducts is available from backend -->
+        <th:block th:if="${featuredProducts != null and !#lists.isEmpty(featuredProducts)}">
+          <article class="product-card" th:each="product : ${featuredProducts}">
+            <div class="product-media"
+                 th:style="'--tone:' + ${product.tone != null ? product.tone : '#efe0d2'}">
+              <!-- Emoji fallback -->
+              <span class="media-fallback" th:text="${product.emoji ?: '🍰'}" aria-hidden="true"></span>
+              <!-- Product image -->
+              <img th:if="${product.imageUrl != null}"
+                   th:src="${product.imageUrl}"
+                   th:alt="${product.name}"
+                   loading="lazy"
+                   onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <!-- Badge -->
+              <span class="product-badge" th:if="${product.badge != null and !#strings.isEmpty(product.badge)}"
+                    th:text="${product.badge}"></span>
+              <!-- Quick Add -->
+              <a th:href="@{/cart/add/{id}(id=${product.id})}"
+                 class="quick-add"
+                 th:classappend="${product.stock <= 0} ? 'disabled'"
+                 th:aria-label="'Thêm ' + ${product.name} + ' vào giỏ'"
+                 th:title="${product.stock <= 0} ? 'Hết hàng' : null">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta" th:text="${product.category}">Bánh kem</div>
+            <h3 class="product-name">
+              <a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name}">Bánh kem dâu tây</a>
+            </h3>
+            <div class="product-row">
+              <span class="product-price"
+                    th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + ' ₫'}">285,000 ₫</span>
+              <span class="product-stock"
+                    th:classappend="${product.stock <= 0} ? 'out'"
+                    th:text="${product.stock > 0} ? 'Còn hàng' : 'Hết hàng'">Còn hàng</span>
+            </div>
+          </article>
+        </th:block>
+
+        <!-- Fallback: Static demo cards when no backend data (pure prototype display) -->
+        <th:block th:if="${featuredProducts == null or #lists.isEmpty(featuredProducts)}">
+
+          <article class="product-card">
+            <div class="product-media" style="--tone:#edd5d3">
+              <span class="media-fallback" aria-hidden="true">🍰</span>
+              <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80"
+                   alt="Bánh kem dâu tây" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <span class="product-badge">Bestseller</span>
+              <a th:href="@{/products/1}" class="quick-add" aria-label="Thêm vào giỏ">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta">BÁNH KEM</div>
+            <h3 class="product-name"><a th:href="@{/products/1}">Bánh kem dâu tây</a></h3>
+            <div class="product-row">
+              <span class="product-price">285,000 ₫</span>
+              <span class="product-stock">Còn hàng</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media" style="--tone:#ead2b8">
+              <span class="media-fallback" aria-hidden="true">🥐</span>
+              <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80"
+                   alt="Croissant bơ Pháp" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <span class="product-badge">Mới ra lò</span>
+              <a th:href="@{/products/2}" class="quick-add" aria-label="Thêm vào giỏ">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta">BÁNH NGỌT</div>
+            <h3 class="product-name"><a th:href="@{/products/2}">Croissant bơ Pháp</a></h3>
+            <div class="product-row">
+              <span class="product-price">45,000 ₫</span>
+              <span class="product-stock">Còn hàng</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media" style="--tone:#d5c0af">
+              <span class="media-fallback" aria-hidden="true">🍮</span>
+              <img src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=600&q=80"
+                   alt="Tiramisu cà phê" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <span class="product-badge">Được yêu thích</span>
+              <a th:href="@{/products/3}" class="quick-add" aria-label="Thêm vào giỏ">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta">BÁNH KEM</div>
+            <h3 class="product-name"><a th:href="@{/products/3}">Tiramisu cà phê</a></h3>
+            <div class="product-row">
+              <span class="product-price">89,000 ₫</span>
+              <span class="product-stock">Còn hàng</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media" style="--tone:#e9d4bc">
+              <span class="media-fallback" aria-hidden="true">🥖</span>
+              <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80"
+                   alt="Bánh mì sourdough" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <span class="product-badge">Thủ công</span>
+              <a th:href="@{/products/4}" class="quick-add" aria-label="Thêm vào giỏ">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta">BÁNH MÌ</div>
+            <h3 class="product-name"><a th:href="@{/products/4}">Bánh mì sourdough</a></h3>
+            <div class="product-row">
+              <span class="product-price">85,000 ₫</span>
+              <span class="product-stock">Còn hàng</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media" style="--tone:#ebcecd">
+              <span class="media-fallback" aria-hidden="true">🧁</span>
+              <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&q=80"
+                   alt="Red velvet mini" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <a th:href="@{/products/5}" class="quick-add" aria-label="Thêm vào giỏ">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta">BÁNH KEM</div>
+            <h3 class="product-name"><a th:href="@{/products/5}">Red velvet mini</a></h3>
+            <div class="product-row">
+              <span class="product-price">115,000 ₫</span>
+              <span class="product-stock">Còn hàng</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media" style="--tone:#e9d6c3">
+              <span class="media-fallback" aria-hidden="true">🍪</span>
+              <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=600&q=80"
+                   alt="Cookie chocolate chip" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <span class="product-badge">Bán chạy</span>
+              <a th:href="@{/products/6}" class="quick-add" aria-label="Thêm vào giỏ">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta">COOKIES</div>
+            <h3 class="product-name"><a th:href="@{/products/6}">Cookie chocolate chip</a></h3>
+            <div class="product-row">
+              <span class="product-price">39,000 ₫</span>
+              <span class="product-stock">Còn hàng</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media" style="--tone:#f0d8cf">
+              <span class="media-fallback" aria-hidden="true">🥧</span>
+              <img src="https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&w=600&q=80"
+                   alt="Bánh tart trái cây" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <a th:href="@{/products/7}" class="quick-add" aria-label="Thêm vào giỏ">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta">BÁNH NGỌT</div>
+            <h3 class="product-name"><a th:href="@{/products/7}">Bánh tart trái cây</a></h3>
+            <div class="product-row">
+              <span class="product-price">75,000 ₫</span>
+              <span class="product-stock">Còn hàng</span>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media" style="--tone:#ecdbc3">
+              <span class="media-fallback" aria-hidden="true">🍞</span>
+              <img src="https://images.unsplash.com/photo-1549931319-a545dcf3bc73?auto=format&fit=crop&w=600&q=80"
+                   alt="Bánh mì brioche" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
+              <a th:href="@{/products/8}" class="quick-add" aria-label="Thêm vào giỏ">
+                <svg aria-hidden="true"><use href="#i-plus"/></svg>
+              </a>
+            </div>
+            <div class="product-meta">BÁNH MÌ</div>
+            <h3 class="product-name"><a th:href="@{/products/8}">Bánh mì brioche</a></h3>
+            <div class="product-row">
+              <span class="product-price">69,000 ₫</span>
+              <span class="product-stock">Còn hàng</span>
+            </div>
+          </article>
+
+        </th:block>
+      </div><!-- /products-grid -->
+
+      <div class="products-footer">
+        <a th:href="@{/products}" class="btn btn-outline" id="btn-view-all">
+          Xem thêm bánh ngon
+          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       ABOUT BAND
+       ============================ -->
+  <section class="about-band" id="about" aria-labelledby="about-heading">
+    <div class="about-inner wrap">
+      <!-- Photo -->
+      <div class="about-photo">
+        <img src="https://images.unsplash.com/photo-1483695028939-5bb13f8648b0?auto=format&fit=crop&w=900&q=80"
+             th:src="@{/assets/about-bakery.svg}"
+             alt="Những chiếc bánh được làm tươi tại tiệm LUNE"
+             onerror="this.onerror=null;this.src='/assets/about-bakery.svg'" />
+        <span class="about-photo-overlay">made with love ♡</span>
+      </div>
+
+      <!-- Copy -->
+      <div class="about-copy">
+        <span class="eyebrow">OUR STORY · CÂU CHUYỆN NHỎ</span>
+        <h2 class="section-title" id="about-heading">
+          Một chiếc bánh ngon.<br>
+          <em>Một ngày thật dịu dàng.</em>
+        </h2>
+        <p>
+          LUNE bắt đầu từ tình yêu dành cho những mùi hương thân thuộc: bơ tan trong lò nướng,
+          bánh mì giòn ấm, và lớp kem nhẹ như mây.
+        </p>
+        <p>
+          Chúng mình tin rằng một chiếc bánh có thể thay lời yêu thương, trở thành lời cảm ơn,
+          lời chúc mừng, hay đơn giản chỉ là món quà dành cho chính bạn.
+        </p>
+        <a th:href="@{/products}" class="text-link">
+          Chọn bánh cho hôm nay
+          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================
+       QUOTE STRIP
+       ============================ -->
+  <section class="quote-strip" aria-label="Câu nói của LUNE">
+    <span>✳ &nbsp; LUNE NOTES &nbsp; ✳</span>
+    <p>"Life is short. Make it a little sweeter."</p>
+    <small>A LITTLE SWEETER, EVERY DAY</small>
+  </section>
+
+  <!-- ============================
+       NEWSLETTER / CTA STRIP
+       ============================ -->
+  <section class="newsletter-strip" aria-labelledby="newsletter-heading">
+    <div class="newsletter-inner wrap">
+      <div class="newsletter-copy">
+        <span class="eyebrow">STAY SWEET</span>
+        <h2 class="newsletter-title" id="newsletter-heading">
+          Nhận ưu đãi &amp; thông báo bánh mới
+        </h2>
+        <p>Đăng ký để không bỏ lỡ những chiếc bánh mới ra lò và ưu đãi đặc biệt.</p>
+      </div>
+      <form class="newsletter-form" id="newsletter-form" onsubmit="handleNewsletter(event)">
+        <div class="newsletter-row">
+          <label class="sr-only" for="newsletter-email">Địa chỉ email của bạn</label>
+          <input type="email" id="newsletter-email" name="email"
+                 placeholder="email@example.com" required
+                 aria-label="Địa chỉ email" />
+          <button type="submit" class="btn btn-primary">
+            Đăng ký
+            <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+          </button>
+        </div>
+        <p class="newsletter-note">Không spam. Hủy đăng ký bất cứ lúc nào.</p>
+      </form>
+    </div>
+  </section>
+
+</main><!-- /main -->
+
+<!-- ===== FOOTER ===== -->
+<footer id="footer" class="footer">
+  <div class="wrap footer-grid">
+    <div>
+      <a class="brand footer-brand" th:href="@{/}">
+        LUNE<span class="brand-dot">.</span><small>BAKERY &amp; PATISSERIE</small>
+      </a>
+      <p>Một tiệm bánh nhỏ, dành cho những niềm vui thật to. Bánh được làm tươi mới với tất cả sự yêu thương.</p>
+    </div>
+    <div>
+      <h4>Khám phá</h4>
+      <a th:href="@{/products}">Tất cả sản phẩm</a>
+      <a th:href="@{/products(category='Bánh kem')}">Bánh kem</a>
+      <a th:href="@{/products(category='Bánh ngọt')}">Bánh ngọt</a>
+      <a th:href="@{/products(category='Bánh mì')}">Bánh mì</a>
+    </div>
+    <div>
+      <h4>Hỗ trợ</h4>
+      <a th:href="@{/orders}">Đơn hàng của tôi</a>
+      <a th:href="@{/profile}">Tài khoản</a>
+      <a href="#about">Câu chuyện của LUNE</a>
+      <a th:href="@{/admin}" th:if="${session.user != null and (session.user.role == 'ADMIN' or session.user.role == 'STAFF')}">
+        Khu vực quản trị
+      </a>
+    </div>
+    <div>
+      <h4>Ghé thăm tiệm</h4>
+      <p>TP. Hồ Chí Minh<br>Thông tin liên hệ sẽ được cập nhật khi triển khai.</p>
+      <div class="footer-social">Handmade with ♡</div>
+    </div>
+  </div>
+  <div class="footer-bottom wrap">
+    <span>© 2026 LUNE Bakery. Bakery Shop Application.</span>
+    <span>Made with a little love &amp; a lot of butter ✳</span>
+  </div>
+</footer>
+
+<!-- ===== TOAST NOTIFICATION ===== -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+  /* ---- Mobile menu toggle ---- */
+  (function () {
+    const btn = document.getElementById('mobile-menu-btn');
+    const nav = document.getElementById('mobile-nav');
+    if (!btn || !nav) return;
+
+    btn.addEventListener('click', function () {
+      const open = nav.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+    });
+
+    /* Close on outside click */
+    document.addEventListener('click', function (e) {
+      if (!nav.contains(e.target) && !btn.contains(e.target)) {
+        nav.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    /* Close on nav link click */
+    nav.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        nav.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+
+  /* ---- Header scroll shadow ---- */
+  (function () {
+    const header = document.getElementById('site-header');
+    if (!header) return;
+    window.addEventListener('scroll', function () {
+      header.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+  })();
+
+  /* ---- Toast helper ---- */
+  let _toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(function () { t.classList.remove('show'); }, 3300);
+  }
+
+  /* ---- Newsletter fallback (client-side) ---- */
+  function handleNewsletter(e) {
+    const input = document.getElementById('newsletter-email');
+    if (!input || !input.value) return;
+    /* Real submission is handled by server; this handles JS fallback */
+    e.preventDefault();
+    showToast('Cảm ơn bạn đã đăng ký! Chúng mình sẽ liên lạc sớm ♡');
+    input.value = '';
+  }
+
+  /* ---- Product image fallback ---- */
+  document.querySelectorAll('.product-media img').forEach(function (img) {
+    img.addEventListener('error', function () {
+      this.style.display = 'none';
+    });
+  });
+
+  /* ---- Category card hover micro-animation ---- */
+  document.querySelectorAll('.category-card').forEach(function (card) {
+    card.addEventListener('mouseenter', function () {
+      const art = card.querySelector('.category-art');
+      if (art) art.style.transform = 'rotate(-8deg) scale(1.08)';
+    });
+    card.addEventListener('mouseleave', function () {
+      const art = card.querySelector('.category-art');
+      if (art) art.style.transform = '';
+    });
+  });
+
+  /* ---- Animate on scroll (simple intersection) ---- */
+  (function () {
+    if (!('IntersectionObserver' in window)) return;
+    const items = document.querySelectorAll(
+      '.product-card, .category-card, .feature, .about-photo, .about-copy'
+    );
+    const io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    items.forEach(function (el) {
+      el.classList.add('fade-in');
+      io.observe(el);
+    });
+  })();
+</script>
+
+<!-- Extra CSS for newsletter strip & scroll animations -->
+<style>
+  /* ---- Scroll shadow ---- */
+  .site-header.scrolled {
+    box-shadow: 0 2px 24px rgba(113, 53, 66, 0.10);
+  }
+
+  /* ---- Newsletter strip ---- */
+  .newsletter-strip {
+    background: var(--paper);
+    border-top: 1px solid var(--stroke);
+    padding: 72px 0;
+  }
+  .newsletter-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .newsletter-title {
+    font: 500 clamp(26px, 3vw, 38px)/1.2 var(--serif);
+    letter-spacing: -.04em;
+    margin: 10px 0 14px;
+    color: var(--ink);
+  }
+  .newsletter-copy p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.8;
+    margin: 0;
+  }
+  .newsletter-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .newsletter-row input[type="email"] {
+    flex: 1;
+    min-width: 180px;
+    padding: 14px 18px;
+    border: 1px solid var(--stroke);
+    border-radius: 4px;
+    background: #fff;
+    font-size: 13px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color .2s;
+  }
+  .newsletter-row input[type="email"]:focus { border-color: #b88689; }
+  .newsletter-note {
+    font-size: 10px;
+    color: #b5a39d;
+    margin: 10px 0 0;
+    letter-spacing: .03em;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---- Fade-in animation ---- */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .55s ease, transform .55s ease;
+  }
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Stagger product cards */
+  .products-grid .product-card:nth-child(1) { transition-delay: .05s; }
+  .products-grid .product-card:nth-child(2) { transition-delay: .10s; }
+  .products-grid .product-card:nth-child(3) { transition-delay: .15s; }
+  .products-grid .product-card:nth-child(4) { transition-delay: .20s; }
+  .products-grid .product-card:nth-child(5) { transition-delay: .25s; }
+  .products-grid .product-card:nth-child(6) { transition-delay: .30s; }
+  .products-grid .product-card:nth-child(7) { transition-delay: .35s; }
+  .products-grid .product-card:nth-child(8) { transition-delay: .40s; }
+
+  /* Stagger category cards */
+  .categories-grid .category-card:nth-child(1) { transition-delay: .05s; }
+  .categories-grid .category-card:nth-child(2) { transition-delay: .10s; }
+  .categories-grid .category-card:nth-child(3) { transition-delay: .15s; }
+  .categories-grid .category-card:nth-child(4) { transition-delay: .20s; }
+
+  /* ---- Category card as link ---- */
+  a.category-card {
+    display: flex;
+    align-items: center;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* ---- Quick-add as link ---- */
+  a.quick-add {
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+  }
+  a.quick-add.disabled {
+    opacity: .4;
+    pointer-events: none;
+  }
+
+  /* ---- Hero visual responsive fix ---- */
+  @media (max-width: 720px) {
+    .newsletter-inner {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+    .newsletter-strip { padding: 52px 0; }
+  }
+
+  /* ---- Reduced motion ---- */
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in { opacity: 1; transform: none; transition: none; }
+  }
+</style>
+
 </body>
 </html>

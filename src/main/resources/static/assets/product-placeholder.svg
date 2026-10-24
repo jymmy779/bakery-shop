@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title desc">
+  <title id="title">Bánh ngọt LUNE Bakery</title>
+  <desc id="desc">Minh họa chiếc bánh ngọt trên nền màu kem</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f8eee8"/>
+      <stop offset="1" stop-color="#e7c9c0"/>
+    </linearGradient>
+    <linearGradient id="cake" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#ce8f78"/>
+      <stop offset="1" stop-color="#a95f57"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-30%" width="140%" height="180%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+  <rect width="800" height="600" fill="url(#background)"/>
+  <circle cx="105" cy="92" r="54" fill="#fff" opacity=".3"/>
+  <circle cx="712" cy="112" r="86" fill="#fff" opacity=".22"/>
+  <path d="M95 488c150-28 453-29 610 0" stroke="#8e514d" stroke-width="32" opacity=".15" filter="url(#shadow)"/>
+  <ellipse cx="400" cy="474" rx="254" ry="48" fill="#fff8ef"/>
+  <path d="M215 285h370v154c0 42-83 72-185 72s-185-30-185-72z" fill="url(#cake)"/>
+  <ellipse cx="400" cy="287" rx="185" ry="66" fill="#fff4df"/>
+  <path d="M216 290c21-29 50-23 63 3 17 35 49 28 59-1 10-32 47-35 64 0 14 29 48 31 62-1 15-34 52-32 66 2 11 27 38 31 56 5v38c-18 30-46 26-59-2-15-31-49-32-63 0-15 34-52 33-66-1-12-29-46-31-60 1-14 33-50 35-66 1-13-28-39-31-56-8z" fill="#fff0d7"/>
+  <g fill="#b74355">
+    <circle cx="334" cy="253" r="25"/>
+    <circle cx="405" cy="232" r="28"/>
+    <circle cx="477" cy="257" r="24"/>
+  </g>
+  <g fill="#60815c">
+    <path d="M328 236c-31-28-49-5-49-5 23 2 36 8 49 5z"/>
+    <path d="M408 211c27-31 48-9 48-9-20 5-33 11-48 9z"/>
+    <path d="M475 238c28-27 47-5 47-5-20 2-33 7-47 5z"/>
+  </g>
+  <text x="400" y="558" text-anchor="middle" fill="#704745" font-family="Georgia, serif" font-size="24" letter-spacing="5">LUNE BAKERY</text>
+</svg>

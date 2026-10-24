@@ -1,6 +1,6 @@
 package com.bakery.catalog.controller.web;
 
-import com.bakery.catalog.service.CatalogQueryService;
+import com.bakery.catalog.service.ProductQueryService;
 import com.bakery.catalog.dto.ProductDetailResponse;
 import com.bakery.catalog.dto.ProductListResponse;
 import com.bakery.catalog.dto.ProductFilters;
@@ -21,10 +21,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestController
-@RequestMapping(value = "/products", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/products", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class ProductController {
-  private final CatalogQueryService catalog;
+  private final ProductQueryService productQueryService;
 
   @GetMapping
   public ProductListResponse list(@RequestParam(defaultValue = "") String keyword,
@@ -36,7 +36,7 @@ public class ProductController {
       @RequestParam(defaultValue = "12") int size) {
     keyword = keyword.strip();
     sort = sort.strip().toLowerCase(Locale.ROOT);
-    var result = catalog.filter(keyword, categoryId, minPrice, maxPrice, sort, page, size);
+    var result = productQueryService.filter(keyword, categoryId, minPrice, maxPrice, sort, page, size);
     String message = result.isEmpty()
         ? "Không tìm thấy sản phẩm phù hợp"
         : "Tìm thấy " + result.getTotalElements() + " sản phẩm";
@@ -70,7 +70,7 @@ public class ProductController {
 
   @GetMapping("/{productId}")
   public ProductDetailResponse detail(@PathVariable Long productId) {
-    return catalog.getById(productId);
+    return productQueryService.getById(productId);
   }
 
   @ExceptionHandler(ResourceNotFoundException.class)

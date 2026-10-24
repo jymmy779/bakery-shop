@@ -1,7 +1,7 @@
 package com.bakery.catalog.controller.web;
 
 import com.bakery.catalog.dto.ProductSummaryResponse;
-import com.bakery.catalog.service.CatalogQueryService;
+import com.bakery.catalog.service.ProductQueryService;
 import java.util.List;
 import java.math.BigDecimal;
 import org.springframework.data.domain.PageImpl;
@@ -15,14 +15,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class ProductControllerTest {
-  private final CatalogQueryService catalog = mock(CatalogQueryService.class);
+  private final ProductQueryService productQueryService = mock(ProductQueryService.class);
 
   @Test
   void noMatchesReturnsRequiredMessageAndEmptyProducts() throws Exception {
-    when(catalog.filter("missing", null, null, null, "name", 0, 12))
+    when(productQueryService.filter("missing", null, null, null, "name", 0, 12))
         .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 12), 0));
-    MockMvcBuilders.standaloneSetup(new ProductController(catalog)).build()
-        .perform(get("/products").param("keyword", "missing"))
+    MockMvcBuilders.standaloneSetup(new ProductController(productQueryService)).build()
+        .perform(get("/api/products").param("keyword", "missing"))
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.message").value("Không tìm thấy sản phẩm phù hợp"))
@@ -34,10 +34,10 @@ class ProductControllerTest {
     var product = new ProductSummaryResponse();
     product.setId(1L);
     product.setName("Bánh dâu");
-    when(catalog.filter("dau", null, null, null, "name", 0, 12))
+    when(productQueryService.filter("dau", null, null, null, "name", 0, 12))
         .thenReturn(new PageImpl<>(List.of(product), PageRequest.of(0, 12), 1));
-    MockMvcBuilders.standaloneSetup(new ProductController(catalog)).build()
-        .perform(get("/products").param("keyword", "dau"))
+    MockMvcBuilders.standaloneSetup(new ProductController(productQueryService)).build()
+        .perform(get("/api/products").param("keyword", "dau"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("Tìm thấy 1 sản phẩm"))
         .andExpect(jsonPath("$.products[0].id").value(1))
@@ -49,10 +49,10 @@ class ProductControllerTest {
     var product = new ProductSummaryResponse();
     var min = new BigDecimal("25000");
     var max = new BigDecimal("300000");
-    when(catalog.filter("dâu", 1L, min, max, "price_desc", 1, 1))
+    when(productQueryService.filter("dâu", 1L, min, max, "price_desc", 1, 1))
         .thenReturn(new PageImpl<>(List.of(product), PageRequest.of(1, 1), 3));
-    MockMvcBuilders.standaloneSetup(new ProductController(catalog)).build()
-        .perform(get("/products").param("keyword", "dâu").param("categoryId", "1")
+    MockMvcBuilders.standaloneSetup(new ProductController(productQueryService)).build()
+        .perform(get("/api/products").param("keyword", "dâu").param("categoryId", "1")
             .param("minPrice", "25000").param("maxPrice", "300000")
             .param("sort", "price_desc").param("page", "1").param("size", "1"))
         .andExpect(status().isOk())
@@ -64,8 +64,8 @@ class ProductControllerTest {
 
   @Test
   void malformedFilterReturnsJson400() throws Exception {
-    MockMvcBuilders.standaloneSetup(new ProductController(catalog)).build()
-        .perform(get("/products").param("minPrice", "abc"))
+    MockMvcBuilders.standaloneSetup(new ProductController(productQueryService)).build()
+        .perform(get("/api/products").param("minPrice", "abc"))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.status").value(400));
   }
