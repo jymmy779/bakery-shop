@@ -76,6 +76,15 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+
+### 24/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Trần Chí Quốc | Lưu giỏ hàng bằng Session — API JSON | Triển khai CartServiceImpl và SessionCartServiceImpl; GET/POST/PATCH/DELETE `/cart/items`; giỏ độc lập theo Session, cộng số lượng có kiểm tra kho; giữ giỏ khi đăng nhập Customer qua Security hiện có; helper checkout xóa giỏ sau thành công/commit và giữ khi lỗi/rollback | Đang làm | Branch `master`; PR/commit: Chưa có | Maven JDK 17: `-Dtest=CartQuantityServiceImplTest,CartQuantityControllerTest,SessionCartIntegrationTest test` đạt 15 test; compile đạt; kiểm thử MockMvc với SecurityConfig thật, mock Catalog và tài khoản test; timeout mô phỏng bằng invalidation | Checkout chưa có implementation nên helper chưa được nối vào đặt đơn thật; chưa demo MySQL/Tomcat timeout thực tế hoặc nối UI; chi tiết `docs/CART_QUANTITY_API.md` |
+| Trần Chí Quốc | Cập nhật số lượng giỏ hàng — API JSON | Thêm PATCH `/cart/items/{productId}` dùng Session `cart`; kiểm tra số lượng tối thiểu 1, tồn kho/trạng thái từ ProductQueryService; cập nhật giá và tính thành tiền/tổng giỏ; trả lỗi JSON 400/404/409; tài liệu `docs/CART_QUANTITY_API.md` | Đang làm | Branch `master`; PR/commit: Chưa có | Maven với JDK 17: `-Dtest=CartQuantityServiceImplTest,CartQuantityControllerTest test` đạt 8 test; compile đạt trong vòng test; chưa demo MySQL hoặc kiểm thử Security tích hợp | Cần luồng thêm sản phẩm vào Session để demo; tích hợp CartService và UI cập nhật tức thì; gửi CSRF token khi gọi API |
+
+
 ### 22/10/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
