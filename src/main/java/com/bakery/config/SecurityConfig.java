@@ -29,6 +29,7 @@ public class SecurityConfig {
             "/about",
             "/contact",
             "/api/products/**",
+            "/api/categories/**",
             "/cart/**",
             "/register/**",
             "/login",
@@ -38,7 +39,6 @@ public class SecurityConfig {
             "/css/**",
             "/js/**",
             "/images/**",
-            "/products/**",
             "/assets/**",
             "/uploads/**").permitAll()
         .requestMatchers("/checkout/**", "/orders/**", "/profile/**")

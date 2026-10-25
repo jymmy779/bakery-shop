@@ -1,7 +1,8 @@
 package com.bakery.catalog.dto;
 
-import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.entity.ProductBadge;
+import com.bakery.catalog.entity.ProductStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,11 @@ public class ProductSummaryResponse {
   private String name;
   private String description;
   private ProductBadge badge;
+  @JsonIgnore
   private String ingredients;
+  @JsonIgnore
   private String storageInstructions;
+  @JsonIgnore
   private String allergenInfo;
   private BigDecimal price;
   private int stockQuantity;
