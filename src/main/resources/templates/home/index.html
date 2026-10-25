@@ -1,795 +1,2029 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#fcf8f3" />
-  <meta name="description" content="LUNE Bakery — Bánh tươi mỗi ngày, đặt bánh online tiện lợi tại TP. Hồ Chí Minh." />
-  <title>LUNE. — Tiệm bánh của những ngày dịu dàng</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" th:href="@{/css/app.css}" />
-</head>
-<body>
-
-<!-- SVG Icon Symbols -->
-<svg xmlns="http://www.w3.org/2000/svg" class="symbols" aria-hidden="true">
-  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M4 8h16l-1.1 12H5.1L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></symbol>
-  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5.3 20v-1.2a6.7 6.7 0 0 1 13.4 0V20"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 5 5"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h16m-7-7 7 7-7 7"/></symbol>
-  <symbol id="i-close" viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
-  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M4 12h16"/></symbol>
-  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
-  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 6h16M9 6V4h6v2M7 6l1 14h8l1-14M10 10v7m4-7v7"/></symbol>
-  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
-  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h13v12H2zM15 10h3.5l3.5 4v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
-  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.7 5.7c-1.8-1.8-4.8-1.8-6.6 0L12 7.8 9.9 5.7C8.1 3.9 5.1 3.9 3.3 5.7s-1.8 4.8 0 6.6L12 21l8.7-8.7c1.8-1.8 1.8-4.8 0-6.6Z"/></symbol>
-  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
-  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3L22 9.3l-5 4.9 1.2 6.9L12 18l-6.2 3.1L7 14.2 2 9.3l6.9-1L12 2Z"/></symbol>
-</svg>
-
-<!-- ===== ANNOUNCEMENT BAR ===== -->
-<div class="announcement">
-  <span class="announcement-star">✳</span>
-  Nướng mới mỗi ngày, ngọt lành trong từng khoảnh khắc
-  <span class="announcement-star">✳</span>
-</div>
-
-<!-- ===== HEADER ===== -->
-<header class="site-header" id="site-header">
-  <div class="header-inner wrap">
-    <!-- Brand -->
-    <a th:href="@{/}" class="brand" aria-label="LUNE Bakery - Trang chủ">
-      LUNE<span class="brand-dot">.</span><small>BAKERY &amp; PATISSERIE</small>
-    </a>
-
-    <!-- Desktop Nav -->
-    <nav class="nav-links" aria-label="Điều hướng chính">
-      <a th:href="@{/}" class="active" data-nav="home">Trang chủ</a>
-      <a th:href="@{/products}" data-nav="shop">Thực đơn</a>
-      <a href="#about">Về LUNE</a>
-      <a href="#footer">Liên hệ</a>
-    </nav>
-
-    <!-- Actions -->
-    <div class="header-actions">
-      <a th:href="@{/products}" class="icon-button desktop-search" aria-label="Tìm bánh">
-        <svg aria-hidden="true"><use href="#i-search"/></svg>
-      </a>
-      <!-- Not logged in -->
-      <a th:href="@{/login}" class="icon-button user-action" aria-label="Đăng nhập"
-         th:if="${session.user == null}">
-        <svg aria-hidden="true"><use href="#i-user"/></svg>
-      </a>
-      <!-- Logged in -->
-      <a th:href="@{/profile}" class="icon-button user-action" aria-label="Tài khoản"
-         th:if="${session.user != null}">
-        <svg aria-hidden="true"><use href="#i-user"/></svg>
-      </a>
-      <!-- Cart -->
-      <a th:href="@{/cart}" class="icon-button cart-button" aria-label="Giỏ hàng">
-        <svg aria-hidden="true"><use href="#i-bag"/></svg>
-        <span class="cart-count" id="cart-count"
-              th:text="${session.cartCount != null ? session.cartCount : 0}">0</span>
-      </a>
-      <!-- Mobile Menu Toggle -->
-      <button class="icon-button mobile-menu" type="button" aria-label="Mở menu"
-              id="mobile-menu-btn" aria-expanded="false" aria-controls="mobile-nav">
-        <svg aria-hidden="true"><use href="#i-menu"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- Mobile Nav -->
-  <nav class="mobile-nav" id="mobile-nav" aria-label="Menu di động">
-    <a th:href="@{/}">Trang chủ</a>
-    <a th:href="@{/products}">Thực đơn</a>
-    <a href="#about">Về LUNE</a>
-    <a href="#footer">Liên hệ</a>
-    <a th:href="@{/orders}">Đơn hàng</a>
-    <a th:href="@{/cart}">Giỏ hàng</a>
-  </nav>
-</header>
-
-<!-- ===== MAIN ===== -->
-<main id="home">
-
-  <!-- ============================
-       HERO SECTION
-       ============================ -->
-  <section class="hero" aria-label="Banner chào mừng">
-    <!-- Left: Copy -->
-    <div class="hero-content">
-      <span class="eyebrow">✳ &nbsp; TIỆM BÁNH NHỎ, NIỀM VUI TO</span>
-      <h1>Gửi chút ngọt<br>vào <em>ngày của bạn.</em></h1>
-      <p class="hero-description">
-        Có những niềm vui giản dị bắt đầu từ một chiếc bánh ngon.
-        Ghé LUNE, chọn chiếc bánh bạn thương, chúng mình sẽ chuẩn bị thật chỉn chu.
-      </p>
-      <div class="hero-buttons">
-        <a th:href="@{/products}" class="btn btn-primary" id="hero-cta-shop">
-          Khám phá thực đơn
-          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-        </a>
-        <a href="#about" class="text-link">
-          Câu chuyện của LUNE
-          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-        </a>
-      </div>
-      <div class="hero-trust">
-        <span>
-          <svg aria-hidden="true"><use href="#i-check"/></svg>
-          Bánh làm tươi mỗi ngày
-        </span>
-        <span>
-          <svg aria-hidden="true"><use href="#i-heart"/></svg>
-          Chăm chút từng chiếc bánh
-        </span>
-      </div>
-    </div>
-
-    <!-- Right: Visual -->
-    <div class="hero-visual" aria-hidden="true">
-      <img th:src="@{/assets/hero-cake.svg}" alt="Bánh kem dâu tây đặc trưng của LUNE Bakery" />
-      <div class="hero-stamp">
-        <span class="stamp-big">fresh</span>
-        <span>BAKED WITH LOVE</span>
-      </div>
-      <div class="hero-float">
-        <span class="sparkle">✳</span>
-        <span>
-          <strong>Sweet little moments</strong>
-          Niềm vui đến từ điều giản dị
-        </span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================
-       FEATURES STRIP
-       ============================ -->
-  <section class="features-strip" aria-label="Điểm nổi bật">
-    <div class="features-inner wrap">
-      <div class="feature">
-        <span aria-hidden="true">♡</span>
-        <div>
-          <strong>Tươi mới mỗi ngày</strong>
-          <small>Nướng với sự tận tâm</small>
-        </div>
-      </div>
-      <div class="feature">
-        <span aria-hidden="true">✳</span>
-        <div>
-          <strong>Nguyên liệu chọn lọc</strong>
-          <small>Chỉn chu từ những điều nhỏ nhất</small>
-        </div>
-      </div>
-      <div class="feature">
-        <span aria-hidden="true">✧</span>
-        <div>
-          <strong>Đặt bánh dễ dàng</strong>
-          <small>Mua sắm chỉ với vài thao tác</small>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================
-       CATEGORIES SECTION
-       ============================ -->
-  <section class="categories-section" aria-labelledby="cat-heading">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">A LITTLE SOMETHING FOR EVERYONE</span>
-          <h2 class="section-title" id="cat-heading">Bạn muốn ăn <em>bánh gì?</em></h2>
-        </div>
-        <a th:href="@{/products}" class="text-link">
-          Xem toàn bộ
-          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-        </a>
-      </div>
-
-      <div class="categories-grid">
-        <!-- Bánh kem -->
-        <a th:href="@{/products(category='Bánh kem')}" class="category-card" id="cat-banh-kem">
-          <span>
-            <span class="cat-name">Bánh kem</span>
-            <span class="cat-count">Bánh kem cho dịp đặc biệt</span>
-          </span>
-          <span class="category-art" aria-hidden="true">🍰</span>
-        </a>
-        <!-- Bánh ngọt -->
-        <a th:href="@{/products(category='Bánh ngọt')}" class="category-card" id="cat-banh-ngot">
-          <span>
-            <span class="cat-name">Bánh ngọt</span>
-            <span class="cat-count">Ngọt ngào mỗi ngày</span>
-          </span>
-          <span class="category-art" aria-hidden="true">🥐</span>
-        </a>
-        <!-- Bánh mì -->
-        <a th:href="@{/products(category='Bánh mì')}" class="category-card" id="cat-banh-mi">
-          <span>
-            <span class="cat-name">Bánh mì</span>
-            <span class="cat-count">Thơm mùi bơ mới</span>
-          </span>
-          <span class="category-art" aria-hidden="true">🥖</span>
-        </a>
-        <!-- Cookies -->
-        <a th:href="@{/products(category='Cookies')}" class="category-card" id="cat-cookies">
-          <span>
-            <span class="cat-name">Cookies</span>
-            <span class="cat-count">Nhỏ xinh để sẻ chia</span>
-          </span>
-          <span class="category-art" aria-hidden="true">🍪</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================
-       FEATURED PRODUCTS
-       ============================ -->
-  <section class="product-section" aria-labelledby="products-heading">
-    <div class="wrap">
-      <div class="section-head">
-        <div>
-          <span class="eyebrow">MADE FRESH, MADE WITH LOVE</span>
-          <h2 class="section-title" id="products-heading">
-            Những chiếc bánh <em>được yêu thích</em>
-          </h2>
-        </div>
-        <a th:href="@{/products}" class="text-link">
-          Tất cả sản phẩm
-          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-        </a>
-      </div>
-
-      <!-- Products Grid — rendered by Thymeleaf from featuredProducts model attribute -->
-      <div class="products-grid" id="featured-products">
-
-        <!-- If featuredProducts is available from backend -->
-        <th:block th:if="${featuredProducts != null and !#lists.isEmpty(featuredProducts)}">
-          <article class="product-card" th:each="product : ${featuredProducts}">
-            <div class="product-media"
-                 th:style="'--tone:' + ${product.tone != null ? product.tone : '#efe0d2'}">
-              <!-- Emoji fallback -->
-              <span class="media-fallback" th:text="${product.emoji ?: '🍰'}" aria-hidden="true"></span>
-              <!-- Product image -->
-              <img th:if="${product.imageUrl != null}"
-                   th:src="${product.imageUrl}"
-                   th:alt="${product.name}"
-                   loading="lazy"
-                   onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <!-- Badge -->
-              <span class="product-badge" th:if="${product.badge != null and !#strings.isEmpty(product.badge)}"
-                    th:text="${product.badge}"></span>
-              <!-- Quick Add -->
-              <a th:href="@{/cart/add/{id}(id=${product.id})}"
-                 class="quick-add"
-                 th:classappend="${product.stock <= 0} ? 'disabled'"
-                 th:aria-label="'Thêm ' + ${product.name} + ' vào giỏ'"
-                 th:title="${product.stock <= 0} ? 'Hết hàng' : null">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta" th:text="${product.category}">Bánh kem</div>
-            <h3 class="product-name">
-              <a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name}">Bánh kem dâu tây</a>
-            </h3>
-            <div class="product-row">
-              <span class="product-price"
-                    th:text="${#numbers.formatInteger(product.price, 0, 'COMMA') + ' ₫'}">285,000 ₫</span>
-              <span class="product-stock"
-                    th:classappend="${product.stock <= 0} ? 'out'"
-                    th:text="${product.stock > 0} ? 'Còn hàng' : 'Hết hàng'">Còn hàng</span>
-            </div>
-          </article>
-        </th:block>
-
-        <!-- Fallback: Static demo cards when no backend data (pure prototype display) -->
-        <th:block th:if="${featuredProducts == null or #lists.isEmpty(featuredProducts)}">
-
-          <article class="product-card">
-            <div class="product-media" style="--tone:#edd5d3">
-              <span class="media-fallback" aria-hidden="true">🍰</span>
-              <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80"
-                   alt="Bánh kem dâu tây" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <span class="product-badge">Bestseller</span>
-              <a th:href="@{/products/1}" class="quick-add" aria-label="Thêm vào giỏ">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta">BÁNH KEM</div>
-            <h3 class="product-name"><a th:href="@{/products/1}">Bánh kem dâu tây</a></h3>
-            <div class="product-row">
-              <span class="product-price">285,000 ₫</span>
-              <span class="product-stock">Còn hàng</span>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media" style="--tone:#ead2b8">
-              <span class="media-fallback" aria-hidden="true">🥐</span>
-              <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80"
-                   alt="Croissant bơ Pháp" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <span class="product-badge">Mới ra lò</span>
-              <a th:href="@{/products/2}" class="quick-add" aria-label="Thêm vào giỏ">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta">BÁNH NGỌT</div>
-            <h3 class="product-name"><a th:href="@{/products/2}">Croissant bơ Pháp</a></h3>
-            <div class="product-row">
-              <span class="product-price">45,000 ₫</span>
-              <span class="product-stock">Còn hàng</span>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media" style="--tone:#d5c0af">
-              <span class="media-fallback" aria-hidden="true">🍮</span>
-              <img src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=600&q=80"
-                   alt="Tiramisu cà phê" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <span class="product-badge">Được yêu thích</span>
-              <a th:href="@{/products/3}" class="quick-add" aria-label="Thêm vào giỏ">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta">BÁNH KEM</div>
-            <h3 class="product-name"><a th:href="@{/products/3}">Tiramisu cà phê</a></h3>
-            <div class="product-row">
-              <span class="product-price">89,000 ₫</span>
-              <span class="product-stock">Còn hàng</span>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media" style="--tone:#e9d4bc">
-              <span class="media-fallback" aria-hidden="true">🥖</span>
-              <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80"
-                   alt="Bánh mì sourdough" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <span class="product-badge">Thủ công</span>
-              <a th:href="@{/products/4}" class="quick-add" aria-label="Thêm vào giỏ">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta">BÁNH MÌ</div>
-            <h3 class="product-name"><a th:href="@{/products/4}">Bánh mì sourdough</a></h3>
-            <div class="product-row">
-              <span class="product-price">85,000 ₫</span>
-              <span class="product-stock">Còn hàng</span>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media" style="--tone:#ebcecd">
-              <span class="media-fallback" aria-hidden="true">🧁</span>
-              <img src="https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=600&q=80"
-                   alt="Red velvet mini" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <a th:href="@{/products/5}" class="quick-add" aria-label="Thêm vào giỏ">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta">BÁNH KEM</div>
-            <h3 class="product-name"><a th:href="@{/products/5}">Red velvet mini</a></h3>
-            <div class="product-row">
-              <span class="product-price">115,000 ₫</span>
-              <span class="product-stock">Còn hàng</span>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media" style="--tone:#e9d6c3">
-              <span class="media-fallback" aria-hidden="true">🍪</span>
-              <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=600&q=80"
-                   alt="Cookie chocolate chip" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <span class="product-badge">Bán chạy</span>
-              <a th:href="@{/products/6}" class="quick-add" aria-label="Thêm vào giỏ">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta">COOKIES</div>
-            <h3 class="product-name"><a th:href="@{/products/6}">Cookie chocolate chip</a></h3>
-            <div class="product-row">
-              <span class="product-price">39,000 ₫</span>
-              <span class="product-stock">Còn hàng</span>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media" style="--tone:#f0d8cf">
-              <span class="media-fallback" aria-hidden="true">🥧</span>
-              <img src="https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&w=600&q=80"
-                   alt="Bánh tart trái cây" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <a th:href="@{/products/7}" class="quick-add" aria-label="Thêm vào giỏ">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta">BÁNH NGỌT</div>
-            <h3 class="product-name"><a th:href="@{/products/7}">Bánh tart trái cây</a></h3>
-            <div class="product-row">
-              <span class="product-price">75,000 ₫</span>
-              <span class="product-stock">Còn hàng</span>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media" style="--tone:#ecdbc3">
-              <span class="media-fallback" aria-hidden="true">🍞</span>
-              <img src="https://images.unsplash.com/photo-1549931319-a545dcf3bc73?auto=format&fit=crop&w=600&q=80"
-                   alt="Bánh mì brioche" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'" />
-              <a th:href="@{/products/8}" class="quick-add" aria-label="Thêm vào giỏ">
-                <svg aria-hidden="true"><use href="#i-plus"/></svg>
-              </a>
-            </div>
-            <div class="product-meta">BÁNH MÌ</div>
-            <h3 class="product-name"><a th:href="@{/products/8}">Bánh mì brioche</a></h3>
-            <div class="product-row">
-              <span class="product-price">69,000 ₫</span>
-              <span class="product-stock">Còn hàng</span>
-            </div>
-          </article>
-
-        </th:block>
-      </div><!-- /products-grid -->
-
-      <div class="products-footer">
-        <a th:href="@{/products}" class="btn btn-outline" id="btn-view-all">
-          Xem thêm bánh ngon
-          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================
-       ABOUT BAND
-       ============================ -->
-  <section class="about-band" id="about" aria-labelledby="about-heading">
-    <div class="about-inner wrap">
-      <!-- Photo -->
-      <div class="about-photo">
-        <img src="https://images.unsplash.com/photo-1483695028939-5bb13f8648b0?auto=format&fit=crop&w=900&q=80"
-             th:src="@{/assets/about-bakery.svg}"
-             alt="Những chiếc bánh được làm tươi tại tiệm LUNE"
-             onerror="this.onerror=null;this.src='/assets/about-bakery.svg'" />
-        <span class="about-photo-overlay">made with love ♡</span>
-      </div>
-
-      <!-- Copy -->
-      <div class="about-copy">
-        <span class="eyebrow">OUR STORY · CÂU CHUYỆN NHỎ</span>
-        <h2 class="section-title" id="about-heading">
-          Một chiếc bánh ngon.<br>
-          <em>Một ngày thật dịu dàng.</em>
-        </h2>
-        <p>
-          LUNE bắt đầu từ tình yêu dành cho những mùi hương thân thuộc: bơ tan trong lò nướng,
-          bánh mì giòn ấm, và lớp kem nhẹ như mây.
-        </p>
-        <p>
-          Chúng mình tin rằng một chiếc bánh có thể thay lời yêu thương, trở thành lời cảm ơn,
-          lời chúc mừng, hay đơn giản chỉ là món quà dành cho chính bạn.
-        </p>
-        <a th:href="@{/products}" class="text-link">
-          Chọn bánh cho hôm nay
-          <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================
-       QUOTE STRIP
-       ============================ -->
-  <section class="quote-strip" aria-label="Câu nói của LUNE">
-    <span>✳ &nbsp; LUNE NOTES &nbsp; ✳</span>
-    <p>"Life is short. Make it a little sweeter."</p>
-    <small>A LITTLE SWEETER, EVERY DAY</small>
-  </section>
-
-  <!-- ============================
-       NEWSLETTER / CTA STRIP
-       ============================ -->
-  <section class="newsletter-strip" aria-labelledby="newsletter-heading">
-    <div class="newsletter-inner wrap">
-      <div class="newsletter-copy">
-        <span class="eyebrow">STAY SWEET</span>
-        <h2 class="newsletter-title" id="newsletter-heading">
-          Nhận ưu đãi &amp; thông báo bánh mới
-        </h2>
-        <p>Đăng ký để không bỏ lỡ những chiếc bánh mới ra lò và ưu đãi đặc biệt.</p>
-      </div>
-      <form class="newsletter-form" id="newsletter-form" onsubmit="handleNewsletter(event)">
-        <div class="newsletter-row">
-          <label class="sr-only" for="newsletter-email">Địa chỉ email của bạn</label>
-          <input type="email" id="newsletter-email" name="email"
-                 placeholder="email@example.com" required
-                 aria-label="Địa chỉ email" />
-          <button type="submit" class="btn btn-primary">
-            Đăng ký
-            <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-          </button>
-        </div>
-        <p class="newsletter-note">Không spam. Hủy đăng ký bất cứ lúc nào.</p>
-      </form>
-    </div>
-  </section>
-
-</main><!-- /main -->
-
-<!-- ===== FOOTER ===== -->
-<footer id="footer" class="footer">
-  <div class="wrap footer-grid">
-    <div>
-      <a class="brand footer-brand" th:href="@{/}">
-        LUNE<span class="brand-dot">.</span><small>BAKERY &amp; PATISSERIE</small>
-      </a>
-      <p>Một tiệm bánh nhỏ, dành cho những niềm vui thật to. Bánh được làm tươi mới với tất cả sự yêu thương.</p>
-    </div>
-    <div>
-      <h4>Khám phá</h4>
-      <a th:href="@{/products}">Tất cả sản phẩm</a>
-      <a th:href="@{/products(category='Bánh kem')}">Bánh kem</a>
-      <a th:href="@{/products(category='Bánh ngọt')}">Bánh ngọt</a>
-      <a th:href="@{/products(category='Bánh mì')}">Bánh mì</a>
-    </div>
-    <div>
-      <h4>Hỗ trợ</h4>
-      <a th:href="@{/orders}">Đơn hàng của tôi</a>
-      <a th:href="@{/profile}">Tài khoản</a>
-      <a href="#about">Câu chuyện của LUNE</a>
-      <a th:href="@{/admin}" th:if="${session.user != null and (session.user.role == 'ADMIN' or session.user.role == 'STAFF')}">
-        Khu vực quản trị
-      </a>
-    </div>
-    <div>
-      <h4>Ghé thăm tiệm</h4>
-      <p>TP. Hồ Chí Minh<br>Thông tin liên hệ sẽ được cập nhật khi triển khai.</p>
-      <div class="footer-social">Handmade with ♡</div>
-    </div>
-  </div>
-  <div class="footer-bottom wrap">
-    <span>© 2026 LUNE Bakery. Bakery Shop Application.</span>
-    <span>Made with a little love &amp; a lot of butter ✳</span>
-  </div>
-</footer>
-
-<!-- ===== TOAST NOTIFICATION ===== -->
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-<!-- ===== SCRIPTS ===== -->
-<script>
-  /* ---- Mobile menu toggle ---- */
-  (function () {
-    const btn = document.getElementById('mobile-menu-btn');
-    const nav = document.getElementById('mobile-nav');
-    if (!btn || !nav) return;
-
-    btn.addEventListener('click', function () {
-      const open = nav.classList.toggle('open');
-      btn.setAttribute('aria-expanded', open);
-    });
-
-    /* Close on outside click */
-    document.addEventListener('click', function (e) {
-      if (!nav.contains(e.target) && !btn.contains(e.target)) {
-        nav.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-      }
-    });
-
-    /* Close on nav link click */
-    nav.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        nav.classList.remove('open');
-        btn.setAttribute('aria-expanded', 'false');
-      });
-    });
-  })();
-
-  /* ---- Header scroll shadow ---- */
-  (function () {
-    const header = document.getElementById('site-header');
-    if (!header) return;
-    window.addEventListener('scroll', function () {
-      header.classList.toggle('scrolled', window.scrollY > 10);
-    }, { passive: true });
-  })();
-
-  /* ---- Toast helper ---- */
-  let _toastTimer;
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(_toastTimer);
-    _toastTimer = setTimeout(function () { t.classList.remove('show'); }, 3300);
-  }
-
-  /* ---- Newsletter fallback (client-side) ---- */
-  function handleNewsletter(e) {
-    const input = document.getElementById('newsletter-email');
-    if (!input || !input.value) return;
-    /* Real submission is handled by server; this handles JS fallback */
-    e.preventDefault();
-    showToast('Cảm ơn bạn đã đăng ký! Chúng mình sẽ liên lạc sớm ♡');
-    input.value = '';
-  }
-
-  /* ---- Product image fallback ---- */
-  document.querySelectorAll('.product-media img').forEach(function (img) {
-    img.addEventListener('error', function () {
-      this.style.display = 'none';
-    });
-  });
-
-  /* ---- Category card hover micro-animation ---- */
-  document.querySelectorAll('.category-card').forEach(function (card) {
-    card.addEventListener('mouseenter', function () {
-      const art = card.querySelector('.category-art');
-      if (art) art.style.transform = 'rotate(-8deg) scale(1.08)';
-    });
-    card.addEventListener('mouseleave', function () {
-      const art = card.querySelector('.category-art');
-      if (art) art.style.transform = '';
-    });
-  });
-
-  /* ---- Animate on scroll (simple intersection) ---- */
-  (function () {
-    if (!('IntersectionObserver' in window)) return;
-    const items = document.querySelectorAll(
-      '.product-card, .category-card, .feature, .about-photo, .about-copy'
-    );
-    const io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          io.unobserve(entry.target);
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="web_standard" name="shell-type" />
+    <title>Lune — Tiệm bánh thủ công</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @layer base {
+        html,
+        body {
+          margin: 0;
+          padding: 0;
         }
-      });
-    }, { threshold: 0.12 });
-    items.forEach(function (el) {
-      el.classList.add('fade-in');
-      io.observe(el);
-    });
-  })();
-</script>
+        body {
+          overscroll-behavior: none;
+        }
+        main > :first-child {
+          margin-top: 0 !important;
+        }
+        main > :last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: baseline;
+        color: #8b263e;
+        font-family: "Playfair Display", serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        text-decoration: none;
+      }
+      .brand-dot {
+        color: #536443;
+      }
+      .brand small {
+        margin-left: 0.5rem;
+        color: #564244;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 0.55rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        line-height: 1.2;
+      }
+      @media (max-width: 480px) {
+        .brand {
+          font-size: 1.5rem;
+        }
+        .brand small {
+          display: none;
+        }
+      }
+      .trust-background {
+        position: absolute;
+        inset: 0;
+        background-position: center;
+        background-size: cover;
+        opacity: 0;
+        transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: opacity;
+      }
+      .trust-background.is-active {
+        opacity: 1;
+      }
+      .trust-panel {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition:
+          opacity 500ms cubic-bezier(0.22, 1, 0.36, 1),
+          visibility 0s linear 500ms;
+        will-change: opacity;
+      }
+      .trust-panel.is-active {
+        opacity: 1;
+        visibility: visible;
+        transition-delay: 0s;
+      }
+      .trust-note {
+        isolation: isolate;
+        background: #ffead2;
+        color: #172f46;
+        box-shadow: 0 24px 60px rgba(25, 17, 16, 0.24);
+      }
+      .trust-note::after {
+        position: absolute;
+        right: 0;
+        bottom: -12px;
+        left: 0;
+        z-index: -1;
+        height: 24px;
+        background: radial-gradient(circle, #ffead2 68%, transparent 72%) 0 0 / 24px 24px repeat-x;
+        content: "";
+        pointer-events: none;
+      }
+      .trust-note .note-kicker {
+        color: #8b263e;
+      }
+      .trust-note .note-copy {
+        color: #493c38;
+      }
+      @media (min-width: 1024px) {
+        #trust-showcase .trust-tab-number {
+          width: 7rem;
+          font-size: 4.5rem;
+        }
+      }
+      .home-cta-menu,
+      .home-cta-party {
+        transition:
+          background-color 240ms ease,
+          color 240ms ease,
+          box-shadow 240ms ease,
+          transform 240ms ease;
+      }
+      .home-cta-menu:hover {
+        background: #6f1930 !important;
+        box-shadow: 0 12px 28px rgba(111, 25, 48, 0.24);
+        transform: translateY(-2px);
+      }
+      .home-cta-party:hover {
+        background: #536443 !important;
+        color: #ffffff !important;
+        box-shadow: 0 12px 28px rgba(83, 100, 67, 0.22);
+        transform: translateY(-2px);
+      }
+      .home-cta-menu .material-symbols-outlined,
+      .home-cta-party .material-symbols-outlined {
+        transition: transform 240ms ease;
+      }
+      .home-cta-menu:hover .material-symbols-outlined,
+      .home-cta-party:hover .material-symbols-outlined {
+        transform: translateX(4px);
+      }
+      .home-buy-button {
+        transition:
+          background-color 220ms ease,
+          color 220ms ease,
+          box-shadow 220ms ease,
+          transform 220ms ease;
+      }
+      .home-buy-button:hover {
+        background: #8b263e !important;
+        color: #ffffff !important;
+        box-shadow: 0 8px 20px rgba(139, 38, 62, 0.22);
+        transform: translateY(-2px);
+      }
+      #faq-section .faq-chevron {
+        transform: rotate(0deg) !important;
+        transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      #faq-section .faq-chevron.is-open {
+        transform: rotate(180deg) !important;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-dim": "#eed5cc",
+              "inverse-on-surface": "#ffede7",
+              "outline-variant": "#dcc0c2",
+              "on-primary-container": "#ffa3b0",
+              "on-surface": "#261814",
+              surface: "#fff8f6",
+              "on-error": "#ffffff",
+              "primary-fixed": "#ffd9dd",
+              tertiary: "#3c342b",
+              "surface-container-lowest": "#ffffff",
+              "surface-container": "#ffe9e3",
+              "surface-container-high": "#fde3da",
+              "surface-tint": "#a3394f",
+              "tertiary-fixed-dim": "#d2c4b7",
+              error: "#ba1a1a",
+              "inverse-primary": "#ffb2bc",
+              "on-tertiary-fixed": "#221a12",
+              "inverse-surface": "#3c2d28",
+              "on-tertiary": "#ffffff",
+              "on-primary-fixed-variant": "#842039",
+              "on-secondary-fixed-variant": "#3b4c2d",
+              "on-secondary-fixed": "#111f06",
+              "on-secondary-container": "#586a48",
+              "tertiary-container": "#544a40",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#f7ddd5",
+              "on-error-container": "#93000a",
+              "on-primary-fixed": "#400013",
+              background: "#fff8f6",
+              "tertiary-fixed": "#efe0d3",
+              "surface-bright": "#fff8f6",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#d5e9bf",
+              "on-surface-variant": "#564244",
+              "secondary-fixed-dim": "#bacda5",
+              "surface-container-low": "#fff1ec",
+              "primary-container": "#8b263e",
+              "on-tertiary-container": "#c8baae",
+              "secondary-container": "#d5e9bf",
+              "on-background": "#261814",
+              "surface-variant": "#f7ddd5",
+              "primary-fixed-dim": "#ffb2bc",
+              secondary: "#536443",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              "space-sm": "0.5rem",
+              "space-lg": "1.5rem",
+              "space-md": "1rem",
+              "space-xs": "0.25rem",
+              "margin-mobile": "1.25rem",
+              "gutter-mobile": "1rem",
+              margin: "3rem",
+              gutter: "1.5rem",
+              "space-xl": "2.5rem",
+            },
+            fontFamily: {
+              "label-md": ["Plus Jakarta Sans"],
+              "label-lg": ["Plus Jakarta Sans"],
+              "body-lg": ["Plus Jakarta Sans"],
+              "headline-lg-mobile": ["Playfair Display"],
+              "label-sm": ["Plus Jakarta Sans"],
+              "headline-md-mobile": ["Playfair Display"],
+              "headline-sm": ["Playfair Display"],
+              "body-sm": ["Plus Jakarta Sans"],
+              "headline-md": ["Playfair Display"],
+              "display-mobile": ["Playfair Display"],
+              display: ["Playfair Display"],
+              "body-md": ["Plus Jakarta Sans"],
+              "headline-lg": ["Playfair Display"],
+            },
+            fontSize: {
+              "label-md": [
+                "0.75rem",
+                {
+                  lineHeight: "1rem",
+                  letterSpacing: "0.06em",
+                  fontWeight: "600",
+                },
+              ],
+              "label-lg": [
+                "0.875rem",
+                {
+                  lineHeight: "1.25rem",
+                  letterSpacing: "0.04em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-lg": [
+                "1.125rem",
+                { lineHeight: "1.875rem", fontWeight: "400" },
+              ],
+              "headline-lg-mobile": [
+                "1.875rem",
+                { lineHeight: "2.375rem", fontWeight: "600" },
+              ],
+              "label-sm": [
+                "0.6875rem",
+                {
+                  lineHeight: "0.875rem",
+                  letterSpacing: "0.08em",
+                  fontWeight: "700",
+                },
+              ],
+              "headline-md-mobile": [
+                "1.5rem",
+                { lineHeight: "2rem", fontWeight: "500" },
+              ],
+              "headline-sm": [
+                "1.25rem",
+                { lineHeight: "1.75rem", fontWeight: "600" },
+              ],
+              "body-sm": [
+                "0.875rem",
+                { lineHeight: "1.375rem", fontWeight: "400" },
+              ],
+              "headline-md": [
+                "2rem",
+                { lineHeight: "2.5rem", fontWeight: "500" },
+              ],
+              "display-mobile": [
+                "2.5rem",
+                {
+                  lineHeight: "3rem",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              display: [
+                "3.5rem",
+                {
+                  lineHeight: "4rem",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-md": [
+                "1rem",
+                { lineHeight: "1.625rem", fontWeight: "400" },
+              ],
+              "headline-lg": [
+                "2.5rem",
+                {
+                  lineHeight: "3rem",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"
+  >
+    <header th:replace="~{fragments/layout :: storefrontHeader('home')}"></header>
+    <main class="w-full pt-20 bg-surface">
+      <div class="flex flex-col w-full">
+        <!-- 1. HERO SECTION -->
+        <section
+          class="w-full max-w-[1280px] mx-auto px-gutter py-space-lg lg:py-space-xl"
+        >
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+            <!-- Col Left (7 cols): Editorial Typography & CTA -->
+            <div
+              class="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-space-lg space-y-space-md"
+            >
+              <div
+                class="inline-flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-secondary-container text-on-secondary-container"
+              >
+                <span
+                  class="w-2 h-2 rounded-full bg-primary animate-pulse"
+                ></span>
+                <span
+                  class="font-label-sm text-label-sm uppercase tracking-wider"
+                  >Mẻ Bánh Mới Mỗi Ngày</span
+                >
+              </div>
+              <h1
+                class="font-display text-display lg:text-[3.75rem] text-tertiary leading-[1.1] tracking-tight"
+              >
+                Hương Vị Thủ Công <br />
+                <span class="font-display italic font-normal text-primary"
+                  >Đánh Thức Từng</span
+                >
+                Giác Quan
+              </h1>
+              <p
+                class="font-body-lg text-body-lg text-on-surface-variant max-w-xl"
+              >
+                Nướng chậm từ bơ thượng hạng Normandie và bột mì hữu cơ nguyên
+                cám. Thưởng thức trọn vẹn sự tươi mới ngay trong ngày.
+              </p>
+              <div class="flex flex-wrap items-center gap-space-md pt-space-xs">
+                <a
+                  class="home-cta-menu cursor-pointer inline-flex items-center gap-space-xs px-space-lg py-3.5 bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg shadow-md"
+                  data-path="san-pham"
+                  th:href="@{/products}"
+                  href="/products"
+                >
+                  <span class="">Khám Phá Thực Đơn Bánh</span>
+                  <span class="material-symbols-outlined text-[18px]"
+                    >east</span
+                  >
+                </a>
+              </div>
+              <!-- Provenance subtle badge strip -->
+              <div
+                class="pt-space-md flex items-center gap-space-lg text-on-surface-variant/80"
+              >
+                <div class="flex items-center gap-2">
+                  <span
+                    class="material-symbols-outlined text-secondary text-[20px]"
+                    >eco</span
+                  >
+                  <span class="font-label-md text-label-md"
+                    >100% Men Tự Nhiên</span
+                  >
+                </div>
+                <div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+                <div class="flex items-center gap-2">
+                  <span
+                    class="material-symbols-outlined text-secondary text-[20px]"
+                    >water_drop</span
+                  >
+                  <span class="font-label-md text-label-md"
+                    >Bơ Sữa Normandie AOP</span
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Col Right (5 cols): auto-playing visual carousel -->
+            <div
+              class="lg:col-span-5 relative mt-space-md lg:mt-0"
+              id="hero-carousel"
+              aria-roledescription="carousel"
+              aria-label="Hình ảnh bánh nổi bật"
+            >
+              <div
+                class="relative overflow-hidden rounded-[2.5rem] shadow-xl bg-surface-container-low aspect-[4/5] max-h-[580px] w-full cursor-grab active:cursor-grabbing select-none touch-pan-y"
+                data-carousel-track
+              >
+                <div class="flex h-full will-change-transform" data-carousel-strip>
+                  <img
+                    class="hero-slide pointer-events-none min-w-full h-full object-cover"
+                    draggable="false"
+                    alt="Bánh thủ công mới ra lò"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLDMv-gwxSG3z9bmT-vsST42dn-JRh1Cty_xvJpD1XVgoyZWuodxonKzKmwnIjybq-VB7WQu7m_nSvZzTcMYTuCjPMgdim0nt1z4NtaLqpk6dQWoJfS43w4TEW623vUTL1T5uNR11pkkg2X2JlB67O5RuExwbbyoB2X-MALWprpR7qnE9P0dBHNeqlt7MJ7VzmRNGihvokfj1lPBgnao2L34NO6aUcV8MYT-YXx1rjB-AdKDgq7GzQSA"
+                  />
+                  <img
+                    class="hero-slide pointer-events-none min-w-full h-full object-cover"
+                    draggable="false"
+                    alt="Croissant bơ thủ công"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqZirpJu706xXeqlzmspDay6t6o9Rt11vSqUO4McPVSNqXR5pgzHryfBX4GyIDKpfOJDuThy6OH7yq8znKSXg-5SK_DMf7kjVA6TyeDBlD31opmVC6lZUX8kX-uhujnx2_za6ybYEecuDFXJUS3_tAN21u_mByez6s1j2YhpUvRExJDsGiP92BHrnilqIZz8ryQbyJO-rNGz-4hKDZJlxbvjwSLfOeAtU6bcjymZN7HxN1dtmo7igkJQ"
+                  />
+                  <img
+                    class="hero-slide pointer-events-none min-w-full h-full object-cover"
+                    draggable="false"
+                    alt="Bánh tart dâu tươi"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuChQzIeKWWtpKyY6cGz4D1SJa9T85q-BCuNncfTH7wjdFQCXo9Tuc8cQRimlRvieyG5SrF72G5BeYYJ0MGrEd5rJ-LqVD0vNdKDYv8MYcKX75yxWUgQt9jr6SzxHIGTyxvcBxT3Tos7KNRfSJDXvYH8Qb6ojt1r0b-LEbcbDwlgfhjZO5928P9d5B5Ln_biEVjBLETOd6mppWsdpm2IbYvcuY62QjydQQ_Zqwk1VNsTah9RMNsisrhFXw"
+                  />
+                  <img
+                    class="hero-slide pointer-events-none min-w-full h-full object-cover"
+                    draggable="false"
+                    alt="Pain au chocolat"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuANsLaMMhTUHJ1_OCRZHUVQf7ZTSxCSNslNnJbY6zWYaIr-cydl_rZdL6PkPBl6oBqZ6u8tIefucUAW0gvP0W8i2f2d0R69D_4k9BUKwH5ZqhV8Tw5Vxqk-Lt4jc_WFZXGV2w1IhcK9s_N7HHPKT3QsJETD7Esh6yp5neOFYSGjOJUqG49wGh6jREZsvTBi95kWmh5642nHhgWC0Nssfx1wKch21gshdUvLRaMIJ29N4gsOogvk_benPw"
+                  />
+                  <img
+                    class="hero-slide pointer-events-none min-w-full h-full object-cover"
+                    draggable="false"
+                    alt="Mousse mâm xôi và hạt dẻ cười"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA6xeIqly-lH0BIAqPqqXDlvXDKW0N8izdImlGJO5oPe-IR28Ux8YojkzkADEv_SGUYdUlZrmw2TGNoWcPcZVI-vzEp7RzEOzDZkLphCamKJHU243ZBU27DNQFsJiNlJloe7ErjL1hounxwd41bnEqpvUBoDoxKCq-Yju5dfFh2f8sVZbTEnrUMkJLMYRAv0nZtgNldowsm-E_ZOWi_MbqyAmUwjy-cVs_OsdOa6dl70QKuvIFAvvgwg"
+                  />
+                </div>
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-tertiary/30 via-transparent to-transparent pointer-events-none"
+                ></div>
+                <div
+                  class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2"
+                  aria-label="Chọn ảnh"
+                >
+                  <button
+                    class="hero-dot cursor-pointer w-6 h-2 rounded-full bg-surface transition-all"
+                    type="button"
+                    data-carousel-dot="0"
+                    aria-label="Xem ảnh 1"
+                    aria-current="true"
+                  ></button>
+                  <button
+                    class="hero-dot cursor-pointer w-2 h-2 rounded-full bg-surface/60 transition-all"
+                    type="button"
+                    data-carousel-dot="1"
+                    aria-label="Xem ảnh 2"
+                    aria-current="false"
+                  ></button>
+                  <button
+                    class="hero-dot cursor-pointer w-2 h-2 rounded-full bg-surface/60 transition-all"
+                    type="button"
+                    data-carousel-dot="2"
+                    aria-label="Xem ảnh 3"
+                    aria-current="false"
+                  ></button>
+                  <button
+                    class="hero-dot cursor-pointer w-2 h-2 rounded-full bg-surface/60 transition-all"
+                    type="button"
+                    data-carousel-dot="3"
+                    aria-label="Xem ảnh 4"
+                    aria-current="false"
+                  ></button>
+                  <button
+                    class="hero-dot cursor-pointer w-2 h-2 rounded-full bg-surface/60 transition-all"
+                    type="button"
+                    data-carousel-dot="4"
+                    aria-label="Xem ảnh 5"
+                    aria-current="false"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- 2. CATEGORIES SECTION (Artisanal Line-Art SVG Icons) -->
+        <section class="w-full max-w-[1280px] mx-auto px-gutter py-space-md">
+          <div
+            class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-space-sm"
+          >
+            <!-- Cat 1 -->
+            <a
+              class="cursor-pointer group flex flex-col items-center justify-center p-space-md rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all duration-300 text-center"
+              data-path="danh-muc-viennoiserie"
+              href="#"
+            >
+              <div
+                class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-space-xs shadow-sm"
+              >
+                <svg
+                  class="w-7 h-7 stroke-current fill-none stroke-[1.6]"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M4 15c1-3 3-5 8-5s7 2 8 5"></path>
+                  <path d="M7 10c0-2.5 2-4 5-4s5 1.5 5 4"></path>
+                  <path d="M3 15c-1 3 0 5 2 5s5-2 7-2 5 2 7 2 3-2 2-5"></path>
+                </svg>
+              </div>
+              <span
+                class="font-label-md text-label-md text-tertiary font-semibold group-hover:text-primary transition-colors"
+                >Bánh Mì &amp; Viennoiserie</span
+              >
+            </a>
+            <!-- Cat 2 -->
+            <a
+              class="cursor-pointer group flex flex-col items-center justify-center p-space-md rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all duration-300 text-center"
+              data-path="danh-muc-banh-sinh-nhat"
+              href="#"
+            >
+              <div
+                class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-space-xs shadow-sm"
+              >
+                <svg
+                  class="w-7 h-7 stroke-current fill-none stroke-[1.6]"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M20 21H4v-7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7z"
+                  ></path>
+                  <path d="M16 12V8a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v4"></path>
+                  <line x1="12" x2="12" y1="2" y2="4"></line>
+                  <circle
+                    class="fill-current"
+                    cx="12"
+                    cy="1.5"
+                    r="0.5"
+                  ></circle>
+                </svg>
+              </div>
+              <span
+                class="font-label-md text-label-md text-tertiary font-semibold group-hover:text-primary transition-colors"
+                >Bánh Sinh Nhật &amp; Entremet</span
+              >
+            </a>
+            <!-- Cat 3 -->
+            <a
+              class="cursor-pointer group flex flex-col items-center justify-center p-space-md rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all duration-300 text-center"
+              data-path="danh-muc-cookies"
+              href="#"
+            >
+              <div
+                class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-space-xs shadow-sm"
+              >
+                <svg
+                  class="w-7 h-7 stroke-current fill-none stroke-[1.6]"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <circle class="fill-current" cx="9" cy="9" r="1"></circle>
+                  <circle class="fill-current" cx="15" cy="10" r="1"></circle>
+                  <circle class="fill-current" cx="10" cy="14" r="1"></circle>
+                  <circle class="fill-current" cx="14" cy="15" r="1"></circle>
+                </svg>
+              </div>
+              <span
+                class="font-label-md text-label-md text-tertiary font-semibold group-hover:text-primary transition-colors"
+                >Bánh Nướng &amp; Cookies</span
+              >
+            </a>
+            <!-- Cat 4 -->
+            <a
+              class="cursor-pointer group flex flex-col items-center justify-center p-space-md rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all duration-300 text-center"
+              data-path="danh-muc-tart-choux"
+              href="#"
+            >
+              <div
+                class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-space-xs shadow-sm"
+              >
+                <svg
+                  class="w-7 h-7 stroke-current fill-none stroke-[1.6]"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M3 13c1 5 3 8 9 8s8-3 9-8H3z"></path>
+                  <path d="M12 4c-3 0-5 2.5-5 5h10c0-2.5-2-5-5-5z"></path>
+                  <path d="M4 13h16"></path>
+                </svg>
+              </div>
+              <span
+                class="font-label-md text-label-md text-tertiary font-semibold group-hover:text-primary transition-colors"
+                >Bánh Tart &amp; Choux</span
+              >
+            </a>
+            <!-- Cat 5 -->
+            <a
+              class="cursor-pointer group flex flex-col items-center justify-center p-space-md rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all duration-300 text-center"
+              data-path="danh-muc-hop-thiec"
+              href="#"
+            >
+              <div
+                class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-space-xs shadow-sm"
+              >
+                <svg
+                  class="w-7 h-7 stroke-current fill-none stroke-[1.6]"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                >
+                  <rect height="12" rx="2" width="18" x="3" y="8"></rect>
+                  <rect height="3" rx="1.5" width="20" x="2" y="5"></rect>
+                  <line x1="8" x2="16" y1="14" y2="14"></line>
+                  <circle class="fill-current" cx="12" cy="14" r="1.5"></circle>
+                </svg>
+              </div>
+              <span
+                class="font-label-md text-label-md text-tertiary font-semibold group-hover:text-primary transition-colors"
+                >Bánh Hộp Thiếc Quà Tặng</span
+              >
+            </a>
+            <!-- Cat 6 -->
+            <a
+              class="cursor-pointer group flex flex-col items-center justify-center p-space-md rounded-2xl bg-surface-container-low hover:bg-surface-container transition-all duration-300 text-center"
+              data-path="danh-muc-mousse"
+              href="#"
+            >
+              <div
+                class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary group-hover:scale-110 transition-transform mb-space-xs shadow-sm"
+              >
+                <svg
+                  class="w-7 h-7 stroke-current fill-none stroke-[1.6]"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M4 18l16-6v6H4z"></path>
+                  <path d="M4 18V9l16 3"></path>
+                  <circle cx="12" cy="6" r="2"></circle>
+                </svg>
+              </div>
+              <span
+                class="font-label-md text-label-md text-tertiary font-semibold group-hover:text-primary transition-colors"
+                >Bánh Lạnh &amp; Mousse</span
+              >
+            </a>
+          </div>
+        </section>
+        <!-- 3. KHU VỰC 1: BÁNH MỚI RA LÒ (EDITORIAL BALANCED 4-COLUMN GRID) -->
+        <section class="w-full max-w-[1280px] mx-auto px-gutter py-space-xl">
+          <div
+            class="flex flex-col md:flex-row md:items-end justify-between mb-space-lg gap-space-sm"
+          >
+            <div>
+              <span
+                class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold"
+                >Thực Đơn Buổi Sáng</span
+              >
+              <h2 class="font-headline-lg text-headline-lg text-tertiary mt-1">
+                Mẻ Bánh Mới Ra Lò
+              </h2>
+              <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                Những hương vị mới nhất vừa hoàn thiện bởi thợ bánh chính
+              </p>
+            </div>
+            <a
+              class="cursor-pointer inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-primary-container transition-colors"
+              data-path="san-pham-moi"
+              href="#"
+            >
+              <span class="">Xem tất cả bánh mới</span>
+              <span class="material-symbols-outlined text-[16px]"
+                >arrow_forward</span
+              >
+            </a>
+          </div>
+          <!-- 8 Product Grid -->
+          <div
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter"
+          >
+            <!-- Item 1 -->
+            <div
+              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              <div
+                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Classic French golden butter croissant from Normandy on white marble counter, deep layered lamination, flaky surface, warm studio lighting"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqZirpJu706xXeqlzmspDay6t6o9Rt11vSqUO4McPVSNqXR5pgzHryfBX4GyIDKpfOJDuThy6OH7yq8znKSXg-5SK_DMf7kjVA6TyeDBlD31opmVC6lZUX8kX-uhujnx2_za6ybYEecuDFXJUS3_tAN21u_mByez6s1j2YhpUvRExJDsGiP92BHrnilqIZz8ryQbyJO-rNGz-4hKDZJlxbvjwSLfOeAtU6bcjymZN7HxN1dtmo7igkJQ"
+                />
+                <span
+                  class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm shadow"
+                  >Mới</span
+                >
+              </div>
+              <span
+                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
+                >Viennoiserie</span
+              >
+              <h3
+                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
+              >
+                Croissant Bơ Pháp Normandie
+              </h3>
+              <div
+                class="mt-auto pt-space-sm flex items-center justify-between"
+              >
+                <span
+                  class="font-headline-sm text-headline-sm text-primary font-bold"
+                  >45.000₫</span
+                >
+                <button
+                  aria-label="Thêm Croissant vào giỏ"
+                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >shopping_bag</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Item 2 -->
+            <div
+              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              <div
+                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="French pain au chocolat with dark Valrhona chocolate bars melting inside, glossy brown flaky pastry surface, flour dusting on dark slate"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuANsLaMMhTUHJ1_OCRZHUVQf7ZTSxCSNslNnJbY6zWYaIr-cydl_rZdL6PkPBl6oBqZ6u8tIefucUAW0gvP0W8i2f2d0R69D_4k9BUKwH5ZqhV8Tw5Vxqk-Lt4jc_WFZXGV2w1IhcK9s_N7HHPKT3QsJETD7Esh6yp5neOFYSGjOJUqG49wGh6jREZsvTBi95kWmh5642nHhgWC0Nssfx1wKch21gshdUvLRaMIJ29N4gsOogvk_benPw"
+                />
+              </div>
+              <span
+                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
+                >Viennoiserie</span
+              >
+              <h3
+                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
+              >
+                Pain au Chocolat Đen Valrhona
+              </h3>
+              <div
+                class="mt-auto pt-space-sm flex items-center justify-between"
+              >
+                <span
+                  class="font-headline-sm text-headline-sm text-primary font-bold"
+                  >52.000₫</span
+                >
+                <button
+                  aria-label="Thêm Pain au Chocolat vào giỏ"
+                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >shopping_bag</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Item 3 -->
+            <div
+              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              <div
+                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Exquisite French wild strawberry tart with almond frangipane cream, glistening red berries, mint garnish on linen tablecloth"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuChQzIeKWWtpKyY6cGz4D1SJa9T85q-BCuNncfTH7wjdFQCXo9Tuc8cQRimlRvieyG5SrF72G5BeYYJ0MGrEd5rJ-LqVD0vNdKDYv8MYcKX75yxWUgQt9jr6SzxHIGTyxvcBxT3Tos7KNRfSJDXvYH8Qb6ojt1r0b-LEbcbDwlgfhjZO5928P9d5B5Ln_biEVjBLETOd6mppWsdpm2IbYvcuY62QjydQQ_Zqwk1VNsTah9RMNsisrhFXw"
+                />
+                <span
+                  class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm shadow"
+                  >Mới</span
+                >
+              </div>
+              <span
+                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
+                >Bánh Tart</span
+              >
+              <h3
+                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
+              >
+                Tart Dâu Tây Rừng &amp; Kem Hạnh Nhân
+              </h3>
+              <div
+                class="mt-auto pt-space-sm flex items-center justify-between"
+              >
+                <span
+                  class="font-headline-sm text-headline-sm text-primary font-bold"
+                  >75.000₫</span
+                >
+                <button
+                  aria-label="Thêm Tart dâu vào giỏ"
+                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >shopping_bag</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Item 4 -->
+            <div
+              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              <div
+                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Individual raspberry pistachio mousse entremet with shiny red mirror glaze and crushed pistachio nuts, served on porcelain dish"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA6xeIqly-lH0BIAqPqqXDlvXDKW0N8izdImlGJO5oPe-IR28Ux8YojkzkADEv_SGUYdUlZrmw2TGNoWcPcZVI-vzEp7RzEOzDZkLphCamKJHU243ZBU27DNQFsJiNlJloe7ErjL1hounxwd41bnEqpvUBoDoxKCq-Yju5dfFh2f8sVZbTEnrUMkJLMYRAv0nZtgNldowsm-E_ZOWi_MbqyAmUwjy-cVs_OsdOa6dl70QKuvIFAvvgwg"
+                />
+              </div>
+              <span
+                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
+                >Bánh Lạnh</span
+              >
+              <h3
+                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
+              >
+                Mousse Phúc Bồn Tử Pistachio
+              </h3>
+              <div
+                class="mt-auto pt-space-sm flex items-center justify-between"
+              >
+                <span
+                  class="font-headline-sm text-headline-sm text-primary font-bold"
+                  >85.000₫</span
+                >
+                <button
+                  aria-label="Thêm Mousse vào giỏ"
+                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >shopping_bag</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Item 5 -->
+            <div
+              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              <div
+                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Artisanal 36 hour sourdough bread boule with scored wheat pattern, blistered dark golden crust, dusted with flour on wooden board"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr952XiUGIoy6O1IcdwCMr9_XgD1EGGs1GaiZMy-15zBvooyfxy1C28KX2xEMFXh_NHV-671RrM4mnEvjrIgMNvTOfZSiwKJLPPZ3dcx4-ncO6B3oDxlv_ope5oVyB516-qIfVJxXSNIXveR3iOAoCSX3XJbmwtGuQl2yGgqyp3_nUzbYlkgDH1q2YpR6IOPCO91edr1mQC4DZt43mPuNwnI59qL6n7gUmt6uw77wCEGuU0OHXYsaQ6g"
+                />
+              </div>
+              <span
+                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
+                >Bánh Mì Mộc</span
+              >
+              <h3
+                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
+              >
+                Sourdough Men Tự Nhiên 36 Giờ
+              </h3>
+              <div
+                class="mt-auto pt-space-sm flex items-center justify-between"
+              >
+                <span
+                  class="font-headline-sm text-headline-sm text-primary font-bold"
+                  >68.000₫</span
+                >
+                <button
+                  aria-label="Thêm Sourdough vào giỏ"
+                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >shopping_bag</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Item 6 -->
+            <div
+              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              <div
+                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Kyoto matcha green tea eclair topped with fine green icing and gold leaf, delicate French pastry presentation"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoFm4D0pMaCQHty2TYeIBwhZ8hj4IKTbKRXlCPyZbJLNnHJkGyBBWJYe04BgzTYfDUSHc6bT41O_UvCYAdDd90M2d-FMmECaZ7-P85htMMqoxVKel9qCOmvjj_3Tl7ZekHUPlj-c0IGkIqDHblBwOPm6CW8he8LjZo-Z4QTIgNpTfREQiVgogGeyyzedzNnqajhPivULZqpQSM28QFZXoe9Q8tIzL78BmV-ZpEsbFoBDbpBmWVDL6i2g"
+                />
+              </div>
+              <span
+                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
+                >Choux &amp; Éclair</span
+              >
+              <h3
+                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
+              >
+                Éclair Trà Xanh Kyoto &amp; Kem Sữa
+              </h3>
+              <div
+                class="mt-auto pt-space-sm flex items-center justify-between"
+              >
+                <span
+                  class="font-headline-sm text-headline-sm text-primary font-bold"
+                  >58.000₫</span
+                >
+                <button
+                  aria-label="Thêm Eclair vào giỏ"
+                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >shopping_bag</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Item 7 -->
+            <div
+              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              <div
+                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Golden enriched brioche loaf studded with rum soaked raisins and pearl sugar crystals, fluffy textured crumb"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKrzrx9bNlvPwE9Si_9k0pD1VY4vzQL52jiyZc2wl5ofcrOqVzQqZkjFtMrTDsUP__vP2l-fe9f6KyoLeSDO-lzgn20esJyZn3gdAtB3ETM45Y07HUNejjz1lvzlWz6D7oLCTL4V0Fnpep_4VllI-BClJWwzHST8gd0oD8artBmY7IE7VRGQDOPscNkoV578Oe52mRiNC8GSeCROVBG9DX1eUlMLH2Jind5oWYkU6tIeaEKU33F4E0nA"
+                />
+                <span
+                  class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm shadow"
+                  >Mới</span
+                >
+              </div>
+              <span
+                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
+                >Brioche</span
+              >
+              <h3
+                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
+              >
+                Brioche Hoàng Gia Nho Khô Rum
+              </h3>
+              <div
+                class="mt-auto pt-space-sm flex items-center justify-between"
+              >
+                <span
+                  class="font-headline-sm text-headline-sm text-primary font-bold"
+                  >65.000₫</span
+                >
+                <button
+                  aria-label="Thêm Brioche vào giỏ"
+                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >shopping_bag</span
+                  >
+                </button>
+              </div>
+            </div>
+            <!-- Item 8 -->
+            <div
+              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
+            >
+              <div
+                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Classic French lemon meringue tart with torched golden peaks of Italian meringue and zesty yellow curd on crisp butter crust"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbZ0Cr_LuvWLab3kqg4fljZDWgY38Y2mdU0FCfGtCQkK7RhFY3EmxcYOwjHtOX0Bl14syNdaRyp_rYOtym8Z5DCcTIZHYF_xCWzDGU_uFuLE9P0YQF47yHr1mZ6a5m-mNL3q6ykA2PirKKCbcgdO4SMY8icVa1CnAeXEYZ0STmqz__3BuMX4FNo3O4MlBIGBvIksPKwFTzQsTp_IMEMt399WfMR94zBiBRyyq3v-0mHyogutLdvvGvdQ"
+                />
+              </div>
+              <span
+                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
+                >Bánh Tart</span
+              >
+              <h3
+                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
+              >
+                Tart Chanh Vàng Meringue Cháy
+              </h3>
+              <div
+                class="mt-auto pt-space-sm flex items-center justify-between"
+              >
+                <span
+                  class="font-headline-sm text-headline-sm text-primary font-bold"
+                  >72.000₫</span
+                >
+                <button
+                  aria-label="Thêm Tart Chanh vào giỏ"
+                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >shopping_bag</span
+                  >
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- 4. KHU VỰC 2: BÁNH SINH NHẬT & BÁNH TIỆC (SPLIT SHOWCASE / HORIZONTAL SPOTLIGHT) -->
+        <section
+          class="w-full bg-surface-container-low py-space-xl my-space-md"
+        >
+          <div class="max-w-[1280px] mx-auto px-gutter">
+            <div
+              class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch"
+            >
+              <!-- Col Left (5 cols): Editorial High-End Banner -->
+              <div
+                class="lg:col-span-5 bg-tertiary text-on-tertiary rounded-3xl p-space-lg lg:p-space-xl flex flex-col justify-between shadow-lg relative overflow-hidden"
+              >
+                <div
+                  class="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-primary/10 pointer-events-none"
+                ></div>
+                <div class="space-y-space-md relative z-10">
+                  <div
+                    class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-surface-container-lowest/15 text-primary-fixed"
+                  >
+                    <span class="material-symbols-outlined text-[16px]"
+                      >celebration</span
+                    >
+                    <span
+                      class="font-label-sm text-label-sm uppercase tracking-wider"
+                      >Bộ Sưu Tập Trang Nhã</span
+                    >
+                  </div>
+                  <h2
+                    class="font-display text-[2.25rem] lg:text-[2.75rem] leading-[1.15] text-surface font-semibold"
+                  >
+                    Bộ Sưu Tập <br />
+                    <span class="italic font-normal text-secondary-fixed"
+                      >Bánh Tiệc &amp; Sinh Nhật</span
+                    >
+                  </h2>
+                  <p
+                    class="font-body-md text-body-md text-tertiary-fixed-dim leading-relaxed"
+                  >
+                    Thiết kế thanh tao, vị ngọt dịu nhẹ cân bằng từ trái cây
+                    tươi và chocolate nguyên chất cho những dịp sum vầy ý nghĩa.
+                  </p>
+                </div>
+                <div class="pt-space-xl relative z-10">
+                  <a
+                    class="home-cta-party cursor-pointer inline-flex items-center justify-between w-full px-space-md py-3.5 bg-surface text-tertiary rounded-xl font-label-lg text-label-lg shadow-sm"
+                    data-path="banh-tiec"
+                    href="#"
+                  >
+                    <span class="">Xem Toàn Bộ Bánh Tiệc</span>
+                    <span class="material-symbols-outlined text-[18px]"
+                      >arrow_forward</span
+                    >
+                  </a>
+                </div>
+              </div>
+              <!-- Col Right (7 cols): 3 Horizontal Wide Product Cards -->
+              <div
+                class="lg:col-span-7 flex flex-col justify-between gap-space-md"
+              >
+                <!-- Celebration Cake 1 -->
+                <div
+                  class="flex flex-col sm:flex-row items-center bg-surface-container-lowest rounded-2xl p-space-sm gap-space-md shadow-sm hover:shadow-md transition-all"
+                >
+                  <div
+                    class="w-full sm:w-44 h-40 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-low"
+                  >
+                    <img
+                      class="w-full h-full object-cover"
+                      data-alt="Luxury French rose and raspberry entremet cake decorated with organic rose petals, glossy pink glaze, diameter 16cm on ceramic cake stand"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDudRTclAFmgFqlz9GGLfgAdUitAWU8cskAYnSAtbW8N3-EHEJdLLYpX6KNLdjgTitkPvdAgYuHBU4aNKBsmVffmc6n_yPrOvDQAgpakyT1iT4GIAJRaRcW8z0Yoe1f1z6Xknk5zoj2cEDmi2lhtM8F9Ns6rzkxuYR9oGy9M8WGRHxj7GbUXXZLSfhLQHZjIXv-IWPkuf4f5kJjwqMUTLyGdkLjM7ckZ9d-1I3XhP8VjK_eYJQSx8q3Tg"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col flex-grow w-full justify-between py-1"
+                  >
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span
+                          class="font-label-sm text-label-sm text-secondary font-bold uppercase"
+                          >Entremet Glacé</span
+                        >
+                        <span
+                          class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full"
+                          >Ø 16cm</span
+                        >
+                      </div>
+                      <h3
+                        class="font-headline-sm text-headline-sm text-tertiary font-medium mt-1"
+                      >
+                        Bánh Entremet Hoa Hồng Dâu Rừng
+                      </h3>
+                      <p
+                        class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 mt-0.5"
+                      >
+                        Mousse hoa hồng Bungary, thạch dâu rừng dại và cốt
+                        dacquoise hạnh nhân giòn.
+                      </p>
+                    </div>
+                    <div
+                      class="flex items-center justify-between pt-space-xs mt-2"
+                    >
+                      <span
+                        class="font-headline-sm text-headline-sm text-primary font-bold"
+                        >520.000₫</span
+                      >
+                      <button
+                        class="cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm"
+                        type="button"
+                      >
+                        <span class="material-symbols-outlined text-[16px]"
+                          >add_shopping_cart</span
+                        >
+                        <span class="">Thêm giỏ</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Celebration Cake 2 -->
+                <div
+                  class="flex flex-col sm:flex-row items-center bg-surface-container-lowest rounded-2xl p-space-sm gap-space-md shadow-sm hover:shadow-md transition-all"
+                >
+                  <div
+                    class="w-full sm:w-44 h-40 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-low"
+                  >
+                    <img
+                      class="w-full h-full object-cover"
+                      data-alt="High end dark Valrhona chocolate gateau cake with bourbon vanilla cream layers, chocolate curls, diameter 18cm luxury celebration cake"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-l_U0eslwOtgrwCvl57Ly3zUb3FXvyZxHKxhaCf619lvVeJQvzeMr4hsXQdDvbdvHCVrVlj3Aovm9x9yE9rebGQDo548pM5elNO57js7WdIi-hiaWjHiqxb6goygaN9Y2aohKRaU-RkEu738o3hGzHYgqd1_M_4U3-6HS9pSAtM2EpOUGkcNHdqWRH2ODXduLFVifFDIFZYZGI2SoDyokA12lJe2qN0AHTvoWuWXRcPn3Ok-lFgxz9A"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col flex-grow w-full justify-between py-1"
+                  >
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span
+                          class="font-label-sm text-label-sm text-secondary font-bold uppercase"
+                          >Gâteau Classique</span
+                        >
+                        <span
+                          class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full"
+                          >Ø 18cm</span
+                        >
+                      </div>
+                      <h3
+                        class="font-headline-sm text-headline-sm text-tertiary font-medium mt-1"
+                      >
+                        Gâteau Chocolate Đen &amp; Vani Bourbon
+                      </h3>
+                      <p
+                        class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 mt-0.5"
+                      >
+                        Ganache Valrhona 70%, hạt ca cao rang giòn và kem béo
+                        ngậy ủ hạt vani Madagascar.
+                      </p>
+                    </div>
+                    <div
+                      class="flex items-center justify-between pt-space-xs mt-2"
+                    >
+                      <span
+                        class="font-headline-sm text-headline-sm text-primary font-bold"
+                        >580.000₫</span
+                      >
+                      <button
+                        class="cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm"
+                        type="button"
+                      >
+                        <span class="material-symbols-outlined text-[16px]"
+                          >add_shopping_cart</span
+                        >
+                        <span class="">Thêm giỏ</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <!-- Celebration Cake 3 -->
+                <div
+                  class="flex flex-col sm:flex-row items-center bg-surface-container-lowest rounded-2xl p-space-sm gap-space-md shadow-sm hover:shadow-md transition-all"
+                >
+                  <div
+                    class="w-full sm:w-44 h-40 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-low"
+                  >
+                    <img
+                      class="w-full h-full object-cover"
+                      data-alt="Modern artisanal sweet corn cream cake with roasted pistachio and cream cheese mascarpone, pastel yellow and green pastel palette, diameter 16cm"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPVx4t2RSWsPjx6Uub4JXaGAbZB0cJ_OXGw2TvQ4XdAU_eb-KOWIxuPSe2dZQGEDylIoy37xPk2PoAPrIhY6qQgMhrzBOXwXxxro5zxi2QYKW99KFPjhYaeZ7u7Qpg1TOCKav6PBSnTgeZSHJTdOWAiXfEAjwIKZoFSlvUE9iMpA3VOdoLPmrfhEKNsR0xzQOEaJk64WcjD3SXpvkI8_uRqkCUdPm2oZCiY2ZWyAg744oNgDop1Q6-_A"
+                    />
+                  </div>
+                  <div
+                    class="flex flex-col flex-grow w-full justify-between py-1"
+                  >
+                    <div>
+                      <div class="flex items-center justify-between">
+                        <span
+                          class="font-label-sm text-label-sm text-secondary font-bold uppercase"
+                          >Signature Atelier</span
+                        >
+                        <span
+                          class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full"
+                          >Ø 16cm</span
+                        >
+                      </div>
+                      <h3
+                        class="font-headline-sm text-headline-sm text-tertiary font-medium mt-1"
+                      >
+                        Bánh Kem Bắp Non &amp; Hạt Dẻ Cười Phô Mai
+                      </h3>
+                      <p
+                        class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 mt-0.5"
+                      >
+                        Sữa bắp tươi ninh nhuyễn cùng mascarpone Ý, sốt praline
+                        dẻ cười thơm lừng.
+                      </p>
+                    </div>
+                    <div
+                      class="flex items-center justify-between pt-space-xs mt-2"
+                    >
+                      <span
+                        class="font-headline-sm text-headline-sm text-primary font-bold"
+                        >490.000₫</span
+                      >
+                      <button
+                        class="cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm"
+                        type="button"
+                      >
+                        <span class="material-symbols-outlined text-[16px]"
+                          >add_shopping_cart</span
+                        >
+                        <span class="">Thêm giỏ</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- 5. KHU VỰC 3: BÁNH HỘP THIẾC (VINTAGE ARTISANAL STRIP / MAGAZINE SPREAD) -->
+        <section class="w-full max-w-[1280px] mx-auto px-gutter py-space-xl">
+          <div class="text-center max-w-2xl mx-auto mb-space-xl">
+            <div
+              class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-secondary-container text-on-secondary-container mb-space-xs"
+            >
+              <span class="material-symbols-outlined text-[16px]">archive</span>
+              <span class="font-label-sm text-label-sm uppercase tracking-wider"
+                >Bộ Quà Hộp Thiếc Nghệ Nhân</span
+              >
+            </div>
+            <h2 class="font-headline-lg text-headline-lg text-tertiary">
+              Bánh Hộp Thiếc Cổ Điển
+            </h2>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mt-space-xs"
+            >
+              Bảo quản trọn vẹn độ giòn tan của bơ tươi trong chiếc hộp thiếc
+              dập nổi trang nhã
+            </p>
+          </div>
+          <!-- 3 Vintage Exhibition Cards Spread -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+            <!-- Tin Box 1 -->
+            <div
+              class="flex flex-col bg-surface-container-low rounded-3xl p-space-md shadow-sm hover:shadow-md transition-all duration-300 relative group"
+            >
+              <div
+                class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container-lowest my-space-xs"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Embossed vintage French tin box filled with golden Breton salted butter cookies, antique botanical illustration on the tin lid, warm morning light on wooden baking surface"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTrxsPfa05tH887BZzpMhjtRbSSC6LLGGFhSQ5os2RZhHtjhczjauJbEGjPyqlLi3w-kMVibQO9TyCOB6vzasjWKkUwyb90SraBeTw2d7Ihbj2aJhliTpWPLPAvCnRw7jNTznn8ll158wmHBq5kU2vAvWBFLby8Stl47hhUWbTGuSVUOfUXNgXMU7t8uxATBCNWNDR3LPMu0GOlqicBdV0XAlreg5yElZUwyN0GDpUcCGQnJ6JF_HsCA"
+                />
+              </div>
+              <!-- Content styled like Parisian patisserie label -->
+              <div class="flex flex-col flex-grow pt-space-xs">
+                <span
+                  class="font-label-sm text-label-sm text-primary font-semibold uppercase"
+                  >Sablé au Beurre Salé</span
+                >
+                <h3
+                  class="font-headline-sm text-headline-sm text-tertiary font-semibold mt-1"
+                >
+                  Hộp Thiếc Sablé Breton Bơ Mặn
+                </h3>
+                <p
+                  class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed"
+                >
+                  Công thức truyền thống vùng Brittany với muối biển Guérande
+                  kết tinh tạo vị đậm đà giòn xốp.
+                </p>
+                <div
+                  class="mt-auto pt-space-md flex items-center justify-between"
+                >
+                  <div>
+                    <span
+                      class="font-label-sm text-label-sm text-on-surface-variant block"
+                      >Giá niêm yết</span
+                    >
+                    <span
+                      class="font-headline-sm text-headline-sm text-primary font-bold"
+                      >240.000₫</span
+                    >
+                  </div>
+                  <button
+                    class="home-buy-button cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-highest text-tertiary font-label-md text-label-md"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]"
+                      >shopping_bag</span
+                    >
+                    <span class="">Chọn mua</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tin Box 2 -->
+            <div
+              class="flex flex-col bg-surface-container-low rounded-3xl p-space-md shadow-sm hover:shadow-md transition-all duration-300 relative group"
+            >
+              <div
+                class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container-lowest my-space-xs"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Artisanal French embossed tin box with delicate crispy almond hazelnut tuiles, thin golden wafers, elegant floral motifs on tin container, culinary photography"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy5oNZvVmN4-ZKP4Q_F6cHYM7tFDbgV93uJzxljKidWw2a-8nSWaznSmm3prHNwKeuRA_1m8J2Ap_QoGGatx9q65uJOY6Uz8Me2BbWZVyqaEMLK90V_6etp3K4HDn-Q25kp4Btokr4IxqOr-HddKaGyLsm8bF3B6JQY3jNUgcuCAmtRABPpB6QobJMdE3llfuVD3Kz9Zyjlq7HP8EGPIAsUFTRNpN-tN3SJqdIj34nzj9-6AwFj7t_kA"
+                />
+              </div>
+              <div class="flex flex-col flex-grow pt-space-xs">
+                <span
+                  class="font-label-sm text-label-sm text-primary font-semibold uppercase"
+                  >Tuiles aux Amandes</span
+                >
+                <h3
+                  class="font-headline-sm text-headline-sm text-tertiary font-semibold mt-1"
+                >
+                  Hộp Thiếc Hạnh Nhân Hạt Phỉ Tuile Giòn
+                </h3>
+                <p
+                  class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed"
+                >
+                  Lát hạnh nhân nướng mỏng tang uốn cong nhẹ nhàng, quyện cùng
+                  hạt phỉ Piedmont bùi thơm ngậy.
+                </p>
+                <div
+                  class="mt-auto pt-space-md flex items-center justify-between"
+                >
+                  <div>
+                    <span
+                      class="font-label-sm text-label-sm text-on-surface-variant block"
+                      >Giá niêm yết</span
+                    >
+                    <span
+                      class="font-headline-sm text-headline-sm text-primary font-bold"
+                      >260.000₫</span
+                    >
+                  </div>
+                  <button
+                    class="home-buy-button cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-highest text-tertiary font-label-md text-label-md"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]"
+                      >shopping_bag</span
+                    >
+                    <span class="">Chọn mua</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Tin Box 3 -->
+            <div
+              class="flex flex-col bg-surface-container-low rounded-3xl p-space-md shadow-sm hover:shadow-md transition-all duration-300 relative group"
+            >
+              <div
+                class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container-lowest my-space-xs"
+              >
+                <img
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  data-alt="Retro tin box packaging for Earl Grey tea and orange peel shortbread cookies, vintage olive and warm cream branding, tea leaves garnish, high quality food packaging"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCchgSI9CGiXKM8jvMMbyAznNATq7BNQtTusigxAXZp8fL_-ELqUHi15HFGJd6bYXnmYGdA9pXuriVRLtCVDOq1Ih_8eaRyoB2c3YjyHxMR3LCRaNhQuO-TMb3FNHkuW62nMlCK9qUiEzHFU_o_L790XPCOUjE8OSEkxntxubYO2M2fdYYHFcZ69ZhX5KOBO5u335L5av3YgRLs8bTke1VyVcppGI6AfFXa-0Au0uAregqH-RwNoSELYA"
+                />
+              </div>
+              <div class="flex flex-col flex-grow pt-space-xs">
+                <span
+                  class="font-label-sm text-label-sm text-primary font-semibold uppercase"
+                  >Shortbread Infusé</span
+                >
+                <h3
+                  class="font-headline-sm text-headline-sm text-tertiary font-semibold mt-1"
+                >
+                  Hộp Thiếc Cookie Trà Earl Grey &amp; Vỏ Cam
+                </h3>
+                <p
+                  class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed"
+                >
+                  Hương thơm bergamot quý phái từ trà bá tước ủ men cùng mứt vỏ
+                  cam vàng thơm the thanh mát.
+                </p>
+                <div
+                  class="mt-auto pt-space-md flex items-center justify-between"
+                >
+                  <div>
+                    <span
+                      class="font-label-sm text-label-sm text-on-surface-variant block"
+                      >Giá niêm yết</span
+                    >
+                    <span
+                      class="font-headline-sm text-headline-sm text-primary font-bold"
+                      >250.000₫</span
+                    >
+                  </div>
+                  <button
+                    class="home-buy-button cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-highest text-tertiary font-label-md text-label-md"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]"
+                      >shopping_bag</span
+                    >
+                    <span class="">Chọn mua</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- 6. WHY LUNE / BRAND PROMISES -->
+        <section class="w-full py-space-xl" aria-labelledby="why-lune-title">
+          <div id="trust-showcase" class="relative grid min-h-screen grid-cols-1 lg:grid-cols-12 overflow-hidden bg-cover bg-center text-on-tertiary transition-[background-image] duration-500" style="background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuDLDMv-gwxSG3z9bmT-vsST42dn-JRh1Cty_xvJpD1XVgoyZWuodxonKzKmwnIjybq-VB7WQu7m_nSvZzTcMYTuCjPMgdim0nt1z4NtaLqpk6dQWoJfS43w4TEW623vUTL1T5uNR11pkkg2X2JlB67O5RuExwbbyoB2X-MALWprpR7qnE9P0dBHNeqlt7MJ7VzmRNGihvokfj1lPBgnao2L34NO6aUcV8MYT-YXx1rjB-AdKDgq7GzQSA')">
+            <div class="absolute inset-0 bg-tertiary/70 pointer-events-none"></div>
+            <div class="lg:col-span-8 relative z-10 min-h-[70vh] lg:min-h-0 overflow-hidden">
+              <div class="absolute top-0 inset-x-0 z-20 p-space-lg sm:p-space-xl lg:p-14 pointer-events-none">
+                <span class="font-label-sm text-label-sm uppercase tracking-widest text-tertiary-fixed-dim font-bold">Điều làm nên LUNE</span>
+                <h2 id="why-lune-title" class="font-display text-[2.5rem] sm:text-[3.5rem] lg:text-[4.25rem] leading-[1.05] text-surface mt-space-xs">Vì sao LUNE được <span class="italic font-normal text-on-primary-container">tin chọn?</span></h2>
+              </div>
+              <div class="trust-panel absolute inset-0" data-trust-panel="0" data-background="https://lh3.googleusercontent.com/aida-public/AB6AXuDLDMv-gwxSG3z9bmT-vsST42dn-JRh1Cty_xvJpD1XVgoyZWuodxonKzKmwnIjybq-VB7WQu7m_nSvZzTcMYTuCjPMgdim0nt1z4NtaLqpk6dQWoJfS43w4TEW623vUTL1T5uNR11pkkg2X2JlB67O5RuExwbbyoB2X-MALWprpR7qnE9P0dBHNeqlt7MJ7VzmRNGihvokfj1lPBgnao2L34NO6aUcV8MYT-YXx1rjB-AdKDgq7GzQSA">
+                <div class="trust-note absolute left-space-lg right-space-lg bottom-[8%] sm:left-space-xl sm:right-space-xl lg:left-14 lg:right-auto lg:bottom-[12%] lg:w-[52rem] max-w-[calc(100%-7rem)] h-[280px] sm:h-[290px] px-space-lg py-space-md sm:px-space-xl sm:py-space-lg flex flex-col justify-center"><span class="note-kicker font-label-sm text-label-sm uppercase tracking-widest font-bold">Luôn tìm điều mới</span><h3 class="font-display text-[2.5rem] sm:text-[3.5rem] leading-tight mt-space-xs">Đổi mới trong từng hương vị</h3><p class="note-copy font-body-lg text-body-lg mt-space-md max-w-2xl">LUNE làm mới thực đơn bằng những kết hợp gần gũi, cân bằng và phù hợp với nhiều khoảnh khắc thưởng thức.</p></div>
+              </div>
+              <div class="trust-panel hidden absolute inset-0" data-trust-panel="1" data-background="https://lh3.googleusercontent.com/aida-public/AB6AXuBqZirpJu706xXeqlzmspDay6t6o9Rt11vSqUO4McPVSNqXR5pgzHryfBX4GyIDKpfOJDuThy6OH7yq8znKSXg-5SK_DMf7kjVA6TyeDBlD31opmVC6lZUX8kX-uhujnx2_za6ybYEecuDFXJUS3_tAN21u_mByez6s1j2YhpUvRExJDsGiP92BHrnilqIZz8ryQbyJO-rNGz-4hKDZJlxbvjwSLfOeAtU6bcjymZN7HxN1dtmo7igkJQ">
+                <div class="trust-note absolute left-space-lg right-space-lg bottom-[8%] sm:left-space-xl sm:right-space-xl lg:left-14 lg:right-auto lg:bottom-[12%] lg:w-[52rem] max-w-[calc(100%-7rem)] h-[280px] sm:h-[290px] px-space-lg py-space-md sm:px-space-xl sm:py-space-lg flex flex-col justify-center"><span class="note-kicker font-label-sm text-label-sm uppercase tracking-widest font-bold">Chăm chút thủ công</span><h3 class="font-display text-[2.5rem] sm:text-[3.5rem] leading-tight mt-space-xs">Tận tâm từ những chi tiết nhỏ</h3><p class="note-copy font-body-lg text-body-lg mt-space-md max-w-2xl">Mỗi chiếc bánh được hoàn thiện cẩn thận về hương vị, hình thức và trải nghiệm khi đến tay người nhận.</p></div>
+              </div>
+              <div class="trust-panel hidden absolute inset-0" data-trust-panel="2" data-background="https://lh3.googleusercontent.com/aida-public/AB6AXuChQzIeKWWtpKyY6cGz4D1SJa9T85q-BCuNncfTH7wjdFQCXo9Tuc8cQRimlRvieyG5SrF72G5BeYYJ0MGrEd5rJ-LqVD0vNdKDYv8MYcKX75yxWUgQt9jr6SzxHIGTyxvcBxT3Tos7KNRfSJDXvYH8Qb6ojt1r0b-LEbcbDwlgfhjZO5928P9d5B5Ln_biEVjBLETOd6mppWsdpm2IbYvcuY62QjydQQ_Zqwk1VNsTah9RMNsisrhFXw">
+                <div class="trust-note absolute left-space-lg right-space-lg bottom-[8%] sm:left-space-xl sm:right-space-xl lg:left-14 lg:right-auto lg:bottom-[12%] lg:w-[52rem] max-w-[calc(100%-7rem)] h-[280px] sm:h-[290px] px-space-lg py-space-md sm:px-space-xl sm:py-space-lg flex flex-col justify-center"><span class="note-kicker font-label-sm text-label-sm uppercase tracking-widest font-bold">Nguyên liệu chọn lọc</span><h3 class="font-display text-[2.5rem] sm:text-[3.5rem] leading-tight mt-space-xs">Ưu tiên chất lượng và sự cân bằng</h3><p class="note-copy font-body-lg text-body-lg mt-space-md max-w-2xl">Nguyên liệu được lựa chọn phù hợp với từng dòng bánh để giữ hương vị rõ ràng và độ ngọt vừa phải.</p></div>
+              </div>
+              <div class="trust-panel hidden absolute inset-0" data-trust-panel="3" data-background="https://lh3.googleusercontent.com/aida-public/AB6AXuCchgSI9CGiXKM8jvMMbyAznNATq7BNQtTusigxAXZp8fL_-ELqUHi15HFGJd6bYXnmYGdA9pXuriVRLtCVDOq1Ih_8eaRyoB2c3YjyHxMR3LCRaNhQuO-TMb3FNHkuW62nMlCK9qUiEzHFU_o_L790XPCOUjE8OSEkxntxubYO2M2fdYYHFcZ69ZhX5KOBO5u335L5av3YgRLs8bTke1VyVcppGI6AfFXa-0Au0uAregqH-RwNoSELYA">
+                <div class="trust-note absolute left-space-lg right-space-lg bottom-[8%] sm:left-space-xl sm:right-space-xl lg:left-14 lg:right-auto lg:bottom-[12%] lg:w-[52rem] max-w-[calc(100%-7rem)] h-[280px] sm:h-[290px] px-space-lg py-space-md sm:px-space-xl sm:py-space-lg flex flex-col justify-center"><span class="note-kicker font-label-sm text-label-sm uppercase tracking-widest font-bold">Trải nghiệm trọn vẹn</span><h3 class="font-display text-[2.5rem] sm:text-[3.5rem] leading-tight mt-space-xs">Chỉn chu từ bánh đến hộp</h3><p class="note-copy font-body-lg text-body-lg mt-space-md max-w-2xl">Sản phẩm được đóng gói cẩn thận để món bánh vẫn đẹp mắt và phù hợp cho cả thưởng thức lẫn trao tặng.</p></div>
+              </div>
+            </div>
 
-<!-- Extra CSS for newsletter strip & scroll animations -->
-<style>
-  /* ---- Scroll shadow ---- */
-  .site-header.scrolled {
-    box-shadow: 0 2px 24px rgba(113, 53, 66, 0.10);
-  }
+            <div class="lg:col-span-4 relative z-10 bg-transparent border-t lg:border-t-0 border-surface/20 px-space-lg py-space-md sm:p-space-lg lg:px-space-xl flex lg:flex-col items-stretch justify-center gap-space-xs lg:gap-space-lg" role="tablist" aria-label="Lý do tin chọn LUNE">
+              <button class="trust-tab group cursor-pointer flex-1 lg:flex-none flex items-center gap-space-sm py-space-sm text-surface transition-colors" type="button" data-trust-tab="0" role="tab" aria-selected="true" aria-label="Đổi mới"><span class="trust-tab-number w-12 sm:w-16 shrink-0 font-display text-[2rem] sm:text-[2.75rem] leading-none text-surface transition-all duration-300">01</span><span class="trust-tab-line h-px flex-1 bg-surface/70 transition-all duration-500 ease-out"></span><span class="trust-tab-dot relative w-3 h-3 shrink-0 rounded-full border border-surface transition-colors duration-300"><span class="absolute inset-[3px] rounded-full bg-surface opacity-100 transition-opacity duration-300"></span></span></button>
+              <button class="trust-tab group cursor-pointer flex-1 lg:flex-none flex items-center gap-space-sm py-space-sm text-surface transition-colors" type="button" data-trust-tab="1" role="tab" aria-selected="false" aria-label="Tận tâm"><span class="trust-tab-number w-12 sm:w-16 shrink-0 font-display text-[2rem] sm:text-[2.75rem] leading-none text-surface/35 transition-all duration-300">02</span><span class="trust-tab-line h-px w-10 sm:w-14 flex-none bg-surface/20 transition-all duration-500 ease-out"></span><span class="trust-tab-dot relative w-3 h-3 shrink-0 rounded-full border border-surface/35 transition-colors duration-300"><span class="absolute inset-[3px] rounded-full bg-surface opacity-0 transition-opacity duration-300"></span></span></button>
+              <button class="trust-tab group cursor-pointer flex-1 lg:flex-none flex items-center gap-space-sm py-space-sm text-surface transition-colors" type="button" data-trust-tab="2" role="tab" aria-selected="false" aria-label="Chọn lọc"><span class="trust-tab-number w-12 sm:w-16 shrink-0 font-display text-[2rem] sm:text-[2.75rem] leading-none text-surface/35 transition-all duration-300">03</span><span class="trust-tab-line h-px w-10 sm:w-14 flex-none bg-surface/20 transition-all duration-500 ease-out"></span><span class="trust-tab-dot relative w-3 h-3 shrink-0 rounded-full border border-surface/35 transition-colors duration-300"><span class="absolute inset-[3px] rounded-full bg-surface opacity-0 transition-opacity duration-300"></span></span></button>
+              <button class="trust-tab group cursor-pointer flex-1 lg:flex-none flex items-center gap-space-sm py-space-sm text-surface transition-colors" type="button" data-trust-tab="3" role="tab" aria-selected="false" aria-label="Chỉn chu"><span class="trust-tab-number w-12 sm:w-16 shrink-0 font-display text-[2rem] sm:text-[2.75rem] leading-none text-surface/35 transition-all duration-300">04</span><span class="trust-tab-line h-px w-10 sm:w-14 flex-none bg-surface/20 transition-all duration-500 ease-out"></span><span class="trust-tab-dot relative w-3 h-3 shrink-0 rounded-full border border-surface/35 transition-colors duration-300"><span class="absolute inset-[3px] rounded-full bg-surface opacity-0 transition-opacity duration-300"></span></span></button>
+            </div>
+          </div>
+        </section>
 
-  /* ---- Newsletter strip ---- */
-  .newsletter-strip {
-    background: var(--paper);
-    border-top: 1px solid var(--stroke);
-    padding: 72px 0;
-  }
-  .newsletter-inner {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: center;
-  }
-  .newsletter-title {
-    font: 500 clamp(26px, 3vw, 38px)/1.2 var(--serif);
-    letter-spacing: -.04em;
-    margin: 10px 0 14px;
-    color: var(--ink);
-  }
-  .newsletter-copy p {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.8;
-    margin: 0;
-  }
-  .newsletter-row {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .newsletter-row input[type="email"] {
-    flex: 1;
-    min-width: 180px;
-    padding: 14px 18px;
-    border: 1px solid var(--stroke);
-    border-radius: 4px;
-    background: #fff;
-    font-size: 13px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color .2s;
-  }
-  .newsletter-row input[type="email"]:focus { border-color: #b88689; }
-  .newsletter-note {
-    font-size: 10px;
-    color: #b5a39d;
-    margin: 10px 0 0;
-    letter-spacing: .03em;
-  }
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
+        <section class="w-full max-w-[1280px] mx-auto px-gutter pb-space-xl" aria-labelledby="lune-promises-title">
+          <div class="relative mt-space-lg min-h-[500px] rounded-[2rem] overflow-hidden bg-cover bg-center text-[#fff9f5]" style="background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuDTrxsPfa05tH887BZzpMhjtRbSSC6LLGGFhSQ5os2RZhHtjhczjauJbEGjPyqlLi3w-kMVibQO9TyCOB6vzasjWKkUwyb90SraBeTw2d7Ihbj2aJhliTpWPLPAvCnRw7jNTznn8ll158wmHBq5kU2vAvWBFLby8Stl47hhUWbTGuSVUOfUXNgXMU7t8uxATBCNWNDR3LPMu0GOlqicBdV0XAlreg5yElZUwyN0GDpUcCGQnJ6JF_HsCA')">
+            <div class="absolute inset-0 bg-[#211827]/85 pointer-events-none"></div>
+            <div class="relative z-10 px-space-md sm:px-space-xl pt-space-xl pb-32">
+              <div class="text-center"><span class="font-label-sm text-label-sm uppercase tracking-[0.2em] text-[#e9b9c5]">Lời hứa trong từng chiếc bánh</span><h3 id="lune-promises-title" class="font-display text-[2.25rem] sm:text-[3rem] leading-tight mt-space-xs">Những điều LUNE luôn gìn giữ</h3></div>
+              <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-space-md gap-y-space-xl mt-space-xl">
+                <div class="text-center"><span class="w-20 h-20 mx-auto rounded-full border border-[#f2c8d2] flex items-center justify-center"><span class="material-symbols-outlined text-[38px]">bakery_dining</span></span><h4 class="font-headline-sm text-headline-sm mt-space-md">Làm mới mỗi ngày</h4><p class="font-body-sm text-body-sm text-[#dfd0da] mt-space-xs max-w-[220px] mx-auto">Giữ trải nghiệm thưởng thức luôn tươi mới.</p></div>
+                <div class="text-center"><span class="w-20 h-20 mx-auto rounded-full border border-[#f2c8d2] flex items-center justify-center"><span class="material-symbols-outlined text-[38px]">eco</span></span><h4 class="font-headline-sm text-headline-sm mt-space-md">Nguyên liệu chọn lọc</h4><p class="font-body-sm text-body-sm text-[#dfd0da] mt-space-xs max-w-[220px] mx-auto">Phù hợp với hương vị của từng dòng bánh.</p></div>
+                <div class="text-center"><span class="w-20 h-20 mx-auto rounded-full border border-[#f2c8d2] flex items-center justify-center"><span class="material-symbols-outlined text-[38px]">favorite</span></span><h4 class="font-headline-sm text-headline-sm mt-space-md">Chăm chút thủ công</h4><p class="font-body-sm text-body-sm text-[#dfd0da] mt-space-xs max-w-[220px] mx-auto">Tỉ mỉ trong từng chi tiết hoàn thiện.</p></div>
+                <div class="text-center"><span class="w-20 h-20 mx-auto rounded-full border border-[#f2c8d2] flex items-center justify-center"><span class="material-symbols-outlined text-[38px]">inventory_2</span></span><h4 class="font-headline-sm text-headline-sm mt-space-md">Đóng gói cẩn thận</h4><p class="font-body-sm text-body-sm text-[#dfd0da] mt-space-xs max-w-[220px] mx-auto">Gọn gàng, đẹp mắt khi thưởng thức hoặc trao tặng.</p></div>
+              </div>
+            </div>
+            <div class="absolute inset-x-0 -bottom-5 text-center font-display text-[4.5rem] sm:text-[7rem] lg:text-[9rem] leading-none tracking-tight text-[#fff9f5]/10 whitespace-nowrap pointer-events-none">LUNE BAKERY</div>
+          </div>
+        </section>
 
-  /* ---- Fade-in animation ---- */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(18px);
-    transition: opacity .55s ease, transform .55s ease;
-  }
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+        <!-- 6. BAKING BATCH SCHEDULE ACCORDION (Artisanal Oven Schedule Component) -->
+        <section
+          class="w-full bg-secondary text-on-secondary py-space-xl my-space-lg"
+          id="oven-schedule"
+        >
+          <div class="max-w-[1280px] mx-auto px-gutter">
+            <div
+              class="flex flex-col md:flex-row md:items-center justify-between gap-space-md pb-space-lg"
+            >
+              <div>
+                <span
+                  class="font-label-sm text-label-sm uppercase tracking-widest text-secondary-fixed"
+                  >Quy Trình Nướng Bánh Chậm</span
+                >
+                <h2
+                  class="font-display text-[2rem] lg:text-[2.5rem] text-surface font-semibold mt-1"
+                >
+                  Lịch Nướng Bánh Tươi Trong Ngày
+                </h2>
+              </div>
+              <p
+                class="font-body-sm text-body-sm text-secondary-fixed max-w-md"
+              >
+                Mỗi mẻ bánh được căn chuẩn nhiệt độ buồng đốt và phục vụ ngay
+                khi đạt độ giòn hoàn hảo nhất.
+              </p>
+            </div>
+            <div
+              class="grid grid-cols-1 md:grid-cols-4 gap-space-md pt-space-sm"
+            >
+              <!-- Slot 1 -->
+              <div
+                class="bg-surface-container-lowest/10 rounded-2xl p-space-md flex flex-col justify-between"
+              >
+                <div class="flex items-center justify-between mb-space-sm">
+                  <span class="font-display text-headline-md text-surface"
+                    >06:30</span
+                  >
+                  <span
+                    class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm"
+                    >Đã Hoàn Thành</span
+                  >
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-surface">
+                  Croissant &amp; Viennoiserie
+                </h3>
+                <p
+                  class="font-body-sm text-body-sm text-secondary-fixed/90 mt-1"
+                >
+                  Bơ nở phồng đa lớp phục vụ ăn sáng sớm cùng cà phê.
+                </p>
+              </div>
+              <!-- Slot 2 -->
+              <div
+                class="bg-surface-container-lowest/15 rounded-2xl p-space-md flex flex-col justify-between shadow-inner"
+              >
+                <div class="flex items-center justify-between mb-space-sm">
+                  <span class="font-display text-headline-md text-surface"
+                    >09:00</span
+                  >
+                  <span
+                    class="px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm animate-pulse"
+                    >Sắp Ra Lò</span
+                  >
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-surface">
+                  Sourdough &amp; Baguette
+                </h3>
+                <p
+                  class="font-body-sm text-body-sm text-secondary-fixed/90 mt-1"
+                >
+                  Bánh mì men chua truyền thống vỏ dày, ruột ẩm mọng.
+                </p>
+              </div>
+              <!-- Slot 3 -->
+              <div
+                class="bg-surface-container-lowest/10 rounded-2xl p-space-md flex flex-col justify-between"
+              >
+                <div class="flex items-center justify-between mb-space-sm">
+                  <span class="font-display text-headline-md text-surface"
+                    >14:00</span
+                  >
+                  <span
+                    class="px-2.5 py-0.5 rounded-full bg-surface-container-lowest/20 text-surface font-label-sm text-label-sm"
+                    >Buổi Chiều</span
+                  >
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-surface">
+                  Brioche &amp; Bánh Nướng Ngọt
+                </h3>
+                <p
+                  class="font-body-sm text-body-sm text-secondary-fixed/90 mt-1"
+                >
+                  Bánh mềm nho khô, babka chocolate cho tiệc trà chiều.
+                </p>
+              </div>
+              <!-- Slot 4 -->
+              <div
+                class="bg-surface-container-lowest/10 rounded-2xl p-space-md flex flex-col justify-between"
+              >
+                <div class="flex items-center justify-between mb-space-sm">
+                  <span class="font-display text-headline-md text-surface"
+                    >16:30</span
+                  >
+                  <span
+                    class="px-2.5 py-0.5 rounded-full bg-surface-container-lowest/20 text-surface font-label-sm text-label-sm"
+                    >Mẻ Cuối</span
+                  >
+                </div>
+                <h3 class="font-headline-sm text-headline-sm text-surface">
+                  Tartlets &amp; Cookies Giòn
+                </h3>
+                <p
+                  class="font-body-sm text-body-sm text-secondary-fixed/90 mt-1"
+                >
+                  Mẻ nướng cuối ngày phục vụ bữa tối gia đình sum họp.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section
+          class="w-full max-w-[1280px] mx-auto px-gutter py-space-xl"
+          id="faq-section"
+        >
+          <div class="text-center max-w-2xl mx-auto mb-space-xl">
+            <div
+              class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-secondary-container text-on-secondary-container mb-space-xs"
+            >
+              <span class="material-symbols-outlined text-[16px]"
+                >help_outline</span
+              ><span
+                class="font-label-sm text-label-sm uppercase tracking-wider"
+                >Hỗ Trợ &amp; Giải Đáp</span
+              >
+            </div>
+            <h2 class="font-headline-lg text-headline-lg text-tertiary">
+              Câu Hỏi Thường Gặp
+            </h2>
+            <p
+              class="font-body-md text-body-md text-on-surface-variant mt-space-xs"
+            >
+              Những điều bạn quan tâm về chất lượng bánh tươi, bảo quản và dịch
+              vụ tại tiệm bánh Lune
+            </p>
+          </div>
+          <div class="max-w-3xl mx-auto space-y-space-sm">
+            <details
+              class="group bg-surface-container-low rounded-2xl border border-outline-variant/60 p-space-md transition-all open:bg-surface-container"
+            >
+              <summary
+                class="flex items-center justify-between cursor-pointer list-none select-none font-headline-sm text-headline-sm text-tertiary font-medium"
+              >
+                <span class="pr-space-sm"
+                  >Bánh tại Lune được làm từ nguyên liệu gì và hạn sử dụng trong
+                  bao lâu?</span
+                ><span
+                  class="faq-chevron material-symbols-outlined text-[20px] text-primary flex-shrink-0"
+                  >expand_more</span
+                >
+              </summary>
+              <div
+                class="mt-space-sm pt-space-xs text-body-md text-on-surface-variant leading-relaxed border-t border-outline-variant/30"
+              >
+                Bánh sử dụng 100% bơ AOP nhập khẩu Pháp và bột mì hữu cơ, nướng
+                mới mỗi sáng không chất bảo quản. Nên thưởng thức trong ngày
+                hoặc bảo quản mát 2-3 ngày.
+              </div>
+            </details>
+            <details
+              class="group bg-surface-container-low rounded-2xl border border-outline-variant/60 p-space-md transition-all open:bg-surface-container"
+            >
+              <summary
+                class="flex items-center justify-between cursor-pointer list-none select-none font-headline-sm text-headline-sm text-tertiary font-medium"
+              >
+                <span class="pr-space-sm"
+                  >Làm sao để tôi biết bánh vừa mới ra lò?</span
+                ><span
+                  class="faq-chevron material-symbols-outlined text-[20px] text-primary flex-shrink-0"
+                  >expand_more</span
+                >
+              </summary>
+              <div
+                class="mt-space-sm pt-space-xs text-body-md text-on-surface-variant leading-relaxed border-t border-outline-variant/30"
+              >
+                Bạn có thể theo dõi bảng Lịch Nướng Bánh Tươi trong ngày của
+                Lune ở ngay phía trên hoặc liên hệ hotline cửa hàng để nhận mẻ
+                bánh nóng nhất.
+              </div>
+            </details>
+            <details
+              class="group bg-surface-container-low rounded-2xl border border-outline-variant/60 p-space-md transition-all open:bg-surface-container"
+            >
+              <summary
+                class="flex items-center justify-between cursor-pointer list-none select-none font-headline-sm text-headline-sm text-tertiary font-medium"
+              >
+                <span class="pr-space-sm"
+                  >Tiệm bánh có nhận giao hàng tận nơi không?</span
+                ><span
+                  class="faq-chevron material-symbols-outlined text-[20px] text-primary flex-shrink-0"
+                  >expand_more</span
+                >
+              </summary>
+              <div
+                class="mt-space-sm pt-space-xs text-body-md text-on-surface-variant leading-relaxed border-t border-outline-variant/30"
+              >
+                Lune nhận giao hàng nhanh nội thành trong vòng 1-2 giờ với bao
+                bì giữ nhiệt và chống sốc chuyên dụng cho cả bánh kem và bánh
+                nướng.
+              </div>
+            </details>
+            <details
+              class="group bg-surface-container-low rounded-2xl border border-outline-variant/60 p-space-md transition-all open:bg-surface-container"
+            >
+              <summary
+                class="flex items-center justify-between cursor-pointer list-none select-none font-headline-sm text-headline-sm text-tertiary font-medium"
+              >
+                <span class="pr-space-sm"
+                  >Tôi cần lưu ý gì khi bảo quản bánh hộp thiếc cổ điển?</span
+                ><span
+                  class="faq-chevron material-symbols-outlined text-[20px] text-primary flex-shrink-0"
+                  >expand_more</span
+                >
+              </summary>
+              <div
+                class="mt-space-sm pt-space-xs text-body-md text-on-surface-variant leading-relaxed border-t border-outline-variant/30"
+              >
+                Bánh hộp thiếc được niêm phong kỹ càng, giữ độ giòn tan đến 30
+                ngày ở nhiệt độ phòng khô ráo, tránh ánh nắng trực tiếp.
+              </div>
+            </details>
+            <details
+              class="group bg-surface-container-low rounded-2xl border border-outline-variant/60 p-space-md transition-all open:bg-surface-container"
+            >
+              <summary
+                class="flex items-center justify-between cursor-pointer list-none select-none font-headline-sm text-headline-sm text-tertiary font-medium"
+              >
+                <span class="pr-space-sm"
+                  >Bánh sinh nhật và bánh tiệc có kèm phụ kiện không?</span
+                ><span
+                  class="faq-chevron material-symbols-outlined text-[20px] text-primary flex-shrink-0"
+                  >expand_more</span
+                >
+              </summary>
+              <div
+                class="mt-space-sm pt-space-xs text-body-md text-on-surface-variant leading-relaxed border-t border-outline-variant/30"
+              >
+                Mỗi bánh sinh nhật và bánh tiệc tại Lune đều đi kèm trọn bộ dao
+                cắt bánh cao cấp, nến sinh nhật nghệ thuật và thiệp viết tay
+                theo yêu cầu.
+              </div>
+            </details>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
 
-  /* Stagger product cards */
-  .products-grid .product-card:nth-child(1) { transition-delay: .05s; }
-  .products-grid .product-card:nth-child(2) { transition-delay: .10s; }
-  .products-grid .product-card:nth-child(3) { transition-delay: .15s; }
-  .products-grid .product-card:nth-child(4) { transition-delay: .20s; }
-  .products-grid .product-card:nth-child(5) { transition-delay: .25s; }
-  .products-grid .product-card:nth-child(6) { transition-delay: .30s; }
-  .products-grid .product-card:nth-child(7) { transition-delay: .35s; }
-  .products-grid .product-card:nth-child(8) { transition-delay: .40s; }
+    <script src="https://unpkg.com/scrollreveal@4.0.9/dist/scrollreveal.min.js"></script>
+    <script>
+      (() => {
+        const reducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        if (reducedMotion || typeof ScrollReveal !== "function") return;
 
-  /* Stagger category cards */
-  .categories-grid .category-card:nth-child(1) { transition-delay: .05s; }
-  .categories-grid .category-card:nth-child(2) { transition-delay: .10s; }
-  .categories-grid .category-card:nth-child(3) { transition-delay: .15s; }
-  .categories-grid .category-card:nth-child(4) { transition-delay: .20s; }
+        const reveal = ScrollReveal({
+          distance: "32px",
+          duration: 750,
+          easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+          interval: 70,
+          opacity: 0,
+          origin: "bottom",
+          reset: false,
+          viewFactor: 0.12,
+        });
 
-  /* ---- Category card as link ---- */
-  a.category-card {
-    display: flex;
-    align-items: center;
-    color: var(--ink);
-    text-decoration: none;
-  }
+        reveal.reveal("main section", { distance: "38px", interval: 0 });
+        reveal.reveal("main section:nth-of-type(2) .grid > *", {
+          distance: "20px",
+          interval: 65,
+        });
+        reveal.reveal("main section:not(:first-of-type) .group", {
+          distance: "24px",
+          interval: 75,
+        });
+        reveal.reveal(
+          '[aria-labelledby="lune-promises-title"] .grid > div',
+          { distance: "20px", interval: 90 },
+        );
+        reveal.reveal("main details", {
+          distance: "18px",
+          interval: 80,
+        });
+        reveal.reveal('main [role="tablist"] > button', {
+          distance: "18px",
+          interval: 70,
+          origin: "right",
+        });
+      })();
 
-  /* ---- Quick-add as link ---- */
-  a.quick-add {
-    display: grid;
-    place-items: center;
-    text-decoration: none;
-  }
-  a.quick-add.disabled {
-    opacity: .4;
-    pointer-events: none;
-  }
+      (() => {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  /* ---- Hero visual responsive fix ---- */
-  @media (max-width: 720px) {
-    .newsletter-inner {
-      grid-template-columns: 1fr;
-      gap: 30px;
-    }
-    .newsletter-strip { padding: 52px 0; }
-  }
+        const states = new WeakMap();
+        document.querySelectorAll("#faq-section details").forEach((details) => {
+          const summary = details.querySelector("summary");
+          const content = summary?.nextElementSibling;
+          const chevron = summary?.querySelector(".faq-chevron");
+          if (!summary || !content) return;
 
-  /* ---- Reduced motion ---- */
-  @media (prefers-reduced-motion: reduce) {
-    .fade-in { opacity: 1; transform: none; transition: none; }
-  }
-</style>
+          details.style.overflow = "hidden";
+          states.set(details, { animation: null, contentAnimation: null, closing: false });
 
-</body>
+          summary.addEventListener("click", (event) => {
+            event.preventDefault();
+            const state = states.get(details);
+            const startHeight = details.getBoundingClientRect().height;
+            const shouldOpen = !details.open || state.closing;
+
+            state.animation?.cancel();
+            state.contentAnimation?.cancel();
+            state.closing = !shouldOpen;
+            chevron?.classList.toggle("is-open", shouldOpen);
+
+            if (shouldOpen) details.open = true;
+
+            const computed = getComputedStyle(details);
+            const closedHeight =
+              summary.offsetHeight +
+              parseFloat(computed.paddingTop) +
+              parseFloat(computed.paddingBottom);
+            const endHeight = shouldOpen ? details.scrollHeight : closedHeight;
+
+            details.style.height = `${startHeight}px`;
+            state.animation = details.animate(
+              { height: [`${startHeight}px`, `${endHeight}px`] },
+              {
+                duration: 380,
+                easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+              },
+            );
+            state.contentAnimation = content.animate(
+              {
+                opacity: shouldOpen ? [0, 1] : [1, 0],
+                transform: shouldOpen
+                  ? ["translateY(-8px)", "translateY(0)"]
+                  : ["translateY(0)", "translateY(-6px)"],
+              },
+              {
+                duration: shouldOpen ? 320 : 180,
+                easing: "ease-out",
+                fill: "both",
+              },
+            );
+
+            state.animation.onfinish = () => {
+              if (!shouldOpen) details.open = false;
+              details.style.height = "";
+              state.contentAnimation?.cancel();
+              state.animation = null;
+              state.contentAnimation = null;
+              state.closing = false;
+            };
+          });
+        });
+      })();
+
+      (() => {
+        const carousel = document.getElementById("hero-carousel");
+        if (!carousel) return;
+        const slides = [...carousel.querySelectorAll(".hero-slide")];
+        const dots = [...carousel.querySelectorAll(".hero-dot")];
+        const track = carousel.querySelector("[data-carousel-track]");
+        const strip = carousel.querySelector("[data-carousel-strip]");
+        const reducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        let current = 0;
+        let timer;
+        let dragStartX = null;
+        let dragOffset = 0;
+        const renderPosition = (animate = true) => {
+          strip.style.transition = animate
+            ? "transform 520ms cubic-bezier(0.22, 1, 0.36, 1)"
+            : "none";
+          strip.style.transform = `translate3d(${-(current * track.clientWidth) + dragOffset}px, 0, 0)`;
+        };
+        const showSlide = (index, animate = true) => {
+          current = (index + slides.length) % slides.length;
+          dragOffset = 0;
+          renderPosition(animate);
+          dots.forEach((dot, dotIndex) => {
+            const active = dotIndex === current;
+            dot.classList.toggle("w-6", active);
+            dot.classList.toggle("w-2", !active);
+            dot.classList.toggle("bg-surface", active);
+            dot.classList.toggle("bg-surface/60", !active);
+            dot.setAttribute("aria-current", String(active));
+          });
+        };
+        const stopAutoPlay = () => window.clearInterval(timer);
+        const startAutoPlay = () => {
+          if (reducedMotion) return;
+          stopAutoPlay();
+          timer = window.setInterval(() => showSlide(current + 1), 5000);
+        };
+        dots.forEach((dot) =>
+          dot.addEventListener("click", () => {
+            showSlide(Number(dot.dataset.carouselDot));
+            startAutoPlay();
+          }),
+        );
+        track.addEventListener("pointerdown", (event) => {
+          if (event.button !== undefined && event.button !== 0) return;
+          event.preventDefault();
+          dragStartX = event.clientX;
+          dragOffset = 0;
+          track.setPointerCapture(event.pointerId);
+          stopAutoPlay();
+        });
+        track.addEventListener("pointermove", (event) => {
+          if (dragStartX === null) return;
+          dragOffset = event.clientX - dragStartX;
+          renderPosition(false);
+        });
+        track.addEventListener("pointerup", (event) => {
+          if (dragStartX === null) return;
+          const distance = event.clientX - dragStartX;
+          dragStartX = null;
+          if (Math.abs(distance) >= 60) {
+            showSlide(current + (distance < 0 ? 1 : -1));
+          } else {
+            dragOffset = 0;
+            renderPosition(true);
+          }
+          startAutoPlay();
+        });
+        track.addEventListener("pointercancel", () => {
+          dragStartX = null;
+          dragOffset = 0;
+          renderPosition(true);
+          startAutoPlay();
+        });
+        track.addEventListener("dragstart", (event) => event.preventDefault());
+        carousel.addEventListener("mouseenter", stopAutoPlay);
+        carousel.addEventListener("mouseleave", startAutoPlay);
+        carousel.addEventListener("focusin", stopAutoPlay);
+        carousel.addEventListener("focusout", startAutoPlay);
+        window.addEventListener("resize", () => renderPosition(false));
+        renderPosition(false);
+        startAutoPlay();
+      })();
+
+      (() => {
+        const tabs = [...document.querySelectorAll("[data-trust-tab]")];
+        const panels = [...document.querySelectorAll("[data-trust-panel]")];
+        const showcase = document.getElementById("trust-showcase");
+        if (!tabs.length || !panels.length || !showcase) return;
+
+        const backgroundFragment = document.createDocumentFragment();
+        const backgrounds = panels.map((panel, index) => {
+          const background = document.createElement("div");
+          background.className = `trust-background${index === 0 ? " is-active" : ""}`;
+          background.style.backgroundImage = `url('${panel.dataset.background}')`;
+          background.setAttribute("aria-hidden", "true");
+          backgroundFragment.appendChild(background);
+          panel.classList.remove("hidden");
+          return background;
+        });
+        showcase.insertBefore(backgroundFragment, showcase.firstChild);
+        showcase.style.backgroundImage = "none";
+
+        const activate = (index) => {
+          tabs.forEach((tab, tabIndex) => {
+            const active = tabIndex === index;
+            tab.setAttribute("aria-selected", String(active));
+            const number = tab.querySelector(".trust-tab-number");
+            const line = tab.querySelector(".trust-tab-line");
+            const dot = tab.querySelector(".trust-tab-dot");
+            const dotCenter = dot?.firstElementChild;
+            number?.classList.toggle("text-surface", active);
+            number?.classList.toggle("text-surface/35", !active);
+            line?.classList.toggle("bg-surface/70", active);
+            line?.classList.toggle("bg-surface/20", !active);
+            line?.classList.toggle("flex-1", active);
+            line?.classList.toggle("flex-none", !active);
+            line?.classList.toggle("w-10", !active);
+            line?.classList.toggle("sm:w-14", !active);
+            dot?.classList.toggle("border-surface", active);
+            dot?.classList.toggle("border-surface/35", !active);
+            dotCenter?.classList.toggle("opacity-100", active);
+            dotCenter?.classList.toggle("opacity-0", !active);
+          });
+          panels.forEach((panel, panelIndex) => {
+            panel.classList.toggle("is-active", panelIndex === index);
+          });
+          backgrounds.forEach((background, backgroundIndex) => {
+            background.classList.toggle("is-active", backgroundIndex === index);
+          });
+        };
+
+        tabs.forEach((tab, index) => {
+          tab.addEventListener("mouseenter", () => activate(index));
+          tab.addEventListener("focus", () => activate(index));
+          tab.addEventListener("click", () => activate(index));
+        });
+        activate(0);
+      })();
+    </script>
+  </body>
 </html>

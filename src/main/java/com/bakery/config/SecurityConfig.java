@@ -24,6 +24,10 @@ public class SecurityConfig {
       .authorizeHttpRequests(auth -> auth
         .requestMatchers(
             "/",
+            "/products",
+            "/products/**",
+            "/about",
+            "/contact",
             "/api/products/**",
             "/cart/**",
             "/register/**",
@@ -34,6 +38,7 @@ public class SecurityConfig {
             "/css/**",
             "/js/**",
             "/images/**",
+            "/products/**",
             "/assets/**",
             "/uploads/**").permitAll()
         .requestMatchers("/checkout/**", "/orders/**", "/profile/**")

@@ -76,6 +76,11 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 25/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Lương Việt Thái | Thiết kế giao diện storefront | Hoàn thiện prototype trang chủ, danh sách, chi tiết, cart, đăng nhập và đăng ký khách hàng; các trang auth dùng header/footer storefront chung, form đăng ký bind đúng `RegisterRequest`, giữ style input nguyên bản và tăng độ rõ của border, có validation UI, hiện/ẩn và đối chiếu mật khẩu; khởi tạo sớm deferred CSRF token cho template dài; dữ liệu cart hiện vẫn là mẫu giao diện | Đang làm | `Thai`; Chưa có | Đã kiểm tra cấu trúc template, field binding, JavaScript và `git diff`; Maven Wrapper không khởi chạy được trong môi trường hiện tại nên chưa test runtime | Bổ sung POST `/register` khi triển khai use case tài khoản, chạy demo trực tiếp các trang auth và tích hợp dữ liệu thật cho cart |
 
 ### 24/10/2026
 
@@ -84,12 +89,12 @@ Mẫu một dòng cập nhật:
 | Trần Chí Quốc | Lưu giỏ hàng bằng Session — API JSON | Triển khai CartServiceImpl và SessionCartServiceImpl; GET/POST/PATCH/DELETE `/cart/items`; giỏ độc lập theo Session, cộng số lượng có kiểm tra kho; giữ giỏ khi đăng nhập Customer qua Security hiện có; helper checkout xóa giỏ sau thành công/commit và giữ khi lỗi/rollback | Đang làm | Branch `master`; PR/commit: Chưa có | Maven JDK 17: `-Dtest=CartQuantityServiceImplTest,CartQuantityControllerTest,SessionCartIntegrationTest test` đạt 15 test; compile đạt; kiểm thử MockMvc với SecurityConfig thật, mock Catalog và tài khoản test; timeout mô phỏng bằng invalidation | Checkout chưa có implementation nên helper chưa được nối vào đặt đơn thật; chưa demo MySQL/Tomcat timeout thực tế hoặc nối UI; chi tiết `docs/CART_QUANTITY_API.md` |
 | Trần Chí Quốc | Cập nhật số lượng giỏ hàng — API JSON | Thêm PATCH `/cart/items/{productId}` dùng Session `cart`; kiểm tra số lượng tối thiểu 1, tồn kho/trạng thái từ ProductQueryService; cập nhật giá và tính thành tiền/tổng giỏ; trả lỗi JSON 400/404/409; tài liệu `docs/CART_QUANTITY_API.md` | Đang làm | Branch `master`; PR/commit: Chưa có | Maven với JDK 17: `-Dtest=CartQuantityServiceImplTest,CartQuantityControllerTest test` đạt 8 test; compile đạt trong vòng test; chưa demo MySQL hoặc kiểm thử Security tích hợp | Cần luồng thêm sản phẩm vào Session để demo; tích hợp CartService và UI cập nhật tức thì; gửi CSRF token khi gọi API |
 
-
 ### 22/10/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
 | --- | --- | --- | --- | --- | --- | --- |
 | Lương Việt Thái | Chuẩn hóa service Catalog | Tách `ProductQueryService`/`ProductQueryServiceImpl` cho storefront; đổi service CMS thành `ProductAdminService`/`ProductAdminServiceImpl` và `CategoryAdminService`/`CategoryAdminServiceImpl`; đồng bộ controller, test và tài liệu, không đổi nghiệp vụ | Đã merge | PR #14, commit `b93274f`, merge commit `8595e2b` | Chưa chạy lại test do môi trường terminal không khởi động được Maven Wrapper và không có Maven cài sẵn | Chạy toàn bộ test bằng IntelliJ; tiếp tục hoàn thiện UI |
+| Lương Việt Thái | UI storefront sản phẩm và quyền truy cập Guest | Public các trang storefront; nối danh sách responsive với API Catalog; tách `product-list.js`; làm đầy trang chủ bằng khu vực dịp sử dụng và combo mẫu; tách riêng giao diện `/about`, `/contact`; chuẩn hóa nhãn sản phẩm và mở rộng SQL lên 60 sản phẩm thuộc 6 danh mục | Đang làm | Branch `Thai`; PR/commit: Chưa có | `git diff --check` và kiểm tra cú pháp `product-list.js` đạt; SQL chưa chạy trên MySQL; Maven test chưa chạy được do wrapper lỗi khởi động và Maven hệ thống bị từ chối đọc file bảo mật của JDK | Chạy SQL mẫu, demo runtime các trang public và nối chi tiết/giỏ hàng/liên hệ với logic thật. OPEN QUESTION/backlog: sản phẩm nổi bật và đánh giá sản phẩm cần nhóm duyệt, cập nhật requirement, phân công, class/database diagram trước khi làm |
 
 ### 21/10/2026
 

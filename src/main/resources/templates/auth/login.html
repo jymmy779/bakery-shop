@@ -1,86 +1,587 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <th:block th:replace="~{fragments/layout :: head-meta('Đăng nhập')}"></th:block>
-  <meta name="description" content="Đăng nhập vào LUNE Bakery để đặt bánh và theo dõi đơn hàng." />
-</head>
-<body>
-  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
-  <header th:replace="~{fragments/layout :: header(currentPage='auth')}"></header>
-
-  <main class="standard-page">
-    <div class="wrap" style="max-width: 520px;">
-      <span class="eyebrow" style="margin-bottom:6px">WELCOME BACK</span>
-      <h1 class="page-title">Rất vui gặp lại!</h1>
-
-      <!-- Error / logout messages -->
-      <div class="alert" th:if="${param.error}">
-        Email hoặc mật khẩu không chính xác. Vui lòng thử lại.
-      </div>
-      <div class="alert" th:if="${param.roleError}">
-        Trang này chỉ dành cho khách hàng. Staff/Admin vui lòng đăng nhập tại CMS.
-      </div>
-      <div class="alert success" th:if="${param.logout}">
-        Bạn đã đăng xuất thành công.
-      </div>
-      <div class="alert success" th:if="${param.registered}">
-        Tạo tài khoản thành công! Vui lòng đăng nhập.
-      </div>
-
-      <div class="panel">
-        <!-- Auth tab switch -->
-        <div class="auth-switch">
-          <button class="active" type="button">Đăng nhập</button>
-          <a th:href="@{/register}" style="display:flex;align-items:center;justify-content:center;padding:13px;font-weight:600;font-size:14px;color:#9a8982;">Đăng ký</a>
-        </div>
-
-        <form th:action="@{/login}" method="post" id="login-form" style="margin-top:4px">
-          <input type="hidden" name="loginType" value="customer" />
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"
-                 th:if="${_csrf != null}" />
-
-          <div class="field">
-            <label for="login-email">Địa chỉ email</label>
-            <input type="email" id="login-email" name="email"
-                   placeholder="email@example.com"
-                   autocomplete="email" required />
-          </div>
-          <div class="field">
-            <label for="login-password">Mật khẩu</label>
-            <input type="password" id="login-password" name="password"
-                   placeholder="Mật khẩu của bạn"
-                   autocomplete="current-password" required />
-            <div style="text-align:right;margin-top:4px">
-              <a th:href="@{/forgot-password}" class="inline-link" style="font-size:11px">Quên mật khẩu?</a>
+  <head>
+    <meta charset="utf-8" />
+    <!-- Resolve the deferred CSRF token before the large inline Tailwind config
+         can fill and commit the servlet response buffer. -->
+    <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="web_standard" name="shell-type" />
+    <title>Đăng nhập — LUNE Bakery</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+    <style>
+      @layer base {
+        html,
+        body {
+          margin: 0;
+          padding: 0;
+        }
+        body {
+          overscroll-behavior: none;
+        }
+        main > :first-child {
+          margin-top: 0 !important;
+        }
+        main > :last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-dim": "#eed5cc",
+              "inverse-on-surface": "#ffede7",
+              "outline-variant": "#dcc0c2",
+              "on-primary-container": "#ffa3b0",
+              "on-surface": "#261814",
+              surface: "#fff8f6",
+              "on-error": "#ffffff",
+              "primary-fixed": "#ffd9dd",
+              tertiary: "#3c342b",
+              "surface-container-lowest": "#ffffff",
+              "surface-container": "#ffe9e3",
+              "surface-container-high": "#fde3da",
+              "surface-tint": "#a3394f",
+              "tertiary-fixed-dim": "#d2c4b7",
+              error: "#ba1a1a",
+              "inverse-primary": "#ffb2bc",
+              "on-tertiary-fixed": "#221a12",
+              "inverse-surface": "#3c2d28",
+              "on-tertiary": "#ffffff",
+              "on-primary-fixed-variant": "#842039",
+              "on-secondary-fixed-variant": "#3b4c2d",
+              "on-secondary-fixed": "#111f06",
+              "on-secondary-container": "#586a48",
+              "tertiary-container": "#544a40",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#f7ddd5",
+              "on-error-container": "#93000a",
+              "on-primary-fixed": "#400013",
+              background: "#fff8f6",
+              "tertiary-fixed": "#efe0d3",
+              "surface-bright": "#fff8f6",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#d5e9bf",
+              "on-surface-variant": "#564244",
+              "secondary-fixed-dim": "#bacda5",
+              "surface-container-low": "#fff1ec",
+              "primary-container": "#8b263e",
+              "on-tertiary-container": "#c8baae",
+              "secondary-container": "#d5e9bf",
+              "on-background": "#261814",
+              "surface-variant": "#f7ddd5",
+              "primary-fixed-dim": "#ffb2bc",
+              secondary: "#536443",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              "space-sm": "0.5rem",
+              "space-lg": "1.5rem",
+              "space-md": "1rem",
+              "space-xs": "0.25rem",
+              "margin-mobile": "1.25rem",
+              "gutter-mobile": "1rem",
+              margin: "3rem",
+              gutter: "1.5rem",
+              "space-xl": "2.5rem",
+            },
+            fontFamily: {
+              "label-md": ["Plus Jakarta Sans"],
+              "label-lg": ["Plus Jakarta Sans"],
+              "body-lg": ["Plus Jakarta Sans"],
+              "headline-lg-mobile": ["Playfair Display"],
+              "label-sm": ["Plus Jakarta Sans"],
+              "headline-md-mobile": ["Playfair Display"],
+              "headline-sm": ["Playfair Display"],
+              "body-sm": ["Plus Jakarta Sans"],
+              "headline-md": ["Playfair Display"],
+              "display-mobile": ["Playfair Display"],
+              display: ["Playfair Display"],
+              "body-md": ["Plus Jakarta Sans"],
+              "headline-lg": ["Playfair Display"],
+            },
+            fontSize: {
+              "label-md": [
+                "0.75rem",
+                {
+                  lineHeight: "1rem",
+                  letterSpacing: "0.06em",
+                  fontWeight: "600",
+                },
+              ],
+              "label-lg": [
+                "0.875rem",
+                {
+                  lineHeight: "1.25rem",
+                  letterSpacing: "0.04em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-lg": [
+                "1.125rem",
+                { lineHeight: "1.875rem", fontWeight: "400" },
+              ],
+              "headline-lg-mobile": [
+                "1.875rem",
+                { lineHeight: "2.375rem", fontWeight: "600" },
+              ],
+              "label-sm": [
+                "0.6875rem",
+                {
+                  lineHeight: "0.875rem",
+                  letterSpacing: "0.08em",
+                  fontWeight: "700",
+                },
+              ],
+              "headline-md-mobile": [
+                "1.5rem",
+                { lineHeight: "2rem", fontWeight: "500" },
+              ],
+              "headline-sm": [
+                "1.25rem",
+                { lineHeight: "1.75rem", fontWeight: "600" },
+              ],
+              "body-sm": [
+                "0.875rem",
+                { lineHeight: "1.375rem", fontWeight: "400" },
+              ],
+              "headline-md": [
+                "2rem",
+                { lineHeight: "2.5rem", fontWeight: "500" },
+              ],
+              "display-mobile": [
+                "2.5rem",
+                {
+                  lineHeight: "3rem",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              display: [
+                "3.5rem",
+                {
+                  lineHeight: "4rem",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-md": [
+                "1rem",
+                { lineHeight: "1.625rem", fontWeight: "400" },
+              ],
+              "headline-lg": [
+                "2.5rem",
+                {
+                  lineHeight: "3rem",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"
+  >
+    <header
+      th:replace="~{fragments/layout :: storefrontHeader('auth')}"
+    ></header>
+    <main class="w-full pt-20 bg-surface">
+      <div class="flex flex-col w-full">
+        <!-- Top Breadcrumb & Ambient Sub-navigation -->
+        <section
+          class="max-w-[1280px] w-full mx-auto px-gutter pt-space-md pb-space-xs"
+        >
+          <nav
+            aria-label="Đường dẫn liên kết"
+            class="flex items-center gap-space-xs text-label-md font-label-md text-on-surface-variant"
+          >
+            <a
+              class="hover:text-primary transition-colors flex items-center gap-1"
+              th:href="@{/}"
+            >
+              <span class="material-symbols-outlined text-[15px]">home</span>
+              <span class="">Trang chủ</span>
+            </a>
+            <span class="text-outline-variant font-normal">/</span>
+            <a class="hover:text-primary transition-colors" th:href="@{/login}"
+              >Tài khoản</a
+            >
+            <span class="text-outline-variant font-normal">/</span>
+            <span class="text-primary font-bold">Đăng nhập</span>
+          </nav>
+        </section>
+        <!-- Main Split Canvas: Atelier Craft Artistry + Thymeleaf Authentication Module -->
+        <section
+          class="max-w-[1280px] w-full mx-auto px-gutter py-space-lg mb-space-xl"
+        >
+          <div
+            class="relative bg-surface-container-lowest rounded-2xl shadow-[0_16px_40px_-8px_rgba(38,24,20,0.06)] overflow-hidden"
+          >
+            <!-- Asymmetrical 12-Column Atelier Split Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
+              <!-- Left Column: The Artisan Sanctuary & Sensory Storytelling (5 cols) -->
+              <div
+                class="lg:col-span-5 relative flex flex-col justify-between p-space-xl bg-surface-container overflow-hidden min-h-[420px] lg:min-h-full"
+              >
+                <!-- Background Atmospheric Photography -->
+                <div
+                  class="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+                  data-alt="Intimate morning light streaming onto rustic flour-dusted marble baker table at French boulangerie Lune, golden flaky viennoiserie croissants and warm levain bread loaves resting beside vintage copper measuring spoons, warm cream and deep berry aesthetic, cinematic still life, soft focus background"
+                  style="
+                    background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuCWQ1IE59TRB5zGm4TDVoRtvrqw4FXRglAOrayWLnsW4w6x9Ayp_lj7Ws26GoelRArXDYvpsY2t4KQkC73Fo_7j6dKd2PlEJX66t4s6kqRzNamMyVEfKcMj5MDhX75E5vKf3mHxPlPISC-6FtOFilvE8Zp15h9XBY3JQeCq2FrJRP_dUOtjD-G4O_elBrS5LNB1XeZwcy-5HRGcvO7qJFYj-6PYT0UW9XORCqrGhiXnh79WDEwJR_FKiA&quot;);
+                  "
+                ></div>
+                <!-- Editorial Scrim Layers for Readability & Tactile Richness -->
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-inverse-surface/90 via-inverse-surface/40 to-transparent mix-blend-multiply"
+                ></div>
+                <div
+                  class="absolute inset-0 bg-gradient-to-b from-primary/30 via-transparent to-inverse-surface/80"
+                ></div>
+                <!-- Top Badge: Craft Identity -->
+                <div class="relative z-10 flex items-center justify-between">
+                  <span
+                    class="inline-flex items-center gap-space-xs px-space-md py-space-xs bg-surface-bright/90 backdrop-blur-md text-primary font-label-sm text-label-sm uppercase tracking-widest rounded-full shadow-sm"
+                  >
+                    <span
+                      class="material-symbols-outlined text-[15px]"
+                      style="font-variation-settings: &quot;FILL&quot; 1"
+                      >local_cafe</span
+                    >
+                    Boulangerie Traditionnelle
+                  </span>
+                  <span
+                    class="text-surface-bright/80 font-label-sm text-label-sm tracking-wider uppercase hidden sm:inline-block"
+                  >
+                    Lot N° 1896
+                  </span>
+                </div>
+                <!-- Center Visual Accent: Delicate Line Flourish / SVG Seal -->
+                <div
+                  class="relative z-10 my-auto py-space-lg hidden lg:flex flex-col items-start max-w-xs"
+                >
+                  <div
+                    class="w-12 h-12 rounded-full bg-surface-bright/20 backdrop-blur-sm flex items-center justify-center text-surface-bright mb-space-sm"
+                  >
+                    <svg
+                      class="w-6 h-6 text-surface-bright"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div class="h-px w-16 bg-surface-bright/40 mb-space-xs"></div>
+                  <p
+                    class="text-surface-bright/90 text-label-md font-label-md tracking-wider uppercase"
+                  >
+                    Nhiệt độ lò nướng 240°C
+                  </p>
+                </div>
+                <!-- Bottom Editorial Quote -->
+                <div class="relative z-10 pt-space-lg">
+                  <div
+                    class="flex items-center gap-2 mb-space-xs text-primary-fixed"
+                  >
+                    <span class="material-symbols-outlined text-[20px]"
+                      >format_quote</span
+                    >
+                    <span
+                      class="text-label-sm font-label-sm tracking-widest uppercase"
+                      >Triết lý nướng bánh</span
+                    >
+                  </div>
+                  <blockquote
+                    class="font-headline-sm text-headline-sm text-surface-bright font-normal leading-relaxed italic mb-space-sm"
+                  >
+                    “Mỗi chiếc bánh nướng tại Lune là một bản giao hưởng giữa
+                    thời gian ủ men và đôi tay người thợ bánh.”
+                  </blockquote>
+                  <div
+                    class="flex items-center justify-between pt-space-xs border-t border-surface-bright/20"
+                  >
+                    <p
+                      class="font-label-md text-label-md text-surface-bright/80 tracking-wide font-medium"
+                    >
+                      Lune Boulangerie &amp; Pâtisserie
+                    </p>
+                    <span
+                      class="material-symbols-outlined text-surface-bright/60 text-[18px]"
+                      >verified</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <!-- Right Column: Warm Tactile Login Interface (7 cols) -->
+              <div
+                class="lg:col-span-7 flex flex-col justify-center px-space-lg sm:px-space-xl lg:px-space-xl py-space-xl bg-surface-container-lowest"
+              >
+                <div class="max-w-[480px] w-full mx-auto">
+                  <!-- Header Group -->
+                  <div class="mb-space-lg">
+                    <h1
+                      class="font-headline-lg text-headline-lg text-on-surface tracking-tight mb-space-xs font-semibold"
+                    >
+                      Đăng Nhập Tài Khoản
+                    </h1>
+                    <p
+                      class="font-body-md text-body-md text-on-surface-variant leading-relaxed"
+                    >
+                      Chào mừng bạn trở lại với hương bánh nướng mới mỗi ngày
+                      tại Lune.
+                    </p>
+                  </div>
+                  <!-- Thymeleaf Form Container -->
+                  <form
+                    class="space-y-space-md"
+                    id="login-form"
+                    method="post"
+                    th:action="@{/login}"
+                  >
+                    <input type="hidden" name="loginType" value="customer" />
+                    <div
+                      class="rounded-xl border border-error/20 bg-error/10 px-space-md py-space-sm text-body-sm text-error"
+                      role="alert"
+                      th:if="${param.error}"
+                    >
+                      Email hoặc mật khẩu không chính xác. Vui lòng thử lại.
+                    </div>
+                    <div
+                      class="rounded-xl border border-error/20 bg-error/10 px-space-md py-space-sm text-body-sm text-error"
+                      role="alert"
+                      th:if="${param.roleError}"
+                    >
+                      Trang này chỉ dành cho khách hàng. Staff/Admin vui lòng
+                      đăng nhập tại CMS.
+                    </div>
+                    <div
+                      class="rounded-xl border border-secondary/20 bg-secondary-container/60 px-space-md py-space-sm text-body-sm text-secondary"
+                      role="status"
+                      th:if="${param.logout}"
+                    >
+                      Bạn đã đăng xuất thành công.
+                    </div>
+                    <div
+                      class="rounded-xl border border-secondary/20 bg-secondary-container/60 px-space-md py-space-sm text-body-sm text-secondary"
+                      role="status"
+                      th:if="${param.registered}"
+                    >
+                      Tạo tài khoản thành công! Vui lòng đăng nhập.
+                    </div>
+                    <!-- Field: Email or Phone -->
+                    <div class="space-y-1.5">
+                      <div class="flex justify-between items-center">
+                        <label
+                          class="font-label-lg text-label-lg text-on-surface font-medium flex items-center gap-1.5"
+                          for="login-email"
+                        >
+                          <span
+                            class="material-symbols-outlined text-[17px] text-tertiary"
+                            >mail</span
+                          >
+                          Địa chỉ email
+                        </label>
+                        <span
+                          class="font-label-sm text-label-sm text-on-surface-variant font-normal"
+                          >Bắt buộc</span
+                        >
+                      </div>
+                      <div class="relative">
+                        <input
+                          class="w-full h-12 px-space-md bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/70 font-body-md text-body-md rounded-xl border border-outline-variant/60 focus:bg-surface-bright focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/20 transition-all duration-200"
+                          id="login-email"
+                          name="email"
+                          placeholder="email@example.com"
+                          autocomplete="email"
+                          required
+                          type="email"
+                        />
+                      </div>
+                    </div>
+                    <!-- Field: Password with Reveal Action -->
+                    <div class="space-y-1.5">
+                      <div class="flex justify-between items-center">
+                        <label
+                          class="font-label-lg text-label-lg text-on-surface font-medium flex items-center gap-1.5"
+                          for="login-password"
+                        >
+                          <span
+                            class="material-symbols-outlined text-[17px] text-tertiary"
+                            >lock</span
+                          >
+                          Mật khẩu
+                        </label>
+                        <span
+                          class="font-label-sm text-label-sm text-on-surface-variant font-normal"
+                          >Tối thiểu 6 ký tự</span
+                        >
+                      </div>
+                      <div class="relative flex items-center">
+                        <input
+                          class="w-full h-12 pl-space-md pr-12 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/70 font-body-md text-body-md rounded-xl border border-outline-variant/60 focus:bg-surface-bright focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/20 transition-all duration-200"
+                          id="login-password"
+                          name="password"
+                          placeholder="Mật khẩu của bạn"
+                          autocomplete="current-password"
+                          required
+                          type="password"
+                        />
+                        <button
+                          aria-label="Hiện hoặc ẩn mật khẩu"
+                          class="absolute right-space-sm text-on-surface-variant hover:text-primary transition-colors p-2 flex items-center justify-center rounded-lg focus:outline-none"
+                          id="togglePasswordBtn"
+                          type="button"
+                        >
+                          <span
+                            class="material-symbols-outlined text-[20px]"
+                            id="passwordEyeIcon"
+                            >visibility_off</span
+                          >
+                        </button>
+                      </div>
+                    </div>
+                    <!-- Utility Row: Remember Me & Forgot Password -->
+                    <div
+                      class="flex items-center justify-between pt-1 pb-space-xs"
+                    >
+                      <a
+                        class="font-label-md text-label-md text-primary-container hover:text-primary transition-colors font-semibold hover:underline underline-offset-4"
+                        th:href="@{/forgot-password}"
+                      >
+                        Quên mật khẩu?
+                      </a>
+                    </div>
+                    <!-- Primary CTA Button -->
+                    <div class="pt-space-xs">
+                      <button
+                        class="w-full h-12 bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg rounded-xl shadow-[0_4px_16px_rgba(139,38,62,0.2)] hover:shadow-[0_8px_24px_rgba(139,38,62,0.3)] transition-all duration-200 flex items-center justify-center gap-space-sm group active:scale-[0.99]"
+                        type="submit"
+                      >
+                        <span class="">Đăng Nhập</span>
+                        <span
+                          class="material-symbols-outlined text-[19px] transition-transform duration-200 group-hover:translate-x-1"
+                          >arrow_forward</span
+                        >
+                      </button>
+                    </div>
+                    <div class="flex justify-center pt-2">
+                      <button
+                        type="button"
+                        id="customer-demo-login"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-outline-variant/60 bg-surface-container-low hover:bg-surface-container text-tertiary hover:text-primary transition-all text-label-sm font-label-sm shadow-sm group active:scale-[0.98]"
+                      >
+                        <span
+                          class="material-symbols-outlined text-[15px] text-primary transition-transform group-hover:rotate-12"
+                          >key</span
+                        ><span class="">Tài khoản demo</span>
+                      </button>
+                    </div>
+                    <!-- Secondary Navigation: Register Callout -->
+                    <div class="text-center pt-space-sm pb-space-xs">
+                      <p
+                        class="font-body-md text-body-md text-on-surface-variant"
+                      >
+                        Chưa có tài khoản tiệm bánh?
+                        <a
+                          class="text-primary-container hover:text-primary font-semibold hover:underline underline-offset-4 ml-1"
+                          th:href="@{/register}"
+                        >
+                          Đăng ký ngay
+                        </a>
+                      </p>
+                    </div>
+                    <!-- Security & Patron Pledge Divider -->
+                    <div
+                      class="pt-space-sm border-t border-outline-variant/30 flex items-start sm:items-center gap-space-xs text-on-surface-variant"
+                    >
+                      <span
+                        class="material-symbols-outlined text-[16px] text-secondary flex-shrink-0 mt-0.5 sm:mt-0"
+                        >verified_user</span
+                      >
+                      <p
+                        class="font-body-sm text-body-sm text-on-surface-variant/90 leading-tight"
+                      >
+                        Thông tin của bạn được bảo mật tuyệt đối theo tiêu chuẩn
+                        của tiệm bánh Lune.
+                      </p>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
+        </section>
+        <!-- Interactive Script for Password Toggle and Input Flourish -->
+        <script>
+          (function initLoginInteractions() {
+            const toggleBtn = document.getElementById("togglePasswordBtn");
+            const passInput = document.getElementById("login-password");
+            const eyeIcon = document.getElementById("passwordEyeIcon");
 
-          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px">
-            Đăng nhập
-            <svg aria-hidden="true" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round">
-              <use href="#i-arrow"/>
-            </svg>
-          </button>
-          <button type="button" class="btn btn-demo" id="customer-demo-login">
-            Khách hàng demo
-          </button>
-        </form>
-
-        <div class="auth-bottom">
-          Chưa có tài khoản?
-          <a th:href="@{/register}" class="inline-link">Đăng ký ngay</a>
-        </div>
+            if (toggleBtn && passInput && eyeIcon) {
+              toggleBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const isPassword =
+                  passInput.getAttribute("type") === "password";
+                passInput.setAttribute(
+                  "type",
+                  isPassword ? "text" : "password",
+                );
+                eyeIcon.textContent = isPassword
+                  ? "visibility"
+                  : "visibility_off";
+                toggleBtn.setAttribute(
+                  "aria-label",
+                  isPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu",
+                );
+              });
+            }
+          })();
+        </script>
+        <script>
+          document
+            .getElementById("customer-demo-login")
+            ?.addEventListener("click", function () {
+              document.getElementById("login-email").value =
+                "customer@bakery.local";
+              document.getElementById("login-password").value = "customer123";
+              document.getElementById("login-form").requestSubmit();
+            });
+        </script>
       </div>
-    </div>
-  </main>
-
-  <footer th:replace="~{fragments/layout :: footer}"></footer>
-  <script>
-    document.getElementById('customer-demo-login')?.addEventListener('click', function () {
-      document.getElementById('login-email').value = 'customer@bakery.local';
-      document.getElementById('login-password').value = 'customer123';
-      document.getElementById('login-form').requestSubmit();
-    });
-  </script>
-</body>
+    </main>
+    <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+  </body>
 </html>
