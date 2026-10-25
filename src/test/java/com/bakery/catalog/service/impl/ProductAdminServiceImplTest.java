@@ -10,6 +10,7 @@ import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductUpdateRequest;
 import com.bakery.catalog.entity.Category;
 import com.bakery.catalog.entity.Product;
+import com.bakery.catalog.entity.ProductBadge;
 import com.bakery.catalog.entity.ProductImage;
 import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.repository.CategoryRepository;
@@ -56,6 +57,10 @@ class ProductAdminServiceImplTest {
     ProductCreateRequest request = new ProductCreateRequest();
     request.setName("Bánh mới");
     request.setDescription("Mô tả");
+    request.setBadge(ProductBadge.NEW);
+    request.setIngredients(" Bột mì và bơ ");
+    request.setStorageInstructions(" Dùng trong ngày ");
+    request.setAllergenInfo(" Gluten ");
     request.setPrice(new BigDecimal("25000"));
     request.setStockQuantity(10);
     request.setPreparationDays(1);
@@ -68,7 +73,11 @@ class ProductAdminServiceImplTest {
 
     service.create(request);
 
-    verify(products).save(any(Product.class));
+    verify(products).save(org.mockito.ArgumentMatchers.argThat(product ->
+        product.getBadge() == ProductBadge.NEW
+            && "Bột mì và bơ".equals(product.getIngredients())
+            && "Dùng trong ngày".equals(product.getStorageInstructions())
+            && "Gluten".equals(product.getAllergenInfo())));
     verify(productQueryService).getById(5L);
   }
 
@@ -78,11 +87,19 @@ class ProductAdminServiceImplTest {
     when(products.findById(5L)).thenReturn(Optional.of(product));
     when(categories.findById(1L)).thenReturn(Optional.of(category));
     ProductUpdateRequest request = updateRequest(ProductStatus.STOPPED);
+    request.setBadge(ProductBadge.SEASONAL);
+    request.setIngredients("Thành phần mới");
+    request.setStorageInstructions("Bảo quản mới");
+    request.setAllergenInfo("Dị ứng mới");
 
     service.update(5L, request);
 
     assertEquals("Bánh sửa", product.getName());
     assertEquals(ProductStatus.STOPPED, product.getStatus());
+    assertEquals(ProductBadge.SEASONAL, product.getBadge());
+    assertEquals("Thành phần mới", product.getIngredients());
+    assertEquals("Bảo quản mới", product.getStorageInstructions());
+    assertEquals("Dị ứng mới", product.getAllergenInfo());
     verify(products).save(product);
   }
 
