@@ -10,6 +10,10 @@ trước khi bắt đầu use case.
 Phạm vi use case, package và file của từng thành viên được mô tả tại
 [`docs/USE_CASE_ASSIGNMENT.md`](docs/USE_CASE_ASSIGNMENT.md).
 
+Các quyết định đã chốt về badge, nội dung chi tiết sản phẩm, quà sinh nhật và
+khách hàng thân thiết được ghi tại
+[`docs/PRODUCT_DATA_REQUIREMENTS.md`](docs/PRODUCT_DATA_REQUIREMENTS.md).
+
 ## Yêu cầu môi trường
 
 - JDK 17

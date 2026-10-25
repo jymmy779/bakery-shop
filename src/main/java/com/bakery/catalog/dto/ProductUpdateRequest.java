@@ -4,6 +4,7 @@ import static com.bakery.common.validation.ValidationMessages.NON_NEGATIVE_STOCK
 import static com.bakery.common.validation.ValidationMessages.POSITIVE_PRICE;
 import static com.bakery.common.validation.ValidationMessages.REQUIRED;
 
+import com.bakery.catalog.entity.ProductBadge;
 import com.bakery.catalog.entity.ProductStatus;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +30,17 @@ public class ProductUpdateRequest {
 
   @NotBlank(message = REQUIRED)
   private String description;
+
+  private ProductBadge badge;
+
+  @Size(max = 10000)
+  private String ingredients;
+
+  @Size(max = 10000)
+  private String storageInstructions;
+
+  @Size(max = 5000)
+  private String allergenInfo;
 
   @NotNull(message = REQUIRED)
   @DecimalMin(value = "0.01", message = POSITIVE_PRICE)

@@ -53,7 +53,7 @@
                       th:text="${product.status.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}">Đang bán</button>
             </form></td>
             <td class="cms-actions">
-              <button class="btn btn-plain" type="button" th:attr="data-product-id=${product.id},data-name=${product.name},data-description=${product.description},data-price=${product.price},data-stock=${product.stockQuantity},data-preparation=${product.preparationDays},data-category=${product.categoryId},data-status=${product.status},data-image=${product.primaryImagePath},data-images=${product.imagePathsCsv},data-image-ids=${product.imageIdsCsv}" onclick="selectProduct(this)">Sửa</button>
+              <button class="btn btn-plain" type="button" th:attr="data-product-id=${product.id},data-name=${product.name},data-description=${product.description},data-badge=${product.badge},data-ingredients=${product.ingredients},data-storage-instructions=${product.storageInstructions},data-allergen-info=${product.allergenInfo},data-price=${product.price},data-stock=${product.stockQuantity},data-preparation=${product.preparationDays},data-category=${product.categoryId},data-status=${product.status},data-image=${product.primaryImagePath},data-images=${product.imagePathsCsv},data-image-ids=${product.imageIdsCsv}" onclick="selectProduct(this)">Sửa</button>
               <form method="post" th:action="@{/cms/products/delete/{id}(id=${product.id})}" data-confirm-message="Bạn có chắc muốn xóa sản phẩm này?" data-confirm-danger="true"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn danger-action" type="submit">Xóa</button></form>
             </td>
           </tr>
@@ -77,7 +77,11 @@
         <label>Tồn kho</label><input th:field="*{stockQuantity}" type="number" min="0" required>
         <label>Số ngày chuẩn bị</label><input th:field="*{preparationDays}" type="number" min="0" required>
         <label>Danh mục</label><select th:field="*{categoryId}" required><option value="">Chọn danh mục</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
+        <label>Badge marketing</label><select th:field="*{badge}"><option value="">Không có badge</option><option value="NEW">Mới</option><option value="BEST_SELLER">Bán chạy</option><option value="LIMITED">Phiên bản giới hạn</option><option value="SEASONAL">Theo mùa</option></select>
         <label>Mô tả</label><textarea th:field="*{description}" required></textarea>
+        <label>Thành phần &amp; hương vị</label><textarea th:field="*{ingredients}" maxlength="10000"></textarea>
+        <label>Hướng dẫn bảo quản &amp; hâm nóng</label><textarea th:field="*{storageInstructions}" maxlength="10000"></textarea>
+        <label>Thông tin dị ứng</label><textarea th:field="*{allergenInfo}" maxlength="5000"></textarea>
         <label>Hình ảnh</label>
         <input th:field="*{images}" id="create-product-images" type="file" multiple accept="image/*">
         <small class="image-upload-hint">Chọn từ 1 đến 4 ảnh. Có thể chọn nhiều ảnh cùng lúc hoặc chọn bổ sung.</small>
@@ -93,7 +97,11 @@
         <label>Số ngày chuẩn bị</label><input name="preparationDays" id="product-preparation" type="number" min="0" required>
         <label>Danh mục</label><select name="categoryId" id="product-category" required><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
         <label>Trạng thái bán</label><select name="status" id="product-status" required><option value="SELLING">Đang bán</option><option value="STOPPED">Ngừng bán</option></select>
+        <label>Badge marketing</label><select name="badge" id="product-badge"><option value="">Không có badge</option><option value="NEW">Mới</option><option value="BEST_SELLER">Bán chạy</option><option value="LIMITED">Phiên bản giới hạn</option><option value="SEASONAL">Theo mùa</option></select>
         <label>Mô tả</label><textarea name="description" id="product-description" required></textarea>
+        <label>Thành phần &amp; hương vị</label><textarea name="ingredients" id="product-ingredients" maxlength="10000"></textarea>
+        <label>Hướng dẫn bảo quản &amp; hâm nóng</label><textarea name="storageInstructions" id="product-storage-instructions" maxlength="10000"></textarea>
+        <label>Thông tin dị ứng</label><textarea name="allergenInfo" id="product-allergen-info" maxlength="5000"></textarea>
         <label>Ảnh mới</label>
         <input name="newImages" id="update-product-images" type="file" multiple accept="image/*">
         <small class="image-upload-hint">Chọn bổ sung ảnh mới. Backend sẽ kiểm tra tổng số ảnh không vượt quá 4.</small>
@@ -109,7 +117,7 @@
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
 <script>
 function openProductCreate() { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Thêm sản phẩm'; document.getElementById('product-create-form').hidden = false; document.getElementById('product-update-form').hidden = true; }
-function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-description').value = button.dataset.description || ''; document.getElementById('update-product-images').value = ''; document.getElementById('update-image-preview').replaceChildren(); renderEditImages(button.dataset.productId, button.dataset.images, button.dataset.imageIds); updatePriceSuggestions('product-price', 'update-price-suggestions'); }
+function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-badge').value = button.dataset.badge || ''; document.getElementById('product-description').value = button.dataset.description || ''; document.getElementById('product-ingredients').value = button.dataset.ingredients || ''; document.getElementById('product-storage-instructions').value = button.dataset.storageInstructions || ''; document.getElementById('product-allergen-info').value = button.dataset.allergenInfo || ''; document.getElementById('update-product-images').value = ''; document.getElementById('update-image-preview').replaceChildren(); renderEditImages(button.dataset.productId, button.dataset.images, button.dataset.imageIds); updatePriceSuggestions('product-price', 'update-price-suggestions'); }
 function renderEditImages(productId, imageCsv, imageIdsCsv) {
   const preview = document.getElementById('edit-image-preview');
   preview.replaceChildren();

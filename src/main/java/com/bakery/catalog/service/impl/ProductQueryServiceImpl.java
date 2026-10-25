@@ -64,6 +64,10 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     result.setId(product.getId());
     result.setName(product.getName());
     result.setDescription(product.getDescription());
+    result.setBadge(product.getBadge());
+    result.setIngredients(product.getIngredients());
+    result.setStorageInstructions(product.getStorageInstructions());
+    result.setAllergenInfo(product.getAllergenInfo());
     result.setPrice(product.getPrice());
     result.setStockQuantity(product.getStockQuantity());
     result.setPreparationDays(product.getPreparationDays());
@@ -112,6 +116,10 @@ public class ProductQueryServiceImpl implements ProductQueryService {
       result.setId(product.getId());
       result.setName(product.getName());
       result.setDescription(product.getDescription());
+      result.setBadge(product.getBadge());
+      result.setIngredients(product.getIngredients());
+      result.setStorageInstructions(product.getStorageInstructions());
+      result.setAllergenInfo(product.getAllergenInfo());
       result.setPrice(product.getPrice());
       result.setStockQuantity(product.getStockQuantity());
       result.setPreparationDays(product.getPreparationDays());

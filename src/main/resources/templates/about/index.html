@@ -1,23 +1,333 @@
-<!DOCTYPE html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><th:block th:replace="~{fragments/layout :: head-meta('Về LUNE')}"></th:block></head>
-<body>
-  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
-  <header th:replace="~{fragments/layout :: header(currentPage='about')}"></header>
-  <main>
-    <section class="story-hero">
-      <div class="wrap story-hero-grid">
-        <div><span class="eyebrow">OUR LITTLE STORY</span><h1>Một chiếc bánh ngon.<br><em>Một ngày dịu dàng.</em></h1><p>LUNE ra đời từ niềm vui được làm bánh và mong muốn biến những khoảnh khắc bình thường thành kỷ niệm thật ngọt.</p></div>
-        <img th:src="@{/assets/about-bakery.svg}" alt="Không gian làm bánh tại LUNE Bakery">
-      </div>
-    </section>
-    <section class="wrap story-values">
-      <article><span>01</span><h2>Làm mới mỗi ngày</h2><p>Bánh được chuẩn bị theo mẻ nhỏ để giữ độ tươi, hương thơm và kết cấu trọn vẹn.</p></article>
-      <article><span>02</span><h2>Nguyên liệu chọn lọc</h2><p>Chúng mình ưu tiên nguyên liệu rõ nguồn gốc và cân chỉnh độ ngọt phù hợp khẩu vị Việt.</p></article>
-      <article><span>03</span><h2>Chăm chút thủ công</h2><p>Từng lớp kem, phần trang trí và hộp bánh đều được hoàn thiện cẩn thận trước khi giao.</p></article>
-    </section>
-    <section class="story-cta"><div class="wrap"><span class="eyebrow">BAKED WITH LOVE</span><h2>Để LUNE góp một chút ngọt ngào<br>vào ngày đặc biệt của bạn.</h2><a th:href="@{/products}" class="btn btn-light">Khám phá sản phẩm</a></div></section>
-  </main>
-  <footer th:replace="~{fragments/layout :: footer}"></footer>
-</body>
-</html>
+<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><title>Lune Bakery — Boulangerie &amp; Pâtisserie Artisanale</title><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-background":"#261814","on-primary":"#ffffff","secondary":"#536443","surface-dim":"#eed5cc","on-error-container":"#93000a","inverse-primary":"#ffb2bc","on-primary-container":"#ffa3b0","on-tertiary-fixed-variant":"#4f453c","primary-container":"#8b263e","tertiary":"#3c342b","on-error":"#ffffff","surface-container":"#ffe9e3","inverse-on-surface":"#ffede7","inverse-surface":"#3c2d28","surface-bright":"#fff8f6","on-primary-fixed":"#400013","primary-fixed-dim":"#ffb2bc","tertiary-fixed-dim":"#d2c4b7","on-secondary-container":"#586a48","surface-container-lowest":"#ffffff","surface-tint":"#a3394f","error":"#ba1a1a","surface-container-highest":"#f7ddd5","background":"#fff8f6","surface-variant":"#f7ddd5","on-secondary-fixed-variant":"#3b4c2d","surface":"#fff8f6","secondary-fixed":"#d5e9bf","outline":"#897174","on-tertiary":"#ffffff","on-tertiary-container":"#c8baae","tertiary-fixed":"#efe0d3","primary-fixed":"#ffd9dd","outline-variant":"#dcc0c2","on-secondary":"#ffffff","secondary-fixed-dim":"#bacda5","primary":"#6c0c28","tertiary-container":"#544a40","secondary-container":"#d5e9bf","error-container":"#ffdad6","surface-container-high":"#fde3da","on-surface":"#261814","on-secondary-fixed":"#111f06","surface-container-low":"#fff1ec","on-tertiary-fixed":"#221a12","on-surface-variant":"#564244","on-primary-fixed-variant":"#842039"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-xs":"0.25rem","gutter":"1.5rem","gutter-mobile":"1rem","space-lg":"1.5rem","space-md":"1rem","margin-mobile":"1.25rem","margin":"3rem","space-xl":"2.5rem","space-sm":"0.5rem"},fontFamily:{"display":["Playfair Display"],"label-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"headline-md":["Playfair Display"],"headline-sm":["Playfair Display"],"body-md":["Plus Jakarta Sans"],"headline-lg-mobile":["Playfair Display"],"headline-md-mobile":["Playfair Display"],"display-mobile":["Playfair Display"],"headline-lg":["Playfair Display"],"body-sm":["Plus Jakarta Sans"],"label-lg":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"]},fontSize:{"display":["3.5rem",{lineHeight:"4rem",letterSpacing:"-0.02em",fontWeight:"600"}],"label-sm":["0.6875rem",{lineHeight:"0.875rem",letterSpacing:"0.08em",fontWeight:"700"}],"body-lg":["1.125rem",{lineHeight:"1.875rem",fontWeight:"400"}],"headline-md":["2rem",{lineHeight:"2.5rem",fontWeight:"500"}],"headline-sm":["1.25rem",{lineHeight:"1.75rem",fontWeight:"600"}],"body-md":["1rem",{lineHeight:"1.625rem",fontWeight:"400"}],"headline-lg-mobile":["1.875rem",{lineHeight:"2.375rem",fontWeight:"600"}],"headline-md-mobile":["1.5rem",{lineHeight:"2rem",fontWeight:"500"}],"display-mobile":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.01em",fontWeight:"600"}],"headline-lg":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["0.875rem",{lineHeight:"1.375rem",fontWeight:"400"}],"label-lg":["0.875rem",{lineHeight:"1.25rem",letterSpacing:"0.04em",fontWeight:"600"}],"label-md":["0.75rem",{lineHeight:"1rem",letterSpacing:"0.06em",fontWeight:"600"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header th:replace="~{fragments/layout :: storefrontHeader('about')}"></header><main class="w-full pt-20 bg-surface"><div th:replace="~{fragments/layout :: storefrontBreadcrumb('Giới thiệu về LUNE', null, null)}"></div><div class="flex flex-col w-full">
+
+<!-- Hero Story Section: Modern Editorial Asymmetric Grid -->
+<section class="w-full py-space-xl relative overflow-hidden">
+<div class="max-w-[1280px] mx-auto px-gutter">
+<!-- Section Label Badge -->
+<div class="flex items-center gap-space-sm mb-space-md">
+<span class="inline-flex items-center gap-1.5 px-space-md py-1 bg-surface-container text-primary text-label-sm font-label-sm tracking-widest uppercase rounded-full shadow-sm opacity-100">
+<span class="material-symbols-outlined text-[14px]">local_fire_department</span>
+          Câu chuyện thương hiệu • Từ năm 2018
+        </span>
+<div class="h-[1px] w-16 bg-outline-variant"></div>
+</div>
+<!-- Main Title & Narrative Split -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start mb-space-xl">
+<div class="lg:col-span-7">
+<h1 class="font-display text-display text-on-surface tracking-tight leading-[1.12]">
+            Gìn Giữ Hồn Bánh Mộc Mạc &amp; Nghệ Thuật Lên Men <span class="text-primary italic">Thủ Công Pháp</span>
+</h1>
+</div>
+<div class="lg:col-span-5 lg:pt-space-sm space-y-space-md">
+<p class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+            Tại gian bếp nhỏ của Lune, mỗi bình minh không bắt đầu bằng tiếng động cơ công nghiệp, mà bằng hương thơm nồng nàn của bột mì lên men chậm và vị béo dịu của bơ lạt AOP Isigny Sainte-Mère 84% trứ danh từ xứ Normandie.
+          </p>
+<p class="font-body-md text-body-md text-on-surface-variant/90 leading-relaxed">
+            Chúng tôi tin rằng chiếc bánh hoàn hảo chỉ được tạo ra khi con người biết kiên nhẫn trước quy luật tự nhiên: để con men dại Levain tự do hô hấp qua 36 giờ ủ lạnh, và để đôi bàn tay người thợ cảm nhận nhịp thở của từng khối bột đàn hồi dưới ánh lửa lò nướng củi.
+          </p>
+</div>
+</div>
+<!-- Asymmetric Dual Photo Showcase -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter items-end">
+<!-- Left Image: Baker Sifting Organic Flour -->
+<div class="md:col-span-7 relative group opacity-100">
+<div class="w-full h-[480px] rounded-xl overflow-hidden bg-surface-container-high shadow-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="Close-up of an artisan French baker hands gently dusting unbleached organic flour over proofed sourdough dough loaves, flour particles suspended in soft golden morning sunlight, rustic dark wooden workstation, warm bakery tone with deep burgundy apron accent" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEaSTffNmnWvMgQa2kZHe-XvghtcNuDW-66D1SPhNr8bBQJxyyOtXwjApFRhQAJIty2RO0f93oF3MpHWOrFOkguyYsLzwuEtzKL8Bm331cazeI0ef2JCKskEISAYM-ZsTI9s4lYupp-wy_MDnBEfVVbMOLPVsHMvHT2NhQWIJVwK1GjC6ypOhNcZZJl8ok9g-abGS--hEQlt4LBYISPuIGvDmyK-saSiDgORNIsHZeY2jZB4rE18tVgg">
+</div>
+<!-- Floating Editorial Caption Pill -->
+<div class="absolute bottom-6 left-6 right-6 md:right-auto md:max-w-xs bg-surface/95 backdrop-blur-md p-space-md rounded-lg shadow-lg">
+<div class="flex items-center gap-space-xs text-primary mb-1">
+<span class="material-symbols-outlined text-[18px]">nature_people</span>
+<span class="font-label-md text-label-md tracking-wider uppercase">Thủ công bản vị</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Bột mì hữu cơ Moulin d'Antoine giữ trọn vẹn lớp cám thơm và khoáng chất tự nhiên.</p>
+</div>
+</div>
+<!-- Right Image: Freshly Baked Sourdough & Croissants -->
+<div class="md:col-span-5 relative mt-space-md md:mt-0">
+<div class="w-full h-[380px] rounded-xl overflow-hidden bg-surface-container-high shadow-md">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="Golden brown fluted croissants with intricate honeycomb lamination layers and rustic scored artisan sourdough loaves cooling on traditional wire cooling racks, warm amber bakery lighting, delicate butter gloss, crumbly texture, gourmet artisanal aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTL7PpOyReELwGM0ruDFXnuwRo7QS2eS8LNkwGSsO0iu0fFVjGUCGmtZYpXBI8lzsM9Sh6vdVavtwki5HlP07x75J_qE2WBEQHGwJsIe5_OBKMjmRQhvL8yDOAeu41rGXqYD16Ff01x_n2vhZrcgPfqjJgmAP1tSENjreoKYoE_4jSpGwVW2nitQxd3lwGPo6KKVF3yPVmBoKYD1KbUzKwzAR_wrgF-94KdzTBHetMa5XshlaKPizUIw">
+</div>
+<!-- Overlapping Decorative Stamp -->
+<div class="absolute -top-5 -right-5 w-24 h-24 rounded-full bg-primary-container text-on-primary flex flex-col items-center justify-center text-center p-2 shadow-xl rotate-6">
+<span class="material-symbols-outlined text-[20px]">cookie</span>
+<span class="font-label-sm text-[10px] tracking-widest uppercase font-bold mt-0.5">Lò Nướng 240°C</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Con Số Biết Nói (Stats / Milestones Bar) -->
+<section class="w-full py-space-xl bg-surface-container-low">
+<div class="max-w-[1280px] mx-auto px-gutter">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Stat 1 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow opacity-100">
+<div class="flex items-center justify-between text-secondary mb-space-md">
+<span class="material-symbols-outlined text-[28px]">timer</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Quy trình</span>
+</div>
+<div>
+<div class="font-display text-[2.75rem] font-bold text-primary leading-none mb-1">36 Giờ</div>
+<div class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">Ủ Men Chậm Tự Nhiên</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Phát triển trọn vẹn tầng hương vị phức hợp, dễ tiêu hóa và thân thiện đường ruột.</p>
+</div>
+</div>
+<!-- Stat 2 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow opacity-100">
+<div class="flex items-center justify-between text-primary mb-space-md">
+<span class="material-symbols-outlined text-[28px]">verified</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Xuất xứ</span>
+</div>
+<div>
+<div class="font-display text-[2.75rem] font-bold text-primary leading-none mb-1">100%</div>
+<div class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">Bơ Lạt AOP Normandie</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Hàm lượng béo 84% nguyên chất từ Isigny Sainte-Mère, không pha trộn dầu thực vật.</p>
+</div>
+</div>
+<!-- Stat 3 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow opacity-100">
+<div class="flex items-center justify-between text-secondary mb-space-md">
+<span class="material-symbols-outlined text-[28px]">schedule</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Nhịp lò</span>
+</div>
+<div>
+<div class="font-display text-[2.75rem] font-bold text-primary leading-none mb-1">02 Mẻ</div>
+<div class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">Mỗi Ngày: 06:30 &amp; 14:00</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Bánh luôn nóng hổi trên kệ, đảm bảo độ giòn xốp và hương thơm tinh khiết nhất.</p>
+</div>
+</div>
+<!-- Stat 4 -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow opacity-100">
+<div class="flex items-center justify-between text-secondary mb-space-md">
+<span class="material-symbols-outlined text-[28px]">eco</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Cam kết</span>
+</div>
+<div>
+<div class="font-display text-[2.75rem] font-bold text-primary leading-none mb-1">0 Hóa Chất</div>
+<div class="font-headline-sm text-headline-sm text-on-surface mb-space-xs">Tươi Mới Trọn Trong Ngày</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Nói không với phụ gia làm mềm, hương liệu tổng hợp hay chất bảo quản nhân tạo.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Triết Lý & Nguyên Liệu Cốt Lõi (Our Philosophy & Ingredients) -->
+<section class="w-full py-space-xl">
+<div class="max-w-[1280px] mx-auto px-gutter">
+<!-- Section Header -->
+<div class="text-center max-w-2xl mx-auto mb-space-xl space-y-space-xs">
+<span class="text-secondary font-label-md text-label-md uppercase tracking-widest">Giá Trị Cốt Lõi</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Ba Nguyên Tắc Bất Biến Tại Gian Bếp Của Lune</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+          Giữa nhịp sống hối hả, chúng tôi chọn làm chậm lại từng công đoạn để mỗi ổ bánh ra lò là một tác phẩm chứa chan sự thành kính với đất trời và nông sản.
+        </p>
+</div>
+<!-- 3 Pillar Cards Bento -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Principle 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col opacity-100">
+<div class="h-56 w-full relative overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Artisan glass fermenting jar with active bubbly levain sourdough starter feeding with micro air bubbles visible on smooth glass, wooden spoon, natural ambient warm light, soft focus bakery kitchen backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCl4-kGRNfxQnAPUudRTPyUbYK1kgRFQ21nNWUuk0YGu7cNc-jDe5nedo5feKoJMgIxQoalkj4lTNUCzWn0zL0A0sz5Wa3DW8haGVei6us1tYfjX9f_wBA79H0rWaP2sSlpO-Vnc7AN_OkP5wR0QdAFXOkm9M_m5bYbLBDZXooF4daSCAV0qrSFq2HO2Bl0fz8IdqU6YRMNOJlC43rKYNLP54QQNqqzHx6PeZOpyjybki31YncYLUFRtg">
+<div class="absolute top-4 left-4 w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow">
+<span class="material-symbols-outlined text-[20px]">spa</span>
+</div>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between">
+<div class="space-y-space-xs">
+<div class="text-label-sm font-label-sm text-secondary uppercase tracking-wider">Nguyên Tắc I</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Men Tự Nhiên Levain 36h</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Không dùng men công nghiệp tác động nhanh. Chúng tôi nuôi cấy men từ nước ép nho hữu cơ và bột lúa mì nguyên cám, ủ lạnh chậm 36 giờ để tạo cấu trúc tổ ong thoáng khí tuyệt đẹp cùng hậu vị chua thanh tao nhã đặc trưng.
+              </p>
+</div>
+<div class="pt-space-md mt-space-md bg-surface-container-low/60 -mx-space-lg -mb-space-lg px-space-lg py-space-sm flex items-center gap-space-xs text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">grain</span>
+<span class="">Men mẹ từ vụ mùa năm 2018</span>
+</div>
+</div>
+</div>
+<!-- Principle 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col opacity-100">
+<div class="h-56 w-full relative overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Solid block of golden yellow authentic French AOP Charentes-Poitou butter sliced open on rustic parchment paper with delicate butter curls, natural rich dairy texture, warm ambient editorial food photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU5_dISOd0fdgxIkajWUtHjD6XxxwfBYK04lWw1XjP3_0Bljyyer0UE1bmyvIryROyyZHgkXAl05GM4pr5ojTxwKbkk6Mkh-GmvvEGcCrqOtaVWCmTlPbIsKAfNAAB0Znle7gw5mvZgF6c-T9iat1-xeTWT8MaRx6OtthQhkjVpTsOB6jIP0q8b454GIJ--P5DRUwlS9gZsP6bjnafyxfocq1ehu6qVw_HHUPARZxvGWF89UPQZWNHiw">
+<div class="absolute top-4 left-4 w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center shadow">
+<span class="material-symbols-outlined text-[20px]">water_drop</span>
+</div>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between">
+<div class="space-y-space-xs">
+<div class="text-label-sm font-label-sm text-primary uppercase tracking-wider">Nguyên Tắc II</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Bơ Chuẩn AOP Normandie</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Lựa chọn nghiêm ngặt bơ lạt AOP 84% béo từ đàn bò ăn cỏ ven biển Normandie. Từng lát bơ lạnh được cán xen kẽ chuẩn xác 27 lớp ngàn tầng giúp bánh croissant nở bung giòn rụm bên ngoài và mềm mướt, ươm mùi sữa hạt phỉ bên trong.
+              </p>
+</div>
+<div class="pt-space-md mt-space-md bg-surface-container-low/60 -mx-space-lg -mb-space-lg px-space-lg py-space-sm flex items-center gap-space-xs text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">award_star</span>
+<span class="">Chứng nhận kiểm định nguồn gốc Appellation d'Origine Protégée</span>
+</div>
+</div>
+</div>
+<!-- Principle 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col opacity-100">
+<div class="h-56 w-full relative overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Traditional stone deck wood-fired bakery oven glowing warmly with fiery embers, golden loaves of bread baking inside, baker holding a wooden bread peel paddle, artisanal rustic European boulangerie" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDImous2pUC7iSk0YgyomLctfldvQe5tJ8ymyeO-29528hQjoP70hQ7myaaboOyOHEUA1DKwhEdK0ofi9OKUnA5974KK0-yCSZfQeENELv_yunOWu5NKt3DplSsGeMhHEozLTdmgfx18_G9UpRfB9czTVmWiSf4tYj7ztj9E4eTmuWpdhNIvaDRzfjA4-3IZGVLmCGfN2UQRI34SSWLKlz5KWJB6rBH_4DwG4owmkZiWrMgVTima7gogw">
+<div class="absolute top-4 left-4 w-10 h-10 rounded-full bg-tertiary-container text-on-tertiary flex items-center justify-center shadow">
+<span class="material-symbols-outlined text-[20px]">oven_gen</span>
+</div>
+</div>
+<div class="p-space-lg flex-1 flex flex-col justify-between">
+<div class="space-y-space-xs">
+<div class="text-label-sm font-label-sm text-tertiary uppercase tracking-wider">Nguyên Tắc III</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Đôi Tay &amp; Lửa Lò Thủ Công</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Máy móc không thể thay thế xúc giác của con người khi kiểm tra độ nở của bột. Mỗi ổ bánh đều được định hình bằng tay và nướng trên mặt đá nung 240°C với luồng hơi nước chuẩn nhịp, mang lại lớp vỏ caramel giòn vang khi gõ nhẹ.
+              </p>
+</div>
+<div class="pt-space-md mt-space-md bg-surface-container-low/60 -mx-space-lg -mb-space-lg px-space-lg py-space-sm flex items-center gap-space-xs text-on-surface-variant text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">touch_app</span>
+<span class="">Tạo hình thủ công 100% từng mẻ bánh</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Hành Trình Người Thợ Bánh (The Artisan Journey / Founder Note) -->
+<section class="w-full py-space-xl bg-surface-container-low">
+<div class="max-w-[1280px] mx-auto px-gutter">
+<div class="bg-surface-container-lowest rounded-2xl p-space-lg md:p-space-xl shadow-md">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
+<!-- Left: Head Baker Portrait -->
+<div class="lg:col-span-5 relative">
+<div class="w-full h-[460px] rounded-xl overflow-hidden bg-surface-container-high shadow-inner">
+<img class="w-full h-full object-cover object-top" data-alt="Portrait of an experienced Vietnamese head baker wearing a clean beige linen apron and baker chef jacket, smiling warmly with calm confidence in an artisanal Parisian style bakery atelier with racks of fresh bread in the background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnO3mPZJxfbym3twsO3p45KYnf4CTTVYxuUvMQEQZUQ2mX7r9cAaceupAc6gMqbfHIAWeInaAw0MyfAsHzUFt8DKe6-s2l4dFct2LNRC0gQYDJmZCfUPFNZMad9iBdzNdCS8vvGTy_IW7ZxaUTTEN6tL0ZWhlnPOHUeCmNQoO2UVpAvyaBYStWeI6SfaVsJ3sVjIVOcw-8XHvFxCPdt1umUoHzpNf9tHrnjcmTXBVUOTk66anqqGpTZA">
+</div>
+<!-- Badge overlay -->
+<div class="absolute bottom-4 left-4 bg-primary text-on-primary py-2 px-4 rounded-lg shadow-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+<span class="font-label-sm text-label-sm tracking-wide">Bếp Trưởng &amp; Đồng Sáng Lập</span>
+</div>
+</div>
+<!-- Right: The Personal Manifesto -->
+<div class="lg:col-span-7 space-y-space-md lg:pl-space-md">
+<div class="space-y-space-xs">
+<span class="text-secondary font-label-sm text-label-sm uppercase tracking-widest">Tâm Sự Của Người Nhào Bột</span>
+<h2 class="font-display text-headline-lg text-on-surface italic">
+                “Bánh mì không chỉ là thức ăn, mà là hơi thở của sự nhẫn nại.”
+              </h2>
+</div>
+<div class="space-y-space-sm font-body-md text-body-md text-on-surface-variant leading-relaxed">
+<p class="">
+                Mỗi sớm mai lúc 04:00, khi thành phố còn đang chìm trong giấc ngủ, gian bếp của Lune đã đỏ lửa. Nhiều người hỏi tôi sao phải mất đến ba ngày chỉ để làm nên một mẻ bánh Sourdough mộc mạc, trong khi các dây chuyền hiện đại có thể làm việc đó trong vòng hai tiếng?
+              </p>
+<p class="">
+                Câu trả lời nằm ở khoảnh khắc bạn cắn vào lớp vỏ bánh giòn tan, cảm nhận phần ruột mềm mọng sực nức hương thơm ngọt dịu của hạt lúa mì được hấp thụ đầy đủ nắng gió. Men sống tự nhiên cần thời gian để chuyển hóa tinh bột thành những gì thuần khiết và thanh lành nhất.
+              </p>
+<p class="">
+                Chúng tôi không theo đuổi số lượng. Tại Lune, mỗi chiếc bánh gửi đến tay bạn là sự gửi gắm trọn vẹn tình yêu nghề và lòng chân thành của những người thợ làm bánh thủ công.
+              </p>
+</div>
+<!-- Signature & Sign-off -->
+<div class="pt-space-md flex items-center justify-between">
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface">Trần Minh Quân &amp; Đội Ngũ Lune</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Thợ bánh chính &amp; Người sáng lập Lune Bakery</div>
+</div>
+<!-- Simulated Elegant Calligraphy Signature SVG -->
+<div class="text-primary opacity-80 pr-space-md">
+<svg class="w-36 h-12" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 160 50">
+<path d="M10 35 C 30 10, 45 45, 60 20 C 75 -5, 80 40, 95 25 C 110 10, 130 30, 150 15"></path>
+<path d="M25 40 Q 55 25, 110 32"></path>
+<circle cx="145" cy="18" fill="currentColor" r="2"></circle>
+</svg>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Không Gian & Trải Nghiệm Ghé Tiệm (Store Experience & Atmosphere) -->
+<section class="w-full py-space-xl">
+<div class="max-w-[1280px] mx-auto px-gutter">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md mb-space-xl">
+<div class="space-y-space-xs max-w-xl">
+<span class="text-secondary font-label-md text-label-md uppercase tracking-widest">Không Gian Tiệm Bánh</span>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Chốn Bình Yên Phảng Phất Hương Bơ Ấm</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Bước chân qua cánh cửa gỗ sồi của Lune, tách biệt khỏi khói bụi phố thị để tìm về một góc nhỏ ngập tràn ánh sáng sớm và tiếng tách cà phê ấm nóng.
+          </p>
+</div>
+<div class="flex-shrink-0">
+<a class="inline-flex items-center gap-space-xs px-space-lg py-space-xs rounded-full bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors" data-path="cua-hang" href="#">
+<span class="material-symbols-outlined text-[18px]">storefront</span>
+<span class="">Xem hệ thống cửa hàng</span>
+</a>
+</div>
+</div>
+<!-- Experience Bento Mosaic -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch mb-space-xl"><div class="lg:col-span-7 rounded-xl overflow-hidden shadow-sm relative group bg-surface-container min-h-[440px]"><img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="Interior of a charming Parisian style bakery cafe with weathered light oak counter displaying glass pastry cloches, fresh baguettes in woven baskets, marble tables with delicate floral vases, warm pendant lamps, morning sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCisdl7JRsn7qIGYX2yL3-Ea8mmvv7HK3xIZ_g9sfhriESeH_YNWUIfzECXqzAT5UIZ8ukpG_SZmnCsbs2FkPiZ7UQkQMm7cDKUb1Wz0mkK6NNlbjN2EYbT84iZEx5VxhBqmukkiu8jR98Q1JtJ4a458287f_fQAV7eA552grCEwNeKTJrkpjWyvJIS7k4LtG1Rer-Rq-jDRYWWKfqz65FKiAChkYdnIXpuM5iHlfUZlHnwscQmyjf5-A"><div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/80 via-transparent to-transparent flex items-end p-space-lg"><div class="text-inverse-on-surface space-y-1"><span class="font-label-sm text-label-sm uppercase tracking-widest text-primary-fixed">Không gian &amp; Cảm hứng</span><h3 class="font-headline-sm text-headline-sm text-on-primary">Góc nhỏ bình yên giữa lòng phố thị</h3><p class="font-body-sm text-body-sm text-inverse-on-surface/90 max-w-lg">Nơi ánh nắng sớm xuyên qua rèm lụa, hòa vào mùi gỗ sồi mộc và hương thơm ngạt ngào của bơ sữa Pháp chín tới.</p></div></div></div><div class="lg:col-span-5 flex flex-col justify-between gap-space-md p-space-lg rounded-xl bg-surface-container-low/70 border-l-4 border-l-primary shadow-sm"><div class="space-y-space-sm"><div class="flex items-center gap-space-xs text-primary"><span class="material-symbols-outlined text-[20px]">chair</span><span class="font-label-md text-label-md uppercase tracking-wider font-semibold">Trải Nghiệm Tại Quầy &amp; Cà Phê</span></div><h3 class="font-headline-sm text-headline-sm text-on-surface">Thảnh Thơi Đón Ngày Mới Cùng Lune</h3><p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">Lune Bakery được thiết kế như một atelier bánh mộc ấm cúng mang phong cách Parisian cổ điển. Bạn có thể chọn cho mình một góc bàn gỗ sồi cạnh cửa sổ, lắng nghe tiếng lách cách ấm áp của tách gốm sứ và mùi vỏ bánh giòn vừa ra khỏi lò.</p></div><div class="space-y-space-sm pt-space-xs border-t border-outline-variant/60"><div class="flex items-start gap-space-xs"><span class="material-symbols-outlined text-[20px] text-secondary flex-shrink-0 mt-0.5">local_cafe</span><div><h4 class="font-label-md text-label-md text-on-surface font-semibold">Hương Vị Cà Phê Mộc Tinh Tuyển</h4><p class="font-body-sm text-body-sm text-on-surface-variant">Arabica Cầu Đất rang mộc vừa vặn, kết hợp hài hòa cùng vị béo thanh của bánh sừng bò.</p></div></div><div class="flex items-start gap-space-xs"><span class="material-symbols-outlined text-[20px] text-secondary flex-shrink-0 mt-0.5">menu_book</span><div><h4 class="font-label-md text-label-md text-on-surface font-semibold">Góc Đọc &amp; Thưởng Thức Yên Bình</h4><p class="font-body-sm text-body-sm text-on-surface-variant">Âm nhạc êm dịu, kệ sách nghệ thuật ẩm thực và không gian thư thái không vội vã.</p></div></div><div class="flex items-start gap-space-xs"><span class="material-symbols-outlined text-[20px] text-secondary flex-shrink-0 mt-0.5">location_on</span><div><h4 class="font-label-md text-label-md text-on-surface font-semibold">Địa Điểm Trải Nghiệm</h4><p class="font-body-sm text-body-sm text-on-surface-variant">42 Nguyễn Huệ, Phường Bến Nghé, Quận 1 • Phục vụ tại chỗ &amp; mang đi</p></div></div></div><div class="pt-space-xs flex items-center justify-between"><span class="text-label-sm font-label-sm text-secondary uppercase tracking-wider flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-secondary animate-pulse"></span>Không gian mở đón khách mỗi ngày</span><a class="text-primary font-label-sm text-label-sm font-semibold hover:underline flex items-center gap-0.5" data-path="cua-hang" href="#"><span class="">Tìm hiểu thêm</span><span class="material-symbols-outlined text-[16px]">arrow_forward</span></a></div></div></div>
+</div>
+</section>
+<!-- Lời Mời Ghé Thăm (Call to Action Banner) -->
+<section class="w-full pb-space-xl">
+<div class="max-w-[1280px] mx-auto px-gutter">
+<div class="relative rounded-2xl overflow-hidden bg-primary-container text-on-primary p-space-xl md:py-16 md:px-16 shadow-xl min-h-[520px] flex items-center">
+<img class="absolute inset-0 w-full h-full object-cover" src="https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&amp;fit=crop&amp;w=1800&amp;q=85" alt="" aria-hidden="true">
+<div class="absolute inset-0 bg-gradient-to-r from-[#5a071f]/95 via-[#6c0c28]/88 to-[#6c0c28]/45 pointer-events-none"></div>
+<div class="relative z-10 max-w-2xl space-y-space-md">
+<div class="inline-flex items-center gap-2 px-space-md py-1 rounded-full bg-[#8b263e] text-primary-fixed text-label-sm font-label-sm tracking-widest uppercase">
+<span class="material-symbols-outlined text-[14px]">favorite</span>
+            Thưởng Thức Hương Vị Tinh Tuyển
+          </div>
+<h2 class="font-display text-headline-lg md:text-display text-on-primary leading-tight">
+            Hãy Để Hương Bánh Mới Đánh Thức Ngày Mới Của Bạn.
+          </h2>
+<p class="font-body-lg text-body-lg text-primary-fixed leading-relaxed">
+            Dù là một ổ bánh mộc cho bữa sáng gia đình hay chiếc bánh ngọt vỗ về tâm hồn buổi chiều, Lune Bakery luôn sẵn sàng chào đón bạn với nụ cười ấm áp nhất.
+          </p>
+<div class="pt-space-sm flex flex-wrap items-center gap-space-md">
+<!-- CTA Button 1: Products -->
+<a class="inline-flex items-center justify-center gap-space-xs px-space-lg py-3 rounded-full bg-surface text-primary font-label-lg text-label-lg shadow-md hover:bg-surface-bright transition-all transform hover:-translate-y-0.5" data-path="san-pham" th:href="@{/products}" href="/products">
+<span class="material-symbols-outlined text-[20px]">bakery_dining</span>
+<span class="">Khám Phá Menu Bánh Tươi</span>
+</a>
+<!-- CTA Button 2: Store Directions -->
+<a class="inline-flex items-center justify-center gap-space-xs px-space-lg py-3 rounded-full bg-transparent text-on-primary font-label-lg text-label-lg hover:bg-on-primary/10 transition-colors" data-path="cua-hang" href="#">
+<span class="material-symbols-outlined text-[20px]">near_me</span>
+<span class="">Chỉ Đường Đến Tiệm (42 Nguyễn Huệ)</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // Micro-interaction: Subtle scroll reveal for storytelling cards
+  document.addEventListener('DOMContentLoaded', () => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.15
+    };
+
+    const revealCallback = (entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('opacity-90');
+          entry.target.classList.add('opacity-100');
+          observer.unobserve(entry.target);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(revealCallback, observerOptions);
+    document.querySelectorAll('.group, .shadow-sm').forEach(el => observer.observe(el));
+  });
+</script></main><footer th:replace="~{fragments/layout :: storefrontFooter}"></footer><th:block th:replace="~{fragments/layout :: storefrontScrollReveal}"></th:block></body></html>

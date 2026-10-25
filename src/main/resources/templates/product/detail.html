@@ -248,31 +248,7 @@
     <header th:replace="~{fragments/layout :: storefrontHeader('products')}"></header>
     <main class="w-full pt-20 bg-surface">
       <div class="flex flex-col w-full">
-        <!-- BREADCRUMB & CONTEXT -->
-        <section
-          class="max-w-[1280px] w-full mx-auto px-gutter pt-space-md pb-space-xs"
-        >
-          <nav
-            aria-label="Đường dẫn trang"
-            class="flex items-center gap-space-xs text-label-md font-label-md text-on-surface-variant"
-          >
-            <a
-              class="cursor-pointer hover:text-primary transition-colors"
-              href="#"
-              >Trang chủ</a
-            >
-            <span class="text-tertiary-fixed-dim">/</span>
-            <a
-              class="cursor-pointer hover:text-primary transition-colors"
-              href="#"
-              >Bánh Mì &amp; Viennoiserie</a
-            >
-            <span class="text-tertiary-fixed-dim">/</span>
-            <span aria-current="page" class="text-on-surface font-semibold"
-              >Croissant Bơ Pháp Normandie</span
-            >
-          </nav>
-        </section>
+        <div th:replace="~{fragments/layout :: storefrontBreadcrumb('Croissant Bơ Pháp Normandie', 'Sản phẩm', '/products')}"></div>
         <!-- MAIN PRODUCT SHOWCASE (Editorial Split Layout) -->
         <section class="max-w-[1280px] w-full mx-auto px-gutter py-space-md">
           <div
@@ -526,7 +502,10 @@
           </div>
         </section>
         <!-- ACCORDION / TABS DETAILS SECTION -->
-        <section class="max-w-[1280px] w-full mx-auto px-gutter py-space-xl">
+        <section
+          class="max-w-[1280px] w-full mx-auto px-gutter py-space-xl"
+          th:if="${product.ingredients != null or product.storageInstructions != null or product.allergenInfo != null}"
+        >
           <div
             class="bg-surface-container-low rounded-xl p-space-md sm:p-space-lg shadow-sm"
           >
@@ -547,6 +526,7 @@
                 <!-- Item 1: Thành phần -->
                 <div
                   class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm"
+                  th:if="${product.ingredients != null}"
                 >
                   <button
                     aria-expanded="true"
@@ -575,71 +555,16 @@
                     class="px-space-md pb-space-md block"
                     id="tab-ingredients"
                   >
-                    <div
-                      class="pt-space-xs text-body-sm font-body-sm text-on-surface-variant leading-relaxed grid grid-cols-1 sm:grid-cols-2 gap-space-md"
-                    >
-                      <div class="space-y-space-xs">
-                        <p
-                          class="font-semibold text-on-surface flex items-center gap-space-xs"
-                        >
-                          <span
-                            class="w-1.5 h-1.5 rounded-full bg-primary-container"
-                          ></span>
-                          Bột mì nguyên chất T55 Pháp
-                        </p>
-                        <p class="text-on-surface-variant pl-space-sm">
-                          Tuyển chọn từ cối xay Moulin de Colagne, đạt chuẩn hữu
-                          cơ AB Châu Âu.
-                        </p>
-                      </div>
-                      <div class="space-y-space-xs">
-                        <p
-                          class="font-semibold text-on-surface flex items-center gap-space-xs"
-                        >
-                          <span
-                            class="w-1.5 h-1.5 rounded-full bg-primary-container"
-                          ></span>
-                          Bơ Normandie AOP 84% béo
-                        </p>
-                        <p class="text-on-surface-variant pl-space-sm">
-                          Bơ lên men truyền thống từ thảo nguyên ven biển
-                          Normandie, tạo độ béo mộc mạc thơm ngậy ngây ngất.
-                        </p>
-                      </div>
-                      <div class="space-y-space-xs">
-                        <p
-                          class="font-semibold text-on-surface flex items-center gap-space-xs"
-                        >
-                          <span
-                            class="w-1.5 h-1.5 rounded-full bg-primary-container"
-                          ></span>
-                          Men tự nhiên Levain nuôi 36h
-                        </p>
-                        <p class="text-on-surface-variant pl-space-sm">
-                          Quá trình lên men chậm làm mềm cấu trúc gluten, hỗ trợ
-                          tiêu hoá êm ái.
-                        </p>
-                      </div>
-                      <div class="space-y-space-xs">
-                        <p
-                          class="font-semibold text-on-surface flex items-center gap-space-xs"
-                        >
-                          <span
-                            class="w-1.5 h-1.5 rounded-full bg-primary-container"
-                          ></span>
-                          Muối biển xám Guérande
-                        </p>
-                        <p class="text-on-surface-variant pl-space-sm">
-                          Hạt muối cào tay tự nhiên từ đầm muối Brittany cân
-                          bằng trọn vẹn vị ngọt thanh của bơ sữa.
-                        </p>
-                      </div>
-                    </div>
+                    <p
+                      class="pt-space-xs whitespace-pre-line text-body-sm font-body-sm text-on-surface-variant leading-relaxed"
+                      th:text="${product.ingredients}"
+                    >Thành phần và hương vị sản phẩm.</p>
                   </div>
                 </div>
                 <!-- Item 2: Bảo quản & Hâm nóng -->
                 <div
                   class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm"
+                  th:if="${product.storageInstructions != null}"
                 >
                   <button
                     aria-expanded="false"
@@ -663,50 +588,16 @@
                     >
                   </button>
                   <div class="px-space-md pb-space-md hidden" id="tab-storage">
-                    <div
-                      class="pt-space-xs text-body-sm font-body-sm text-on-surface-variant leading-relaxed space-y-space-sm"
-                    >
-                      <div
-                        class="p-space-sm bg-surface-container-low rounded-lg flex items-start gap-space-sm"
-                      >
-                        <span
-                          class="material-symbols-outlined text-secondary text-[20px] flex-shrink-0 mt-0.5"
-                          >tips_and_updates</span
-                        >
-                        <p>
-                          <strong class="font-semibold text-on-surface"
-                            >Thưởng thức ngon nhất:</strong
-                          >
-                          Trong vòng 4 đến 6 giờ kể từ khi ra lò để cảm nhận
-                          trọn vẹn lớp vỏ vỡ giòn và ruột bánh ẩm mượt tự nhiên.
-                        </p>
-                      </div>
-                      <p>
-                        <strong class="font-semibold text-on-surface"
-                          >Hâm nóng tại gia:</strong
-                        >
-                        Làm nóng trước lò nướng hoặc nồi chiên không dầu ở
-                        <span class="font-semibold text-primary">160°C</span>.
-                        Đặt bánh nướng nhẹ từ
-                        <span class="font-semibold text-primary"
-                          >3 - 4 phút</span
-                        >. Để bánh nguội 2 phút ngoài nhiệt độ phòng để vỏ bánh
-                        lấy lại độ giòn tối đa.
-                      </p>
-                      <p>
-                        <strong class="font-semibold text-on-surface"
-                          >Bảo quản qua đêm:</strong
-                        >
-                        Đựng trong túi giấy kín ở nhiệt độ phòng thoáng mát.
-                        Tránh để bánh trong tủ lạnh ngăn mát vì sẽ làm thoái hoá
-                        tinh bột nhanh chóng.
-                      </p>
-                    </div>
+                    <p
+                      class="pt-space-xs whitespace-pre-line text-body-sm font-body-sm text-on-surface-variant leading-relaxed"
+                      th:text="${product.storageInstructions}"
+                    >Hướng dẫn bảo quản và hâm nóng sản phẩm.</p>
                   </div>
                 </div>
                 <!-- Item 3: Dị ứng & Lưu ý -->
                 <div
                   class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm"
+                  th:if="${product.allergenInfo != null}"
                 >
                   <button
                     aria-expanded="false"
@@ -733,11 +624,8 @@
                     <div
                       class="pt-space-xs text-body-sm font-body-sm text-on-surface-variant leading-relaxed space-y-space-xs"
                     >
-                      <p>
-                        <strong class="font-semibold text-on-surface"
-                          >Chứa thành phần:</strong
-                        >
-                        Bột mì chứa Gluten, Bơ sữa động vật (Lactose).
+                      <p class="whitespace-pre-line" th:text="${product.allergenInfo}">
+                        Thông tin thành phần có nguy cơ gây dị ứng.
                       </p>
                       <p>
                         <strong class="font-semibold text-on-surface"
@@ -1119,5 +1007,6 @@
       </script>
     </main>
     <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+    <th:block th:replace="~{fragments/layout :: storefrontScrollReveal}"></th:block>
   </body>
 </html>

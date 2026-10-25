@@ -1,5 +1,9 @@
 <!doctype html>
-<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<html
+  lang="vi"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
   <body>
     <!-- ========================================================
      FRAGMENT: header
@@ -157,6 +161,46 @@
         <span>Made with a little love &amp; a lot of butter ✳</span>
       </div>
     </footer>
+
+    <!-- Scroll reveal dùng chung cho các trang nội dung storefront. -->
+    <th:block th:fragment="storefrontScrollReveal">
+      <script src="https://unpkg.com/scrollreveal@4.0.9/dist/scrollreveal.min.js"></script>
+      <script>
+        (() => {
+          if (
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+            typeof ScrollReveal !== "function"
+          ) {
+            return;
+          }
+
+          const reveal = ScrollReveal({
+            distance: "30px",
+            duration: 760,
+            easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+            origin: "bottom",
+            opacity: 0,
+            scale: 0.985,
+            reset: false,
+            cleanup: true,
+            viewFactor: 0.12,
+          });
+
+          reveal.reveal("main section", {
+            interval: 0,
+          });
+          reveal.reveal(
+            "main article, main .card, main details, main [data-scroll-item]",
+            {
+              distance: "22px",
+              duration: 680,
+              interval: 65,
+              viewFactor: 0.08,
+            },
+          );
+        })();
+      </script>
+    </th:block>
 
     <!-- ========================================================
      FRAGMENT: scripts (mobile menu + header scroll)
@@ -464,19 +508,24 @@
             href="/products"
             th:classappend="${activePage == 'products'} ? ' is-active'"
             >Sản phẩm</a
-          ><a href="#">Giới thiệu</a>
+          ><a
+            th:href="@{/about}"
+            href="/about"
+            th:classappend="${activePage == 'about'} ? ' is-active'"
+            >Giới thiệu</a
+          >
         </nav>
         <div class="sf-header__actions">
           <form
             class="sf-header__search"
             id="header-search"
-            th:action="@{/products}"
-            action="/products"
+            th:action="@{/products/search}"
+            action="/products/search"
             method="get"
           >
             <input
               id="search-input"
-              name="q"
+              name="keyword"
               type="search"
               placeholder="Tìm bánh..."
               aria-label="Tìm kiếm bánh"
@@ -488,7 +537,22 @@
             class="sf-header__action sf-header__action--account"
             th:href="@{/login}"
             href="/login"
-            aria-label="Tài khoản"
+            aria-label="Đăng nhập"
+            sec:authorize="isAnonymous()"
+            ><span class="material-symbols-outlined">account_circle</span></a
+          ><a
+            class="sf-header__action sf-header__action--account"
+            th:href="@{/profile}"
+            href="/profile"
+            aria-label="Hồ sơ của tôi"
+            sec:authorize="hasRole('CUSTOMER')"
+            ><span class="material-symbols-outlined">account_circle</span></a
+          ><a
+            class="sf-header__action sf-header__action--account"
+            th:href="@{/cms}"
+            href="/cms"
+            aria-label="Trang quản trị"
+            sec:authorize="hasAnyRole('STAFF', 'ADMIN')"
             ><span class="material-symbols-outlined">account_circle</span></a
           ><a
             class="sf-header__action"
@@ -514,8 +578,16 @@
       >
         <a th:href="@{/}" href="/">Trang chủ</a
         ><a th:href="@{/products}" href="/products">Sản phẩm</a
-        ><a href="#">Giới thiệu</a
-        ><a th:href="@{/login}" href="/login">Tài khoản</a
+        ><a th:href="@{/about}" href="/about">Giới thiệu</a
+        ><a th:href="@{/login}" href="/login" sec:authorize="isAnonymous()"
+          >Đăng nhập</a
+        ><a th:href="@{/profile}" href="/profile" sec:authorize="hasRole('CUSTOMER')"
+          >Tài khoản</a
+        ><a
+          th:href="@{/cms}"
+          href="/cms"
+          sec:authorize="hasAnyRole('STAFF', 'ADMIN')"
+          >Trang quản trị</a
         ><a th:href="@{/cart}" href="/cart">Giỏ hàng</a>
       </nav>
       <script>
@@ -531,6 +603,67 @@
         })();
       </script>
     </header>
+
+    <!-- Breadcrumb dùng chung cho các trang storefront. -->
+    <div
+      th:fragment="storefrontBreadcrumb(currentLabel, parentLabel, parentHref)"
+      class="sf-breadcrumb"
+    >
+      <style>
+        .sf-breadcrumb {
+          width: 100%;
+          background: #fff1ec;
+          color: #564244;
+          font-family: "Plus Jakarta Sans", sans-serif;
+          font-size: 0.82rem;
+          font-weight: 600;
+        }
+        .sf-breadcrumb__inner {
+          display: flex;
+          align-items: center;
+          gap: 0.55rem;
+          width: min(100% - 3rem, 1280px);
+          min-height: 46px;
+          margin: 0 auto;
+        }
+        .sf-breadcrumb a {
+          color: #564244;
+          text-decoration: none;
+          transition: color 180ms ease;
+        }
+        .sf-breadcrumb a:hover {
+          color: #8b263e;
+        }
+        .sf-breadcrumb__separator {
+          color: #b99ea1;
+          font-weight: 400;
+        }
+        .sf-breadcrumb strong {
+          color: #261814;
+          font-weight: 700;
+        }
+        @media (max-width: 640px) {
+          .sf-breadcrumb__inner {
+            width: min(100% - 2rem, 1280px);
+            overflow: hidden;
+            white-space: nowrap;
+          }
+          .sf-breadcrumb strong {
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+        }
+      </style>
+      <nav class="sf-breadcrumb__inner" aria-label="Đường dẫn trang">
+        <a th:href="@{/}" href="/">Trang chủ</a>
+        <span class="sf-breadcrumb__separator" aria-hidden="true">/</span>
+        <th:block th:if="${parentLabel != null and !parentLabel.isEmpty()}">
+          <a th:href="${parentHref}" th:text="${parentLabel}">Sản phẩm</a>
+          <span class="sf-breadcrumb__separator" aria-hidden="true">/</span>
+        </th:block>
+        <strong aria-current="page" th:text="${currentLabel}">Trang hiện tại</strong>
+      </nav>
+    </div>
 
     <!-- Storefront footer dùng chung cho home, product list và product detail. -->
     <footer th:fragment="storefrontFooter" class="sf-footer">
