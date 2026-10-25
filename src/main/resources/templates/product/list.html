@@ -1,59 +1,839 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <th:block th:replace="~{fragments/layout :: head-meta('Sản phẩm')}"></th:block>
-</head>
-<body>
-  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
-  <header th:replace="~{fragments/layout :: header(currentPage='shop')}"></header>
-
-  <main class="standard-page">
-    <section class="wrap catalog-heading">
-      <span class="eyebrow">FRESHLY BAKED FOR YOU</span>
-      <h1 class="page-title">Bộ sưu tập bánh</h1>
-      <p>Mỗi chiếc bánh là một niềm vui nhỏ, được làm mới tại tiệm mỗi ngày.</p>
-    </section>
-
-    <section class="wrap catalog-layout">
-      <aside class="panel catalog-filter">
-        <form id="catalog-filter-form">
-          <label for="keyword">Tìm món bạn thích</label>
-          <div class="catalog-search">
-            <input id="keyword" name="keyword" type="search" placeholder="Tên bánh, hương vị...">
-            <button type="submit">Tìm</button>
-          </div>
-          <hr>
-          <label for="category">Danh mục</label>
-          <select id="category" name="categoryId">
-            <option value="">Tất cả sản phẩm</option>
-          </select>
-          <label for="sort">Sắp xếp</label>
-          <select id="sort" name="sort">
-            <option value="name">Tên A–Z</option>
-            <option value="price_asc">Giá thấp đến cao</option>
-            <option value="price_desc">Giá cao đến thấp</option>
-          </select>
-          <button class="btn btn-primary" type="submit">Áp dụng bộ lọc</button>
-        </form>
-      </aside>
-
-      <div>
-        <div class="catalog-toolbar"><strong id="catalog-count">Đang tải sản phẩm...</strong><span>12 sản phẩm mỗi trang</span></div>
-        <div id="catalog-grid" class="catalog-grid" aria-live="polite">
-          <div class="catalog-loading">Đang chuẩn bị những chiếc bánh ngon...</div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tất cả sản phẩm — LUNE Bakery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --paper: #fff8f6;
+        --paper-2: #fff1ec;
+        --paper-3: #ffe9e3;
+        --ink: #261814;
+        --muted: #6f5a5b;
+        --wine: #8b263e;
+        --wine-dark: #6f1930;
+        --olive: #536443;
+        --line: #ead5cf;
+        --white: #fff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Plus Jakarta Sans", sans-serif;
+      }
+      .container {
+        width: min(1280px, calc(100% - 40px));
+        margin-inline: auto;
+      }
+      .header {
+        position: fixed;
+        inset: 0 0 auto;
+        z-index: 50;
+        height: 80px;
+        background: var(--paper);
+        border-bottom: 1px solid rgba(139, 38, 62, 0.1);
+      }
+      .header-inner {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: baseline;
+        color: var(--wine);
+        font-family: "Playfair Display", serif;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        text-decoration: none;
+      }
+      .brand-dot {
+        color: var(--olive);
+      }
+      .brand small {
+        margin-left: 8px;
+        color: #564244;
+        font: 700 9px/1.2 "Plus Jakarta Sans";
+        letter-spacing: 0.14em;
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .nav a,
+      .action {
+        border-radius: 12px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-decoration: none;
+        padding: 9px 15px;
+        transition: 0.2s;
+      }
+      .nav a:hover,
+      .nav a.active {
+        background: var(--paper-3);
+        color: var(--wine);
+      }
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .search {
+        position: relative;
+      }
+      .search input {
+        width: 230px;
+        border: 0;
+        border-radius: 999px;
+        background: var(--paper-2);
+        padding: 10px 42px 10px 16px;
+        font: 500 13px "Plus Jakarta Sans";
+        outline: none;
+      }
+      .search button {
+        position: absolute;
+        right: 7px;
+        top: 5px;
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .action {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+      }
+      .action:hover {
+        background: var(--paper-3);
+        color: var(--wine);
+      }
+      main {
+        padding-top: 80px;
+      }
+      .crumb {
+        background: var(--paper-2);
+        padding: 14px 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .crumb a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .intro {
+        padding: 58px 0 32px;
+      }
+      .intro-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        align-items: end;
+        gap: 40px;
+      }
+      .eyebrow {
+        color: var(--wine);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.17em;
+        text-transform: uppercase;
+      }
+      .intro h1 {
+        margin: 8px 0 14px;
+        font:
+          600 clamp(38px, 5vw, 64px)/1.08 "Playfair Display",
+          serif;
+        letter-spacing: -0.03em;
+      }
+      .intro p {
+        max-width: 720px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+      .promise {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        background: #ffe5de;
+        padding: 18px;
+        border-radius: 18px;
+      }
+      .promise-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 52px;
+        width: 52px;
+        height: 52px;
+        margin: 0;
+        border-radius: 50%;
+        background: #a32446;
+        color: #fff;
+        overflow: hidden;
+      }
+      .promise-icon .material-symbols-outlined {
+        display: block;
+        margin: 0;
+        color: #fff !important;
+        font-size: 28px !important;
+        line-height: 1;
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 500,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .promise strong {
+        display: block;
+        font:
+          600 19px "Playfair Display",
+          serif;
+      }
+      .promise > div > span {
+        display: block;
+        margin-top: 3px;
+        color: #684e50;
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .categories {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        padding: 8px 0 24px;
+        scrollbar-width: none;
+      }
+      .categories::-webkit-scrollbar {
+        display: none;
+      }
+      .chip {
+        flex: none;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        background: var(--paper-3);
+        color: var(--ink);
+        padding: 10px 16px;
+        font: 700 11px "Plus Jakarta Sans";
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .chip:hover,
+      .chip.active {
+        background: var(--wine);
+        color: #fff;
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        background: #fff;
+        padding: 16px 18px;
+        border: 1px solid #f2dfda;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(80, 38, 46, 0.05);
+      }
+      .result-count {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .result-count strong {
+        color: var(--ink);
+      }
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .filters select {
+        border: 0;
+        border-radius: 10px;
+        background: var(--paper-2);
+        color: var(--ink);
+        padding: 11px 38px 11px 13px;
+        font: 600 12px "Plus Jakarta Sans";
+        cursor: pointer;
+        outline: none;
+      }
+      .catalog {
+        padding: 28px 0 70px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 24px;
+      }
+      .card {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        background: #fff;
+        border: 1px solid #f1dfda;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(70, 33, 42, 0.05);
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 42px rgba(70, 33, 42, 0.11);
+      }
+      .image-wrap {
+        position: relative;
+        aspect-ratio: 1;
+        overflow: hidden;
+        background: var(--paper-2);
+      }
+      .image-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .card:hover img {
+        transform: scale(1.05);
+      }
+      .badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        border-radius: 999px;
+        padding: 7px 10px;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+      .badge.NEW {
+        background: var(--olive);
+      }
+      .badge.BEST_SELLER {
+        background: var(--wine);
+      }
+      .badge.LIMITED {
+        background: #7b5537;
+      }
+      .badge.SEASONAL {
+        background: #be6d46;
+      }
+      .card-body {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding: 17px;
+      }
+      .category {
+        color: var(--olive);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .card h2 {
+        margin: 7px 0 6px;
+        font:
+          600 20px/1.3 "Playfair Display",
+          serif;
+      }
+      .card h2 a {
+        color: inherit;
+        text-decoration: none;
+      }
+      .card h2 a:hover {
+        color: var(--wine);
+      }
+      .description {
+        display: -webkit-box;
+        min-height: 44px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.65;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+      .card-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 17px;
+      }
+      .price {
+        font:
+          600 20px "Playfair Display",
+          serif;
+      }
+      .add {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border: 0;
+        border-radius: 50%;
+        background: var(--wine);
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .add:hover {
+        background: var(--wine-dark);
+        transform: rotate(8deg);
+      }
+      .empty {
+        display: none;
+        grid-column: 1/-1;
+        padding: 80px 20px;
+        text-align: center;
+        color: var(--muted);
+      }
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 38px;
+      }
+      .page {
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        background: transparent;
+        color: var(--ink);
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .page.active,
+      .page:hover {
+        background: var(--wine);
+        color: #fff;
+        border-color: var(--wine);
+      }
+      footer {
+        background: var(--paper-2);
+        padding: 50px 0 30px;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1.5fr repeat(3, 1fr);
+        gap: 36px;
+      }
+      .footer-grid h3 {
+        font:
+          600 18px "Playfair Display",
+          serif;
+      }
+      .footer-grid p,
+      .footer-grid a {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.8;
+        text-decoration: none;
+      }
+      .footer-grid a:hover {
+        color: var(--wine);
+      }
+      .copyright {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 36px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .mobile-menu {
+        display: none;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+      @media (max-width: 1000px) {
+        .grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .intro-grid {
+          grid-template-columns: 1fr;
+        }
+        .promise {
+          max-width: 480px;
+        }
+        .nav,
+        .search {
+          display: none;
+        }
+        .mobile-menu {
+          display: block;
+        }
+        .footer-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 720px) {
+        .container {
+          width: min(100% - 28px, 1280px);
+        }
+        .brand small {
+          display: none;
+        }
+        .grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 14px;
+        }
+        .toolbar {
+          align-items: stretch;
+          flex-direction: column;
+        }
+        .filters select {
+          flex: 1;
+          min-width: 140px;
+        }
+        .intro {
+          padding-top: 38px;
+        }
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+        .copyright {
+          gap: 8px;
+          flex-direction: column;
+        }
+        .actions .action {
+          display: none;
+        }
+      }
+      @media (max-width: 440px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .card {
+          max-width: 360px;
+          margin: auto;
+        }
+        .intro h1 {
+          font-size: 38px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header
+      th:replace="~{fragments/layout :: storefrontHeader('products')}"
+    ></header>
+    <main>
+      <div class="crumb">
+        <div class="container">
+          <a th:href="@{/}" href="/">Trang chủ</a> &nbsp;/&nbsp;
+          <strong>Tất cả sản phẩm</strong>
         </div>
-        <div id="catalog-empty" class="empty-state" hidden>
-          <span>♡</span>
-          <h3>Chưa tìm thấy món bánh phù hợp</h3>
-          <p>Thử đổi từ khóa hoặc chọn một danh mục khác nhé.</p>
-        </div>
-        <nav id="catalog-pagination" class="catalog-pagination" aria-label="Phân trang"></nav>
       </div>
-    </section>
-  </main>
-
-  <footer th:replace="~{fragments/layout :: footer}"></footer>
-
-  <script th:src="@{/js/product-list.js}" defer></script>
-</body>
+      <section class="intro">
+        <div class="container">
+          <div class="intro-grid">
+            <div>
+              <span class="eyebrow"
+                >Boulangerie &amp; Pâtisserie Artisanale</span
+              >
+              <h1>Bộ sưu tập bánh của LUNE</h1>
+              <p>
+                Từ những ổ bánh nướng thơm mỗi ngày đến bánh kem cho khoảnh khắc
+                đặc biệt — mỗi món tại LUNE đều được hoàn thiện bằng nguyên liệu
+                chọn lọc và sự chăm chút vừa đủ.
+              </p>
+            </div>
+            <aside class="promise">
+              <span class="promise-icon"
+                ><span class="material-symbols-outlined" aria-hidden="true"
+                  >workspace_premium</span
+                ></span
+              >
+              <div>
+                <strong>100% Tự Nhiên</strong
+                ><span
+                  >Không chất bảo quản, thưởng thức trọn vẹn trong ngày.</span
+                >
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="container">
+          <div
+            class="categories"
+            id="category-filters"
+            role="tablist"
+            aria-label="Danh mục sản phẩm"
+          >
+            <button class="chip active" data-category="all">Tất cả</button
+            ><button class="chip" data-category="Bánh mới">Bánh mới</button
+            ><button class="chip" data-category="Bánh sinh nhật">
+              Bánh sinh nhật</button
+            ><button class="chip" data-category="Bánh hộp thiếc">
+              Bánh hộp thiếc</button
+            ><button class="chip" data-category="Bánh nướng">Bánh nướng</button
+            ><button class="chip" data-category="Dessert">Dessert</button>
+          </div>
+          <div class="toolbar">
+            <div class="result-count">
+              Đang hiển thị <strong id="result-count">0</strong> sản phẩm
+            </div>
+            <div class="filters">
+              <select id="price-filter" aria-label="Lọc theo giá">
+                <option value="all">Tất cả mức giá</option>
+                <option value="under100">Dưới 100.000đ</option>
+                <option value="100to300">100.000đ – 300.000đ</option>
+                <option value="above300">Trên 300.000đ</option></select
+              ><select id="sort-filter" aria-label="Sắp xếp">
+                <option value="latest">Mới nhất</option>
+                <option value="priceAsc">Giá thấp đến cao</option>
+                <option value="priceDesc">Giá cao đến thấp</option>
+                <option value="nameAsc">Tên A – Z</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="catalog">
+        <div class="container">
+          <div class="grid" id="product-grid"></div>
+          <div class="pagination" aria-label="Phân trang">
+            <button class="page active">1</button><button class="page">2</button
+            ><button class="page" aria-label="Trang tiếp theo">
+              <span class="material-symbols-outlined">east</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+    <script>
+      const products = [
+        {
+          id: 1,
+          name: "Croissant Bơ Pháp",
+          category: "Bánh mới",
+          price: 45000,
+          badge: "NEW",
+          description: "Lớp vỏ giòn nhẹ, ruột bánh mềm và hương bơ cân bằng.",
+          image:
+            "https://lh3.googleusercontent.com/aida-public/AB6AXuBTj6bLhutT5RYQNDok-k6f3OFj32QygP8IS0NbAgxTX2s-uXywh77SFUympApbmphF4E3OId8xbk8Hdz9sRaneRnEGa0_Wf7mHXmskzN44h-qJVMrLs_EqhRIsbPVS_iymRYjtEV0XTDllMrV1z1P1kYie_r-SOsAv5iPD7G25_DKcvTqXjUDNXs7SrRcvF2GlPJBxPe8uCMD3O0QgM9ldPPkL20gJOn4J9QIE0UtjnorW-5bCNAwHTg",
+        },
+        {
+          id: 2,
+          name: "Pain au Chocolat Đen",
+          category: "Bánh mới",
+          price: 52000,
+          badge: "BEST_SELLER",
+          description: "Bánh ngàn lớp kết hợp chocolate đen đậm vị.",
+          image:
+            "https://lh3.googleusercontent.com/aida-public/AB6AXuAUR_uFeyfcj5uZ-FXSYBqLG7QQFwZs4vGJo1D8jOPVilZ2ZWBN_VhP0dYNCb7ejVdr4o3ighUuXkO4Xk5t4VIxa2FsEJ_Tk5HM6SPH4kdGk3QFJtmdjGrsbJRLdsH1NfDmVjE_UM_520mKKpAnoTZ2AZYFQwQI10cmEIOZCPZIu6wI4MEKie_vEwgWQpHXVY4NmKcPcGs9mRRQ-gPn5Zp-CC1rrZf_HwX3Dp26XY_3MN-dpplg2g91cg",
+        },
+        {
+          id: 3,
+          name: "Tart Dâu Kem Hạnh Nhân",
+          category: "Dessert",
+          price: 75000,
+          badge: "SEASONAL",
+          description: "Dâu tươi, kem hạnh nhân và đế tart bơ nướng giòn.",
+          image:
+            "https://lh3.googleusercontent.com/aida-public/AB6AXuA3vzqwmoVj8APFHlfdngp1Y95M_0-ArUm42s8Eoy3DTUsEGptqAsUR7o__GGojhK8WWh8iP2HSuHxzrZpaJgBHMmQGVdTyntlRLA2e5CWR5aHhHCaYCPD_LuEWagfy5-E8ZbnzsTa4KkS_hlLRggJ1BNE59nWsHFxyKru5cNAnpK9kjMRzq8Av92ZHdGQJ8IQQGkLwmmkoYyYCI3VFgXqsXDomFcdS-BhL6j7vWmZMcADM0PR9TmV1Ig",
+        },
+        {
+          id: 4,
+          name: "Sourdough Men Tự Nhiên",
+          category: "Bánh nướng",
+          price: 68000,
+          badge: null,
+          description: "Ủ chậm cho vị chua dịu, ruột thoáng và lớp vỏ thơm.",
+          image:
+            "https://lh3.googleusercontent.com/aida-public/AB6AXuBaaLaRNStjb-78lwSYpeCcNb-HWUta_GIJw-uWoDiNL8pEiJDc5TcXHRSxBso-gIAXc8fs9Y1CtdezKMMROWbbJOJ0bwYFL9EKX_0kpVu2oti9653EkWsgwzsPA5d_457azGMKnKV1ERbQr3zkKM_IQBylkyJFKWDAXV3FeSTD8ut7gQjZeMcv559xUm2ekOO1qLIODlB62Q8mtfU4erU6oejWEfL1ecWiovVUcGPg_Qlev8Sc4hneKw",
+        },
+        {
+          id: 5,
+          name: "Bánh Kem Bắp Non",
+          category: "Bánh sinh nhật",
+          price: 420000,
+          badge: "BEST_SELLER",
+          description: "Cốt bánh mềm, kem sữa nhẹ và bắp non ngọt thanh.",
+          image:
+            "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=900&q=85",
+        },
+        {
+          id: 6,
+          name: "Mousse Phúc Bồn Tử",
+          category: "Dessert",
+          price: 165000,
+          badge: "NEW",
+          description: "Mousse mịn nhẹ với lớp quả mọng chua thanh.",
+          image:
+            "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=85",
+        },
+        {
+          id: 7,
+          name: "Hộp Sablé Bơ Mặn",
+          category: "Bánh hộp thiếc",
+          price: 285000,
+          badge: "LIMITED",
+          description:
+            "Bánh quy bơ giòn tan trong hộp thiếc dùng làm quà tặng.",
+          image:
+            "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=900&q=85",
+        },
+        {
+          id: 8,
+          name: "Gâteau Chocolate Vani",
+          category: "Bánh sinh nhật",
+          price: 490000,
+          badge: null,
+          description: "Chocolate đen cân bằng với kem vani thơm dịu.",
+          image:
+            "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=900&q=85",
+        },
+        {
+          id: 9,
+          name: "Éclair Trà Xanh Uji",
+          category: "Dessert",
+          price: 69000,
+          badge: "SEASONAL",
+          description: "Vỏ choux mềm nhẹ, nhân trà xanh thanh và thơm.",
+          image:
+            "https://images.unsplash.com/photo-1612203985729-70726954388c?auto=format&fit=crop&w=900&q=85",
+        },
+        {
+          id: 10,
+          name: "Brioche Nho Khô",
+          category: "Bánh nướng",
+          price: 65000,
+          badge: null,
+          description: "Brioche mềm ẩm với nho khô và hương bơ dịu.",
+          image:
+            "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=900&q=85",
+        },
+        {
+          id: 11,
+          name: "Hộp Tuile Hạnh Nhân",
+          category: "Bánh hộp thiếc",
+          price: 320000,
+          badge: "LIMITED",
+          description: "Tuile mỏng giòn, nhiều hạnh nhân rang thơm.",
+          image:
+            "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=900&q=85",
+        },
+        {
+          id: 12,
+          name: "Tart Chanh Meringue",
+          category: "Bánh mới",
+          price: 82000,
+          badge: null,
+          description: "Kem chanh vàng chua dịu cùng meringue mềm mượt.",
+          image:
+            "https://images.unsplash.com/photo-1519915028121-7d3463d20b13?auto=format&fit=crop&w=900&q=85",
+        },
+      ];
+      const labels = {
+        NEW: "Mới",
+        BEST_SELLER: "Bán chạy",
+        LIMITED: "Giới hạn",
+        SEASONAL: "Theo mùa",
+      };
+      const grid = document.getElementById("product-grid"),
+        count = document.getElementById("result-count"),
+        price = document.getElementById("price-filter"),
+        sort = document.getElementById("sort-filter"),
+        search = document.getElementById("search-input");
+      let category = "all";
+      const money = (value) =>
+        new Intl.NumberFormat("vi-VN").format(value) + "đ";
+      function render() {
+        const term = search.value.trim().toLocaleLowerCase("vi");
+        let result = products.filter(
+          (p) =>
+            (category === "all" || p.category === category) &&
+            (!term || p.name.toLocaleLowerCase("vi").includes(term)) &&
+            (price.value === "all" ||
+              (price.value === "under100" && p.price < 100000) ||
+              (price.value === "100to300" &&
+                p.price >= 100000 &&
+                p.price <= 300000) ||
+              (price.value === "above300" && p.price > 300000)),
+        );
+        result = [...result].sort((a, b) =>
+          sort.value === "priceAsc"
+            ? a.price - b.price
+            : sort.value === "priceDesc"
+              ? b.price - a.price
+              : sort.value === "nameAsc"
+                ? a.name.localeCompare(b.name, "vi")
+                : b.id - a.id,
+        );
+        count.textContent = result.length;
+        grid.innerHTML =
+          result
+            .map(
+              (p) =>
+                `<article class="card"><div class="image-wrap"><a href="/products/${p.id}" aria-label="Xem ${p.name}"><img src="${p.image}" alt="${p.name}" loading="lazy"></a>${p.badge ? `<span class="badge ${p.badge}">${labels[p.badge]}</span>` : ""}</div><div class="card-body"><span class="category">${p.category}</span><h2><a href="/products/${p.id}">${p.name}</a></h2><p class="description">${p.description}</p><div class="card-bottom"><span class="price">${money(p.price)}</span><button class="add" type="button" aria-label="Thêm ${p.name} vào giỏ"><span class="material-symbols-outlined">add_shopping_cart</span></button></div></div></article>`,
+            )
+            .join("") ||
+          `<div class="empty" style="display:block"><span class="material-symbols-outlined">search_off</span><p>Không tìm thấy sản phẩm phù hợp.</p></div>`;
+      }
+      document.querySelectorAll(".chip").forEach((button) =>
+        button.addEventListener("click", () => {
+          document
+            .querySelectorAll(".chip")
+            .forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+          category = button.dataset.category;
+          render();
+        }),
+      );
+      price.addEventListener("change", render);
+      sort.addEventListener("change", render);
+      document
+        .getElementById("header-search")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          render();
+          document
+            .querySelector(".catalog")
+            .scrollIntoView({ behavior: "smooth" });
+        });
+      render();
+    </script>
+  </body>
 </html>

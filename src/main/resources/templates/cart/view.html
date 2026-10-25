@@ -1,96 +1,954 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <th:block th:replace="~{fragments/layout :: head-meta('Giỏ hàng')}"></th:block>
-</head>
-<body>
-  <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
-  <header th:replace="~{fragments/layout :: header(currentPage='cart')}"></header>
-
-  <main class="standard-page">
-    <div class="wrap">
-      <span class="eyebrow">YOUR SWEET PICKS</span>
-      <h1 class="page-title">Giỏ bánh của bạn</h1>
-
-      <!-- If cart empty -->
-      <div th:if="${cartItems == null or #lists.isEmpty(cartItems)}" class="empty-state" style="margin-top:20px">
-        <span>🥐</span>
-        <h3>Giỏ bánh còn trống</h3>
-        <p>Hãy chọn một chiếc bánh thật ngon nhé!</p>
-        <a th:href="@{/products}" class="btn btn-primary" style="margin-top:16px">
-          Khám phá các loại bánh
-          <svg aria-hidden="true" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round"><use href="#i-arrow"/></svg>
-        </a>
-      </div>
-
-      <!-- Cart content -->
-      <div class="two-col" th:unless="${cartItems == null or #lists.isEmpty(cartItems)}">
-        <!-- Cart items -->
-        <div class="panel">
-          <h3 th:text="${#lists.size(cartItems)} + ' sản phẩm trong giỏ'">0 sản phẩm trong giỏ</h3>
-
-          <div class="cart-item" th:each="item : ${cartItems}">
-            <div class="product-media"
-                 th:style="'width:86px;height:86px;aspect-ratio:auto;--tone:' + ${item.product.tone ?: '#f3e6df'}">
-              <span class="media-fallback" style="font-size:39px"
-                    th:text="${item.product.emoji ?: '🍰'}"></span>
-              <img th:if="${item.product.imageUrl != null}"
-                   th:src="${item.product.imageUrl}"
-                   th:alt="${item.product.name}"
-                   loading="lazy" />
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="web_standard" name="shell-type" />
+    <title>Atelier Du Four — Boulangerie &amp; Pâtisserie Artisanale</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @layer base {
+        html,
+        body {
+          margin: 0;
+          padding: 0;
+        }
+        body {
+          overscroll-behavior: none;
+        }
+        main > :first-child {
+          margin-top: 0 !important;
+        }
+        main > :last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-dim": "#eed5cc",
+              "inverse-on-surface": "#ffede7",
+              "outline-variant": "#dcc0c2",
+              "on-primary-container": "#ffa3b0",
+              "on-surface": "#261814",
+              surface: "#fff8f6",
+              "on-error": "#ffffff",
+              "primary-fixed": "#ffd9dd",
+              tertiary: "#3c342b",
+              "surface-container-lowest": "#ffffff",
+              "surface-container": "#ffe9e3",
+              "surface-container-high": "#fde3da",
+              "surface-tint": "#a3394f",
+              "tertiary-fixed-dim": "#d2c4b7",
+              error: "#ba1a1a",
+              "inverse-primary": "#ffb2bc",
+              "on-tertiary-fixed": "#221a12",
+              "inverse-surface": "#3c2d28",
+              "on-tertiary": "#ffffff",
+              "on-primary-fixed-variant": "#842039",
+              "on-secondary-fixed-variant": "#3b4c2d",
+              "on-secondary-fixed": "#111f06",
+              "on-secondary-container": "#586a48",
+              "tertiary-container": "#544a40",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#f7ddd5",
+              "on-error-container": "#93000a",
+              "on-primary-fixed": "#400013",
+              background: "#fff8f6",
+              "tertiary-fixed": "#efe0d3",
+              "surface-bright": "#fff8f6",
+              "on-secondary": "#ffffff",
+              "secondary-fixed": "#d5e9bf",
+              "on-surface-variant": "#564244",
+              "secondary-fixed-dim": "#bacda5",
+              "surface-container-low": "#fff1ec",
+              "primary-container": "#8b263e",
+              "on-tertiary-container": "#c8baae",
+              "secondary-container": "#d5e9bf",
+              "on-background": "#261814",
+              "surface-variant": "#f7ddd5",
+              "primary-fixed-dim": "#ffb2bc",
+              secondary: "#536443",
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+            spacing: {
+              "space-sm": "0.5rem",
+              "space-lg": "1.5rem",
+              "space-md": "1rem",
+              "space-xs": "0.25rem",
+              "margin-mobile": "1.25rem",
+              "gutter-mobile": "1rem",
+              margin: "3rem",
+              gutter: "1.5rem",
+              "space-xl": "2.5rem",
+            },
+            fontFamily: {
+              "label-md": ["Plus Jakarta Sans"],
+              "label-lg": ["Plus Jakarta Sans"],
+              "body-lg": ["Plus Jakarta Sans"],
+              "headline-lg-mobile": ["Playfair Display"],
+              "label-sm": ["Plus Jakarta Sans"],
+              "headline-md-mobile": ["Playfair Display"],
+              "headline-sm": ["Playfair Display"],
+              "body-sm": ["Plus Jakarta Sans"],
+              "headline-md": ["Playfair Display"],
+              "display-mobile": ["Playfair Display"],
+              display: ["Playfair Display"],
+              "body-md": ["Plus Jakarta Sans"],
+              "headline-lg": ["Playfair Display"],
+            },
+            fontSize: {
+              "label-md": [
+                "0.75rem",
+                {
+                  lineHeight: "1rem",
+                  letterSpacing: "0.06em",
+                  fontWeight: "600",
+                },
+              ],
+              "label-lg": [
+                "0.875rem",
+                {
+                  lineHeight: "1.25rem",
+                  letterSpacing: "0.04em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-lg": [
+                "1.125rem",
+                { lineHeight: "1.875rem", fontWeight: "400" },
+              ],
+              "headline-lg-mobile": [
+                "1.875rem",
+                { lineHeight: "2.375rem", fontWeight: "600" },
+              ],
+              "label-sm": [
+                "0.6875rem",
+                {
+                  lineHeight: "0.875rem",
+                  letterSpacing: "0.08em",
+                  fontWeight: "700",
+                },
+              ],
+              "headline-md-mobile": [
+                "1.5rem",
+                { lineHeight: "2rem", fontWeight: "500" },
+              ],
+              "headline-sm": [
+                "1.25rem",
+                { lineHeight: "1.75rem", fontWeight: "600" },
+              ],
+              "body-sm": [
+                "0.875rem",
+                { lineHeight: "1.375rem", fontWeight: "400" },
+              ],
+              "headline-md": [
+                "2rem",
+                { lineHeight: "2.5rem", fontWeight: "500" },
+              ],
+              "display-mobile": [
+                "2.5rem",
+                {
+                  lineHeight: "3rem",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+              display: [
+                "3.5rem",
+                {
+                  lineHeight: "4rem",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "600",
+                },
+              ],
+              "body-md": [
+                "1rem",
+                { lineHeight: "1.625rem", fontWeight: "400" },
+              ],
+              "headline-lg": [
+                "2.5rem",
+                {
+                  lineHeight: "3rem",
+                  letterSpacing: "-0.01em",
+                  fontWeight: "600",
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"
+  >
+    <header
+      th:replace="~{fragments/layout :: storefrontHeader('cart')}"
+    ></header>
+    <main class="w-full pt-20 bg-surface">
+      <div class="flex flex-col w-full">
+        <div class="max-w-[1280px] w-full mx-auto px-gutter py-space-lg">
+          <!-- Breadcrumb & Header Section -->
+          <nav
+            aria-label="Đường dẫn trang"
+            class="flex items-center gap-space-xs text-label-md font-label-md text-on-surface-variant mb-space-md"
+          >
+            <a
+              class="hover:text-primary transition-colors flex items-center gap-1"
+              data-path="trang-chu"
+              href="#"
+            >
+              <span class="material-symbols-outlined text-[16px]">home</span>
+              <span>Trang chủ</span>
+            </a>
+            <span class="text-outline-variant">/</span>
+            <span class="text-on-surface font-semibold">Giỏ hàng của bạn</span>
+          </nav>
+          <!-- Page Title & Micro Context -->
+          <div
+            class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-lg"
+          >
+            <div class="space-y-space-xs">
+              <div class="flex items-center gap-space-sm">
+                <h1
+                  class="font-headline-lg text-headline-lg text-primary tracking-tight"
+                >
+                  Giỏ Hàng Của Bạn
+                </h1>
+                <span
+                  class="inline-flex items-center px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm"
+                >
+                  3 món bánh
+                </span>
+              </div>
+              <p
+                class="font-body-md text-body-md text-on-surface-variant max-w-2xl"
+              >
+                Các món bánh tươi được giữ chỗ trong giỏ và sẽ được nướng mới,
+                đóng gói cẩn thận ngay khi bạn hoàn tất đặt đơn.
+              </p>
             </div>
-            <div>
-              <strong th:text="${item.product.name}">Tên bánh</strong>
-              <span class="unit-price"
-                    th:text="${#numbers.formatInteger(item.product.price, 0, 'COMMA') + ' ₫'}">0 ₫</span>
-              <!-- Qty stepper via POST form -->
-              <form th:action="@{/cart/update}" method="post" class="qty-stepper" style="margin-top:12px">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
-                <input type="hidden" name="productId" th:value="${item.product.id}" />
-                <button type="submit" name="action" value="decrease" aria-label="Giảm số lượng">−</button>
-                <span th:text="${item.quantity}">1</span>
-                <button type="submit" name="action" value="increase" aria-label="Tăng số lượng">+</button>
-              </form>
+          </div>
+          <!-- Main Two-Column Layout (7:5 desktop proportion) -->
+          <div
+            class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start mb-space-xl"
+          >
+            <!-- Left Column: Cart Items (7 Cols) -->
+            <section
+              aria-label="Danh sách món bánh trong giỏ"
+              class="lg:col-span-7 flex flex-col gap-space-md"
+            >
+              <!-- Table Header (Visual layout without harsh borders) -->
+              <div
+                class="hidden sm:grid grid-cols-12 gap-space-sm px-space-md py-space-xs bg-surface-container-low rounded-xl text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider"
+              >
+                <div class="col-span-6">Sản phẩm</div>
+                <div class="col-span-2 text-right">Đơn giá</div>
+                <div class="col-span-2 text-center">Số lượng</div>
+                <div class="col-span-2 text-right">Tạm tính</div>
+              </div>
+              <!-- Cart Item 1: Croissant Bơ Normandie -->
+              <article
+                class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm transition-all hover:shadow-md flex flex-col sm:grid sm:grid-cols-12 gap-space-md items-center"
+              >
+                <div class="col-span-6 flex items-center gap-space-md w-full">
+                  <div
+                    class="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container"
+                  >
+                    <img
+                      class="w-full h-full object-cover"
+                      data-alt="Cận cảnh bánh sừng bò Pháp vàng óng ả với các lớp vỏ ngàn lớp giòn rụm bơ sữa AOP Normandie tỏa hơi ấm, đặt trên nền vải linen mộc"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwa1qWd1Lqjo9X4UyitESSDOiibgD70U_6ms5nO-qH8AB3y2Me0O-BO0UjvoH_oHxpcmvzVKdBI9zumI0WP8K95NsbaLuVtPRMFn2ZZf6FkHc4tJTRfpcJOrOx_eBmDwO0CC-5vke-fvQGvFAL2Iw-_4zq5DZMiYUHjp5TcTnjdGId1w-qBjnzfM7-2y3ipOyij0Wm7q-ovFi9mVe-ONdvN7e-F6GG_aKpY_sZx2FTcKv_znryEhm4_g"
+                    />
+                    <span
+                      class="absolute top-1 left-1 px-1.5 py-0.5 bg-primary-container text-on-primary rounded text-[10px] font-label-sm font-semibold"
+                    >
+                      Bán chạy
+                    </span>
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <h3
+                      class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate"
+                    >
+                      Croissant Bơ Pháp Normandie
+                    </h3>
+                    <p
+                      class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5"
+                    >
+                      <span
+                        class="material-symbols-outlined text-[14px] text-secondary"
+                        >eco</span
+                      >
+                      Ủ men chậm 36 giờ, 100% bơ AOP
+                    </p>
+                    <button
+                      class="sm:hidden mt-2 text-error text-label-sm font-label-sm inline-flex items-center gap-1 w-fit"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >delete</span
+                      >
+                      Xóa món
+                    </button>
+                  </div>
+                </div>
+                <div class="col-span-2 text-right hidden sm:block">
+                  <span
+                    class="font-body-md text-body-md text-on-surface-variant font-medium"
+                    >45.000 đ</span
+                  >
+                </div>
+                <!-- Quantity Stepper -->
+                <div
+                  class="col-span-2 flex items-center justify-between sm:justify-center w-full sm:w-auto"
+                >
+                  <span
+                    class="sm:hidden font-body-sm text-body-sm text-on-surface-variant"
+                    >Số lượng:</span
+                  >
+                  <div
+                    class="inline-flex items-center rounded-full bg-surface-container-low p-0.5"
+                  >
+                    <button
+                      aria-label="Giảm số lượng Croissant"
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >remove</span
+                      >
+                    </button>
+                    <span
+                      class="w-8 text-center font-label-md text-label-md font-bold text-on-surface"
+                      >2</span
+                    >
+                    <button
+                      aria-label="Tăng số lượng Croissant"
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >add</span
+                      >
+                    </button>
+                  </div>
+                </div>
+                <!-- Subtotal & Remove -->
+                <div
+                  class="col-span-2 flex items-center justify-between sm:justify-end gap-space-sm w-full sm:w-auto"
+                >
+                  <span
+                    class="sm:hidden font-body-sm text-body-sm text-on-surface-variant"
+                    >Thành tiền:</span
+                  >
+                  <span
+                    class="font-headline-sm text-headline-sm text-primary font-bold"
+                    >90.000 đ</span
+                  >
+                  <button
+                    aria-label="Xóa Croissant Bơ Pháp"
+                    class="hidden sm:inline-flex p-1.5 rounded-lg text-outline hover:text-error hover:bg-error-container/40 transition-colors"
+                    title="Xóa sản phẩm"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]"
+                      >delete_outline</span
+                    >
+                  </button>
+                </div>
+              </article>
+              <!-- Cart Item 2: Tart Dâu Tây Rừng -->
+              <article
+                class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm transition-all hover:shadow-md flex flex-col sm:grid sm:grid-cols-12 gap-space-md items-center"
+              >
+                <div class="col-span-6 flex items-center gap-space-md w-full">
+                  <div
+                    class="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container"
+                  >
+                    <img
+                      class="w-full h-full object-cover"
+                      data-alt="Bánh Tart dâu tây rừng Pháp phủ mứt đỏ bóng lấp lánh trên lớp kem custard vani mịn màng và đế bánh sablée bơ nướng nâu giòn"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJf9CC7AMxaob_9Sbu-Te6AgxM5rL2J8fq0sRMpe5wV4u8y5TcEdpIoaGFkKECv_tOev_VKTNnQgnGSgz5mI9rdUS6Q7SzEXk21d_ORVGXRyE-IasqDYKOL1OPfjxoml7nzXWEtqldHrM0IZR3_f7BCHPlc8BoG9NUknlINrIeNtXLcy_oWgWUybr4_81sKaClPH-N_JnWyhm74FcO4Noc8Pz1xYSS4u4XVblKTWncCrBgjFENySkzUw"
+                    />
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <h3
+                      class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate"
+                    >
+                      Tart Dâu Tây Rừng
+                    </h3>
+                    <p
+                      class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5"
+                    >
+                      <span
+                        class="material-symbols-outlined text-[14px] text-primary"
+                        >local_florist</span
+                      >
+                      Đế sablée giòn tan, kem vani Madagascar
+                    </p>
+                    <button
+                      class="sm:hidden mt-2 text-error text-label-sm font-label-sm inline-flex items-center gap-1 w-fit"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >delete</span
+                      >
+                      Xóa món
+                    </button>
+                  </div>
+                </div>
+                <div class="col-span-2 text-right hidden sm:block">
+                  <span
+                    class="font-body-md text-body-md text-on-surface-variant font-medium"
+                    >75.000 đ</span
+                  >
+                </div>
+                <!-- Quantity Stepper -->
+                <div
+                  class="col-span-2 flex items-center justify-between sm:justify-center w-full sm:w-auto"
+                >
+                  <span
+                    class="sm:hidden font-body-sm text-body-sm text-on-surface-variant"
+                    >Số lượng:</span
+                  >
+                  <div
+                    class="inline-flex items-center rounded-full bg-surface-container-low p-0.5"
+                  >
+                    <button
+                      aria-label="Giảm số lượng Tart Dâu Tây Rừng"
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >remove</span
+                      >
+                    </button>
+                    <span
+                      class="w-8 text-center font-label-md text-label-md font-bold text-on-surface"
+                      >1</span
+                    >
+                    <button
+                      aria-label="Tăng số lượng Tart Dâu Tây Rừng"
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >add</span
+                      >
+                    </button>
+                  </div>
+                </div>
+                <!-- Subtotal & Remove -->
+                <div
+                  class="col-span-2 flex items-center justify-between sm:justify-end gap-space-sm w-full sm:w-auto"
+                >
+                  <span
+                    class="sm:hidden font-body-sm text-body-sm text-on-surface-variant"
+                    >Thành tiền:</span
+                  >
+                  <span
+                    class="font-headline-sm text-headline-sm text-primary font-bold"
+                    >75.000 đ</span
+                  >
+                  <button
+                    aria-label="Xóa Tart Dâu Tây Rừng"
+                    class="hidden sm:inline-flex p-1.5 rounded-lg text-outline hover:text-error hover:bg-error-container/40 transition-colors"
+                    title="Xóa sản phẩm"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]"
+                      >delete_outline</span
+                    >
+                  </button>
+                </div>
+              </article>
+              <!-- Cart Item 3: Sourdough Men Tự Nhiên -->
+              <article
+                class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm transition-all hover:shadow-md flex flex-col sm:grid sm:grid-cols-12 gap-space-md items-center"
+              >
+                <div class="col-span-6 flex items-center gap-space-md w-full">
+                  <div
+                    class="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container"
+                  >
+                    <img
+                      class="w-full h-full object-cover"
+                      data-alt="Ổ bánh mì men tự nhiên Sourdough nướng mộc mạc phong cách đồng quê Pháp với vết rạch nghệ thuật và rắc bột trắng thơm ngon, ruột bánh tổ ong mềm dẻo"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlZKn8ZLFPyrzX_k4JChYF8cxqNRdBs4C4yY4BzprXmDOWSlJRROcEJQVvAPSlazsojLTEM6rKQY4bg6ZqxlRXIQblo4FDYByBVy8KGdxyiPJ1waaQBnkcyd2bot59MEOKRTYpFtiVo7I5xA_r6bO_bdj7I_zPT1J-RYNrJZ7AKJGW7s7Lh1bqG3TG8WspVmDiMw2H18Fyv3O2v0mKZvI_liHLNebIwhKS0drIOGU5Tux_rV4Elun0-g"
+                    />
+                  </div>
+                  <div class="flex flex-col min-w-0">
+                    <h3
+                      class="font-headline-sm text-headline-sm text-on-surface leading-tight truncate"
+                    >
+                      Sourdough Men Tự Nhiên
+                    </h3>
+                    <p
+                      class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1 mt-0.5"
+                    >
+                      <span
+                        class="material-symbols-outlined text-[14px] text-secondary"
+                        >bakery_dining</span
+                      >
+                      Lên men tự nhiên Levain 36h
+                    </p>
+                    <button
+                      class="sm:hidden mt-2 text-error text-label-sm font-label-sm inline-flex items-center gap-1 w-fit"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >delete</span
+                      >
+                      Xóa món
+                    </button>
+                  </div>
+                </div>
+                <div class="col-span-2 text-right hidden sm:block">
+                  <span
+                    class="font-body-md text-body-md text-on-surface-variant font-medium"
+                    >85.000 đ</span
+                  >
+                </div>
+                <!-- Quantity Stepper -->
+                <div
+                  class="col-span-2 flex items-center justify-between sm:justify-center w-full sm:w-auto"
+                >
+                  <span
+                    class="sm:hidden font-body-sm text-body-sm text-on-surface-variant"
+                    >Số lượng:</span
+                  >
+                  <div
+                    class="inline-flex items-center rounded-full bg-surface-container-low p-0.5"
+                  >
+                    <button
+                      aria-label="Giảm số lượng Sourdough"
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >remove</span
+                      >
+                    </button>
+                    <span
+                      class="w-8 text-center font-label-md text-label-md font-bold text-on-surface"
+                      >1</span
+                    >
+                    <button
+                      aria-label="Tăng số lượng Sourdough"
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors"
+                      type="button"
+                    >
+                      <span class="material-symbols-outlined text-[16px]"
+                        >add</span
+                      >
+                    </button>
+                  </div>
+                </div>
+                <!-- Subtotal & Remove -->
+                <div
+                  class="col-span-2 flex items-center justify-between sm:justify-end gap-space-sm w-full sm:w-auto"
+                >
+                  <span
+                    class="sm:hidden font-body-sm text-body-sm text-on-surface-variant"
+                    >Thành tiền:</span
+                  >
+                  <span
+                    class="font-headline-sm text-headline-sm text-primary font-bold"
+                    >85.000 đ</span
+                  >
+                  <button
+                    aria-label="Xóa Sourdough Men Tự Nhiên"
+                    class="hidden sm:inline-flex p-1.5 rounded-lg text-outline hover:text-error hover:bg-error-container/40 transition-colors"
+                    title="Xóa sản phẩm"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[18px]"
+                      >delete_outline</span
+                    >
+                  </button>
+                </div>
+              </article>
+              <!-- Cart Action Controls & Bread Baking Note -->
+              <div
+                class="flex flex-col sm:flex-row items-center justify-between gap-space-md pt-space-xs"
+              >
+                <a
+                  class="inline-flex items-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md"
+                  data-path="san-pham"
+                  href="#"
+                >
+                  <span class="material-symbols-outlined text-[18px]"
+                    >arrow_back</span
+                  >
+                  <span>Tiếp tục chọn bánh</span>
+                </a>
+                <button
+                  class="text-on-surface-variant hover:text-error transition-colors font-label-md text-label-md inline-flex items-center gap-1"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-[16px]"
+                    >delete_sweep</span
+                  >
+                  <span>Xóa tất cả món</span>
+                </button>
+              </div>
+              <!-- Packaging & Artisan Care Card -->
+              <div
+                class="mt-space-sm p-space-md rounded-xl bg-surface-container-low text-on-surface flex items-start gap-space-md"
+              >
+                <div
+                  class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center flex-shrink-0"
+                >
+                  <span class="material-symbols-outlined text-[20px]"
+                    >inventory_2</span
+                  >
+                </div>
+                <div class="space-y-0.5">
+                  <h4 class="font-headline-sm text-headline-sm text-on-surface">
+                    Đóng gói chuẩn tiệm thủ công
+                  </h4>
+                  <p
+                    class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed"
+                  >
+                    Tất cả bánh đều được gói trong túi giấy kraft chuyên dụng
+                    thoáng khí và hộp carton giữ form, giúp lớp vỏ pastry luôn
+                    duy trì độ giòn xốp tối đa cho đến khi chạm tay bạn.
+                  </p>
+                </div>
+              </div>
+            </section>
+            <!-- Right Column: Order Summary Card (5 Cols) -->
+            <aside
+              aria-label="Tóm tắt đơn hàng"
+              class="lg:col-span-5 sticky top-32"
+            >
+              <div
+                class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md"
+              >
+                <div class="flex items-center justify-between pb-space-xs">
+                  <h2
+                    class="font-headline-md text-headline-md text-on-surface tracking-tight"
+                  >
+                    Tóm tắt đơn hàng
+                  </h2>
+                  <span
+                    class="material-symbols-outlined text-primary text-[24px]"
+                    >receipt_long</span
+                  >
+                </div>
+                <!-- Cost Calculations Breakdown -->
+                <div class="space-y-space-sm pt-space-xs">
+                  <div
+                    class="flex items-center justify-between text-body-md font-body-md"
+                  >
+                    <span class="text-on-surface-variant"
+                      >Tạm tính (3 món)</span
+                    >
+                    <span class="text-on-surface font-medium">250.000 đ</span>
+                  </div>
+                  <div
+                    class="flex items-start justify-between text-body-md font-body-md"
+                  >
+                    <div class="flex flex-col">
+                      <span class="text-on-surface-variant"
+                        >Phí vận chuyển ước tính</span
+                      >
+                      <span
+                        class="font-label-sm text-label-sm text-on-surface-variant opacity-80"
+                        >Giao hỏa tốc giữ ấm giòn</span
+                      >
+                    </div>
+                    <span class="text-on-surface font-medium">25.000 đ</span>
+                  </div>
+                  <!-- Soft visual separator without borders -->
+                  <div
+                    class="h-px w-full bg-surface-container-high my-space-xs"
+                  ></div>
+                  <div class="flex items-baseline justify-between pt-space-xs">
+                    <div class="flex flex-col">
+                      <span
+                        class="font-headline-sm text-headline-sm text-on-surface"
+                        >Tổng cộng</span
+                      >
+                    </div>
+                    <div class="text-right">
+                      <span
+                        class="font-display-mobile text-display-mobile text-primary font-bold"
+                        >275.000 đ</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <!-- Primary CTA Button -->
+                <button
+                  class="w-full py-3.5 px-space-md rounded-xl bg-primary-container text-on-primary hover:bg-primary transition-all duration-200 font-label-lg text-label-lg flex items-center justify-center gap-space-xs shadow-md hover:shadow-lg active:scale-[0.99]"
+                  type="button"
+                >
+                  <span>Tiến hành thanh toán</span>
+                  <span class="material-symbols-outlined text-[20px]"
+                    >arrow_forward</span
+                  >
+                </button>
+                <!-- Safe Baker Guarantees -->
+                <div class="pt-space-sm space-y-space-sm">
+                  <div
+                    class="flex items-start gap-space-sm text-body-sm font-body-sm text-on-surface-variant"
+                  >
+                    <span
+                      class="material-symbols-outlined text-secondary text-[20px] flex-shrink-0 mt-0.5"
+                      >verified_user</span
+                    >
+                    <span
+                      >100% Bơ Pháp Normandie AOP &amp; Bột mì hữu cơ chứng
+                      nhận</span
+                    >
+                  </div>
+                  <div
+                    class="flex items-start gap-space-sm text-body-sm font-body-sm text-on-surface-variant"
+                  >
+                    <span
+                      class="material-symbols-outlined text-secondary text-[20px] flex-shrink-0 mt-0.5"
+                      >outdoor_garden</span
+                    >
+                    <span
+                      >Bánh ra lò 2 khung giờ chuẩn: Sáng 06:30 &amp; Chiều
+                      14:00</span
+                    >
+                  </div>
+                  <div
+                    class="flex items-start gap-space-sm text-body-sm font-body-sm text-on-surface-variant"
+                  >
+                    <span
+                      class="material-symbols-outlined text-secondary text-[20px] flex-shrink-0 mt-0.5"
+                      >sync_saved_locally</span
+                    >
+                    <span
+                      >Hỗ trợ đổi bánh tức thì nếu sản phẩm bị xô lệch khi vận
+                      chuyển</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+          <!-- Related Pastries Section -->
+          <section
+            aria-labelledby="tea-suggestions-title"
+            class="pt-space-xl border-t-0"
+          >
+            <div
+              class="flex flex-col md:flex-row md:items-end justify-between gap-space-sm mb-space-lg"
+            >
+              <div>
+                <span
+                  class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold"
+                >
+                  Thưởng thức trọn vẹn
+                </span>
+                <h2
+                  class="font-headline-md text-headline-md text-on-surface tracking-tight mt-0.5"
+                  id="tea-suggestions-title"
+                >
+                  Gợi ý thêm
+                </h2>
+              </div>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">
+                Những món bánh thơm dịu nhẹ, kết hợp hài hòa với tách trà chiều
+                tĩnh lặng.
+              </p>
             </div>
-            <form th:action="@{/cart/remove}" method="post">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf != null}"/>
-              <input type="hidden" name="productId" th:value="${item.product.id}" />
-              <button type="submit" class="remove" title="Xóa khỏi giỏ" aria-label="Xóa sản phẩm">
-                <svg aria-hidden="true" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round"><use href="#i-trash"/></svg>
-              </button>
-            </form>
-          </div>
-
-          <div style="margin-top:18px">
-            <a th:href="@{/products}" class="btn btn-plain">Tiếp tục mua sắm</a>
-          </div>
-        </div>
-
-        <!-- Order summary -->
-        <div class="panel order-summary">
-          <h3>Tổng đơn hàng</h3>
-          <div class="summary-line">
-            <span>Tạm tính</span>
-            <strong th:text="${#numbers.formatInteger(cartTotal, 0, 'COMMA') + ' ₫'}">0 ₫</strong>
-          </div>
-          <div class="summary-line">
-            <span>Phí giao hàng</span>
-            <span>Xác nhận sau</span>
-          </div>
-          <div class="summary-line total">
-            <span>Tổng tiền bánh</span>
-            <strong th:text="${#numbers.formatInteger(cartTotal, 0, 'COMMA') + ' ₫'}">0 ₫</strong>
-          </div>
-          <a th:href="@{/checkout}" class="btn btn-primary" style="width:100%;margin-top:8px">
-            Tiến hành thanh toán
-            <svg aria-hidden="true" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round"><use href="#i-arrow"/></svg>
-          </a>
-          <a th:href="@{/products}" class="btn btn-outline" style="width:100%;margin-top:10px">Tiếp tục mua sắm</a>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+              <!-- Suggestion Card 1: Pain au Chocolat Đen -->
+              <div
+                class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
+              >
+                <div>
+                  <div
+                    class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-surface-container mb-space-sm"
+                  >
+                    <img
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      data-alt="Bánh Pain au Chocolat vỏ phồng giòn rụm màu cánh gián với hai thanh chocolate đen 70% nguyên chất đang tan chảy nhẹ từ thớ bánh bơ"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDszVOCMPIheyX-fxbuQ6a0Pr1mVBZUgoc2xuQVpcuQy6WELvbFIm5a4oODL_sIHx1kG9mcmOvrIW3G7svRN3qlH3NcHhR4iZ-kZ9uNFQ13sf_aUfgYgZ6GGX63omamWWLKDs4vUhbIaVHdVJKLNbuSOB_o4JDHSNH_yt0L_NnFXaCdm7qqjII5CjguhBYjrEAY1YEvXgIoF_2Zhd3MnbdrfLudGANzQaDcoLzKj-gCvVRnbQTYTbTpMA"
+                    />
+                    <span
+                      class="absolute top-2 right-2 px-2 py-0.5 bg-primary-container rounded-full text-on-primary font-label-sm text-label-sm"
+                    >
+                      Bán chạy
+                    </span>
+                  </div>
+                  <h3
+                    class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors"
+                  >
+                    Pain au Chocolat Đen
+                  </h3>
+                  <p
+                    class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2"
+                  >
+                    Bột ủ men ngàn lớp bọc 2 thanh chocolate Valrhona đậm đà,
+                    thơm lừng hương bơ mộc.
+                  </p>
+                </div>
+                <div
+                  class="flex items-center justify-between pt-space-md mt-space-sm"
+                >
+                  <span
+                    class="font-headline-sm text-headline-sm text-on-surface font-semibold"
+                    >52.000 đ</span
+                  >
+                  <button
+                    class="px-space-md py-space-xs rounded-xl bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary transition-colors font-label-md text-label-md flex items-center gap-1"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[16px]"
+                      >add_shopping_cart</span
+                    >
+                    <span>Thêm vào giỏ</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Suggestion Card 2: Éclair Trà Xanh Kyoto -->
+              <div
+                class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
+              >
+                <div>
+                  <div
+                    class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-surface-container mb-space-sm"
+                  >
+                    <img
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      data-alt="Bánh Éclair su dài Pháp phủ lớp tráng gương màu xanh matcha mướt mắt rắc bột matcha Kyoto thơm ngát trên mặt men gốm trắng tinh tế"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNQxtvlkPt9aYV5BU0PsfwBIh8QXeVBmMkq0iMzsNEEsqXdsJL50SNHqM-iYIvXHPHJqpY2rKZ3gHJ_DzX0VtGWB7Ubv5AgaaEqRlMdaCaNQ4Dfq8pHxBY_mVYhJ2gXHgFvX5mgeSjbmIL7KvN-qIjYaaam0FebrVkzHRTUE3yIjlFcRBoODfhaUI2IQNICEFt616zQ9F80gIYlz3VfH-O6wqOU5l6mijqLhU3FYUVyM5Mv0UzYEKrEA"
+                    />
+                    <span
+                      class="absolute top-2 right-2 px-2 py-0.5 bg-[#be6d46] rounded-full text-white font-label-sm text-label-sm"
+                    >
+                      Theo mùa
+                    </span>
+                  </div>
+                  <h3
+                    class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors"
+                  >
+                    Éclair Trà Xanh Kyoto
+                  </h3>
+                  <p
+                    class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2"
+                  >
+                    Vỏ bánh choux nướng kỹ giòn thơm, nhân kem béo thanh đượm
+                    hương trà xanh nguyên chất Uji.
+                  </p>
+                </div>
+                <div
+                  class="flex items-center justify-between pt-space-md mt-space-sm"
+                >
+                  <span
+                    class="font-headline-sm text-headline-sm text-on-surface font-semibold"
+                    >62.000 đ</span
+                  >
+                  <button
+                    class="px-space-md py-space-xs rounded-xl bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary transition-colors font-label-md text-label-md flex items-center gap-1"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[16px]"
+                      >add_shopping_cart</span
+                    >
+                    <span>Thêm vào giỏ</span>
+                  </button>
+                </div>
+              </div>
+              <!-- Suggestion Card 3: Bánh Hộp Thiếc Sablé Breton -->
+              <div
+                class="bg-surface-container-lowest rounded-xl p-space-md shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
+              >
+                <div>
+                  <div
+                    class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-surface-container mb-space-sm"
+                  >
+                    <img
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      data-alt="Hộp thiếc vintage sang trọng đựng những chiếc bánh quy bơ Sablé Breton mộc tròn dày rắc muối biển Guérande màu nâu vàng óng ả"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCanEUYqCaKUBYBdGxl5VbQPrD8GaR-jM5r6wWdHlhjevZVUzehkreuj2te295PHD-p3p_an_JroUJqWjohBN41gw171g9YGEiMZlu5uCk88Tyu6akmvaUSp7Fm4y5rSghsDBFYcHT7dvbd1xP4Uv_V57VqBirAuMxlUCXUJtbnUxhaVWWf019aeuZjgnHNaNTwxeG2buTUmrps-nvgrC97HWy8gYKoNkH5qR3x6WxOX3b5I-WUdaXpEw"
+                    />
+                    <span
+                      class="absolute top-2 right-2 px-2 py-0.5 bg-[#7b5537] rounded-full text-white font-label-sm text-label-sm"
+                    >
+                      Giới hạn
+                    </span>
+                  </div>
+                  <h3
+                    class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary transition-colors"
+                  >
+                    Bánh Hộp Thiếc Sablé Breton
+                  </h3>
+                  <p
+                    class="font-body-sm text-body-sm text-on-surface-variant mt-1 line-clamp-2"
+                  >
+                    Bánh quy bơ mặn vùng Bretagne với muối biển Guérande, tan
+                    ngay đầu lưỡi. Đóng hộp trang nhã.
+                  </p>
+                </div>
+                <div
+                  class="flex items-center justify-between pt-space-md mt-space-sm"
+                >
+                  <span
+                    class="font-headline-sm text-headline-sm text-on-surface font-semibold"
+                    >240.000 đ</span
+                  >
+                  <button
+                    class="px-space-md py-space-xs rounded-xl bg-surface-container text-on-surface hover:bg-primary-container hover:text-on-primary transition-colors font-label-md text-label-md flex items-center gap-1"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-[16px]"
+                      >add_shopping_cart</span
+                    >
+                    <span>Thêm vào giỏ</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </div>
-    </div>
-  </main>
-
-  <footer th:replace="~{fragments/layout :: footer}"></footer>
-</body>
+    </main>
+    <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+  </body>
 </html>

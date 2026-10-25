@@ -76,6 +76,12 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 25/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Lương Việt Thái | Thiết kế giao diện storefront | Hoàn thiện prototype trang chủ, danh sách, chi tiết, cart, đăng nhập và đăng ký khách hàng; các trang auth dùng header/footer storefront chung, form đăng ký bind đúng `RegisterRequest`, giữ style input nguyên bản và tăng độ rõ của border, có validation UI, hiện/ẩn và đối chiếu mật khẩu; khởi tạo sớm deferred CSRF token cho template dài; dữ liệu cart hiện vẫn là mẫu giao diện | Đang làm | `Thai`; Chưa có | Đã kiểm tra cấu trúc template, field binding, JavaScript và `git diff`; Maven Wrapper không khởi chạy được trong môi trường hiện tại nên chưa test runtime | Bổ sung POST `/register` khi triển khai use case tài khoản, chạy demo trực tiếp các trang auth và tích hợp dữ liệu thật cho cart |
+
 ### 22/10/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |

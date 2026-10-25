@@ -1,199 +1,744 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<body>
-
-<!-- ========================================================
+  <body>
+    <!-- ========================================================
      FRAGMENT: header
      Usage: th:replace="~{fragments/layout :: header}"
      Model attrs (optional): currentPage ('home'|'shop'|...)
      ======================================================== -->
-<header th:fragment="header" class="site-header" id="site-header">
-  <!-- Announcement Bar -->
-  <div class="announcement">
-    <span class="announcement-star">✳</span>
-    Nướng mới mỗi ngày, ngọt lành trong từng khoảnh khắc
-    <span class="announcement-star">✳</span>
-  </div>
+    <header th:fragment="header" class="site-header" id="site-header">
+      <!-- Announcement Bar -->
+      <div class="announcement">
+        <span class="announcement-star">✳</span>
+        Nướng mới mỗi ngày, ngọt lành trong từng khoảnh khắc
+        <span class="announcement-star">✳</span>
+      </div>
 
-  <div class="header-inner wrap">
-    <!-- Brand -->
-    <a th:href="@{/}" class="brand" aria-label="LUNE Bakery - Trang chủ">
-      LUNE<span class="brand-dot">.</span><small>BAKERY &amp; PATISSERIE</small>
-    </a>
+      <div class="header-inner wrap">
+        <!-- Brand -->
+        <a th:href="@{/}" class="brand" aria-label="LUNE Bakery - Trang chủ">
+          LUNE<span class="brand-dot">.</span
+          ><small>BAKERY &amp; PATISSERIE</small>
+        </a>
 
-    <!-- Desktop Navigation -->
-    <nav class="nav-links" aria-label="Điều hướng chính">
-      <a th:href="@{/}"
-         th:classappend="${currentPage == 'home'} ? ' active'"
-         data-nav="home">Trang chủ</a>
-      <a th:href="@{/products}"
-         th:classappend="${currentPage == 'shop'} ? ' active'"
-         data-nav="shop">Sản phẩm</a>
-      <a th:href="@{/about}" th:classappend="${currentPage == 'about'} ? ' active'">Về LUNE</a>
-      <a th:href="@{/contact}" th:classappend="${currentPage == 'contact'} ? ' active'">Liên hệ</a>
-    </nav>
+        <!-- Desktop Navigation -->
+        <nav class="nav-links" aria-label="Điều hướng chính">
+          <a
+            th:href="@{/}"
+            th:classappend="${currentPage == 'home'} ? ' active'"
+            data-nav="home"
+            >Trang chủ</a
+          >
+          <a
+            th:href="@{/products}"
+            th:classappend="${currentPage == 'shop'} ? ' active'"
+            data-nav="shop"
+            >Thực đơn</a
+          >
+          <a href="#about">Về LUNE</a>
+          <a href="#footer">Liên hệ</a>
+        </nav>
 
-    <!-- Header Actions -->
-    <div class="header-actions">
-      <!-- Search -->
-      <a th:href="@{/products}" class="icon-button desktop-search" aria-label="Tìm bánh">
-        <svg aria-hidden="true"><use href="#i-search"/></svg>
-      </a>
-      <!-- User / Login -->
-      <a th:href="@{/login}" class="icon-button user-action" aria-label="Đăng nhập"
-         th:if="${session.user == null}">
-        <svg aria-hidden="true"><use href="#i-user"/></svg>
-      </a>
-      <a th:href="@{/profile}" class="icon-button user-action" aria-label="Tài khoản"
-         th:unless="${session.user == null}">
-        <svg aria-hidden="true"><use href="#i-user"/></svg>
-      </a>
-      <!-- Cart -->
-      <a th:href="@{/cart}" class="icon-button cart-button" aria-label="Giỏ hàng">
-        <svg aria-hidden="true"><use href="#i-bag"/></svg>
-        <span class="cart-count" id="cart-count"
-              th:text="${session.cartCount != null ? session.cartCount : 0}">0</span>
-      </a>
-      <!-- Mobile Menu -->
-      <button class="icon-button mobile-menu" type="button" id="mobile-menu-btn"
-              aria-label="Mở menu" aria-expanded="false" aria-controls="mobile-nav">
-        <svg aria-hidden="true"><use href="#i-menu"/></svg>
-      </button>
-    </div>
-  </div>
+        <!-- Header Actions -->
+        <div class="header-actions">
+          <!-- Search -->
+          <a
+            th:href="@{/products}"
+            class="icon-button desktop-search"
+            aria-label="Tìm bánh"
+          >
+            <svg aria-hidden="true"><use href="#i-search" /></svg>
+          </a>
+          <!-- User / Login -->
+          <a
+            th:href="@{/cms/login}"
+            class="icon-button user-action"
+            aria-label="Đăng nhập"
+            th:if="${session.user == null}"
+          >
+            <svg aria-hidden="true"><use href="#i-user" /></svg>
+          </a>
+          <a
+            th:href="@{/profile}"
+            class="icon-button user-action"
+            aria-label="Tài khoản"
+            th:unless="${session.user == null}"
+          >
+            <svg aria-hidden="true"><use href="#i-user" /></svg>
+          </a>
+          <!-- Cart -->
+          <a
+            th:href="@{/cart}"
+            class="icon-button cart-button"
+            aria-label="Giỏ hàng"
+          >
+            <svg aria-hidden="true"><use href="#i-bag" /></svg>
+            <span
+              class="cart-count"
+              id="cart-count"
+              th:text="${session.cartCount != null ? session.cartCount : 0}"
+              >0</span
+            >
+          </a>
+          <!-- Mobile Menu -->
+          <button
+            class="icon-button mobile-menu"
+            type="button"
+            id="mobile-menu-btn"
+            aria-label="Mở menu"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+          >
+            <svg aria-hidden="true"><use href="#i-menu" /></svg>
+          </button>
+        </div>
+      </div>
 
-  <!-- Mobile Navigation -->
-  <nav class="mobile-nav" id="mobile-nav" aria-label="Menu di động">
-    <a th:href="@{/}">Trang chủ</a>
-    <a th:href="@{/products}">Sản phẩm</a>
-    <a th:href="@{/about}">Về LUNE</a>
-    <a th:href="@{/contact}">Liên hệ</a>
-    <a th:href="@{/orders}">Đơn hàng</a>
-    <a th:href="@{/cart}">Giỏ hàng</a>
-    <a th:href="@{/login}" th:if="${session.user == null}">Đăng nhập</a>
-    <a th:href="@{/profile}" th:unless="${session.user == null}">Tài khoản</a>
-  </nav>
-</header>
+      <!-- Mobile Navigation -->
+      <nav class="mobile-nav" id="mobile-nav" aria-label="Menu di động">
+        <a th:href="@{/}">Trang chủ</a>
+        <a th:href="@{/products}">Thực đơn</a>
+        <a href="#about">Về LUNE</a>
+        <a th:href="@{/orders}">Đơn hàng</a>
+        <a th:href="@{/cart}">Giỏ hàng</a>
+        <a th:href="@{/login}" th:if="${session.user == null}">Đăng nhập</a>
+        <a th:href="@{/profile}" th:unless="${session.user == null}"
+          >Tài khoản</a
+        >
+      </nav>
+    </header>
 
-<!-- ========================================================
+    <!-- ========================================================
      FRAGMENT: footer
      Usage: th:replace="~{fragments/layout :: footer}"
      ======================================================== -->
-<footer th:fragment="footer" id="footer" class="footer">
-  <div class="wrap footer-grid">
-    <div>
-      <a class="brand footer-brand" th:href="@{/}">
-        LUNE<span class="brand-dot">.</span><small>BAKERY &amp; PATISSERIE</small>
-      </a>
-      <p>Một tiệm bánh nhỏ, dành cho những niềm vui thật to. Bánh được làm tươi mới với tất cả sự yêu thương.</p>
-    </div>
-    <div>
-      <h4>Khám phá</h4>
-      <a th:href="@{/products}">Tất cả sản phẩm</a>
-      <a th:href="@{/products(category='Bánh kem')}">Bánh kem</a>
-      <a th:href="@{/products(category='Bánh ngọt')}">Bánh ngọt</a>
-      <a th:href="@{/products(category='Bánh mì')}">Bánh mì</a>
-    </div>
-    <div>
-      <h4>Hỗ trợ</h4>
-      <a th:href="@{/orders}">Đơn hàng của tôi</a>
-      <a th:href="@{/profile}">Tài khoản</a>
-      <a th:href="@{/about}">Câu chuyện của LUNE</a>
-      <a th:href="@{/contact}">Liên hệ với tiệm</a>
-      <a th:href="@{/admin}"
-         th:if="${session.user != null and (session.user.role.name() == 'ADMIN' or session.user.role.name() == 'STAFF')}">
-        Khu vực quản trị
-      </a>
-    </div>
-    <div>
-      <h4>Ghé thăm tiệm</h4>
-      <p>TP. Hồ Chí Minh<br>Thông tin liên hệ sẽ được cập nhật khi triển khai.</p>
-      <div class="footer-social">Handmade with ♡</div>
-    </div>
-  </div>
-  <div class="footer-bottom wrap">
-    <span>© 2026 LUNE Bakery. Bakery Shop Application.</span>
-    <span>Made with a little love &amp; a lot of butter ✳</span>
-  </div>
-</footer>
+    <footer th:fragment="footer" id="footer" class="footer">
+      <div class="wrap footer-grid">
+        <div>
+          <a class="brand footer-brand" th:href="@{/}">
+            LUNE<span class="brand-dot">.</span
+            ><small>BAKERY &amp; PATISSERIE</small>
+          </a>
+          <p>
+            Một tiệm bánh nhỏ, dành cho những niềm vui thật to. Bánh được làm
+            tươi mới với tất cả sự yêu thương.
+          </p>
+        </div>
+        <div>
+          <h4>Khám phá</h4>
+          <a th:href="@{/products}">Tất cả sản phẩm</a>
+          <a th:href="@{/products(category='Bánh kem')}">Bánh kem</a>
+          <a th:href="@{/products(category='Bánh ngọt')}">Bánh ngọt</a>
+          <a th:href="@{/products(category='Bánh mì')}">Bánh mì</a>
+        </div>
+        <div>
+          <h4>Hỗ trợ</h4>
+          <a th:href="@{/orders}">Đơn hàng của tôi</a>
+          <a th:href="@{/profile}">Tài khoản</a>
+          <a href="#about">Câu chuyện của LUNE</a>
+          <a
+            th:href="@{/admin}"
+            th:if="${session.user != null and (session.user.role.name() == 'ADMIN' or session.user.role.name() == 'STAFF')}"
+          >
+            Khu vực quản trị
+          </a>
+        </div>
+        <div>
+          <h4>Ghé thăm tiệm</h4>
+          <p>
+            TP. Hồ Chí Minh<br />Thông tin liên hệ sẽ được cập nhật khi triển
+            khai.
+          </p>
+          <div class="footer-social">Handmade with ♡</div>
+        </div>
+      </div>
+      <div class="footer-bottom wrap">
+        <span>© 2026 LUNE Bakery. Bakery Shop Application.</span>
+        <span>Made with a little love &amp; a lot of butter ✳</span>
+      </div>
+    </footer>
 
-<!-- ========================================================
+    <!-- ========================================================
      FRAGMENT: scripts (mobile menu + header scroll)
      Usage: th:replace="~{fragments/layout :: scripts}"
      ======================================================== -->
-<th:block th:fragment="scripts">
-  <!-- SVG Icons inline (required when header is a fragment) -->
-  <svg xmlns="http://www.w3.org/2000/svg" class="symbols" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
-    <symbol id="i-bag"    viewBox="0 0 24 24"><path d="M4 8h16l-1.1 12H5.1L4 8Z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></symbol>
-    <symbol id="i-user"   viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5.3 20v-1.2a6.7 6.7 0 0 1 13.4 0V20"/></symbol>
-    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="m16 16 5 5"/></symbol>
-    <symbol id="i-arrow"  viewBox="0 0 24 24"><path d="M4 12h16m-7-7 7 7-7 7"/></symbol>
-    <symbol id="i-close"  viewBox="0 0 24 24"><path d="m5 5 14 14M19 5 5 19"/></symbol>
-    <symbol id="i-plus"   viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
-    <symbol id="i-minus"  viewBox="0 0 24 24"><path d="M4 12h16"/></symbol>
-    <symbol id="i-chevron"viewBox="0 0 24 24"><path d="m7 10 5 5 5-5"/></symbol>
-    <symbol id="i-check"  viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
-    <symbol id="i-trash"  viewBox="0 0 24 24"><path d="M4 6h16M9 6V4h6v2M7 6l1 14h8l1-14M10 10v7m4-7v7"/></symbol>
-    <symbol id="i-lock"   viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
-    <symbol id="i-heart"  viewBox="0 0 24 24"><path d="M20.7 5.7c-1.8-1.8-4.8-1.8-6.6 0L12 7.8 9.9 5.7C8.1 3.9 5.1 3.9 3.3 5.7s-1.8 4.8 0 6.6L12 21l8.7-8.7c1.8-1.8 1.8-4.8 0-6.6Z"/></symbol>
-    <symbol id="i-menu"   viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
-    <symbol id="i-truck"  viewBox="0 0 24 24"><path d="M2 6h13v12H2zM15 10h3.5l3.5 4v4h-7"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
-    <symbol id="i-edit"   viewBox="0 0 24 24"><path d="M4 20l4.5-1 11-11a2.5 2.5 0 0 0-3.5-3.5l-11 11L4 20Z"/><path d="m14 6 4 4"/></symbol>
-    <symbol id="i-clock"  viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l4 3"/></symbol>
-  </svg>
+    <th:block th:fragment="scripts">
+      <!-- SVG Icons inline (required when header is a fragment) -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="symbols"
+        aria-hidden="true"
+        style="position: absolute; width: 0; height: 0; overflow: hidden"
+      >
+        <symbol id="i-bag" viewBox="0 0 24 24">
+          <path d="M4 8h16l-1.1 12H5.1L4 8Z" />
+          <path d="M9 9V6a3 3 0 0 1 6 0v3" />
+        </symbol>
+        <symbol id="i-user" viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="3.5" />
+          <path d="M5.3 20v-1.2a6.7 6.7 0 0 1 13.4 0V20" />
+        </symbol>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <circle cx="10.8" cy="10.8" r="6.6" />
+          <path d="m16 16 5 5" />
+        </symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24">
+          <path d="M4 12h16m-7-7 7 7-7 7" />
+        </symbol>
+        <symbol id="i-close" viewBox="0 0 24 24">
+          <path d="m5 5 14 14M19 5 5 19" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24">
+          <path d="M12 4v16M4 12h16" />
+        </symbol>
+        <symbol id="i-minus" viewBox="0 0 24 24"><path d="M4 12h16" /></symbol>
+        <symbol id="i-chevron" viewBox="0 0 24 24">
+          <path d="m7 10 5 5 5-5" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+          <path d="m4 12 5 5L20 6" />
+        </symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24">
+          <path d="M4 6h16M9 6V4h6v2M7 6l1 14h8l1-14M10 10v7m4-7v7" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24">
+          <rect x="5" y="11" width="14" height="10" rx="2" />
+          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+        </symbol>
+        <symbol id="i-heart" viewBox="0 0 24 24">
+          <path
+            d="M20.7 5.7c-1.8-1.8-4.8-1.8-6.6 0L12 7.8 9.9 5.7C8.1 3.9 5.1 3.9 3.3 5.7s-1.8 4.8 0 6.6L12 21l8.7-8.7c1.8-1.8 1.8-4.8 0-6.6Z"
+          />
+        </symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24">
+          <path d="M3 6h18M3 12h18M3 18h18" />
+        </symbol>
+        <symbol id="i-truck" viewBox="0 0 24 24">
+          <path d="M2 6h13v12H2zM15 10h3.5l3.5 4v4h-7" />
+          <circle cx="7" cy="18" r="2" />
+          <circle cx="18" cy="18" r="2" />
+        </symbol>
+        <symbol id="i-edit" viewBox="0 0 24 24">
+          <path d="M4 20l4.5-1 11-11a2.5 2.5 0 0 0-3.5-3.5l-11 11L4 20Z" />
+          <path d="m14 6 4 4" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l4 3" />
+        </symbol>
+      </svg>
 
-  <script>
-    /* Mobile menu */
-    (function () {
-      var btn = document.getElementById('mobile-menu-btn');
-      var nav = document.getElementById('mobile-nav');
-      if (!btn || !nav) return;
-      btn.addEventListener('click', function () {
-        var open = nav.classList.toggle('open');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-      document.addEventListener('click', function (e) {
-        if (nav.classList.contains('open') && !nav.contains(e.target) && !btn.contains(e.target)) {
-          nav.classList.remove('open');
-          btn.setAttribute('aria-expanded', 'false');
+      <script>
+        /* Mobile menu */
+        (function () {
+          var btn = document.getElementById("mobile-menu-btn");
+          var nav = document.getElementById("mobile-nav");
+          if (!btn || !nav) return;
+          btn.addEventListener("click", function () {
+            var open = nav.classList.toggle("open");
+            btn.setAttribute("aria-expanded", open ? "true" : "false");
+          });
+          document.addEventListener("click", function (e) {
+            if (
+              nav.classList.contains("open") &&
+              !nav.contains(e.target) &&
+              !btn.contains(e.target)
+            ) {
+              nav.classList.remove("open");
+              btn.setAttribute("aria-expanded", "false");
+            }
+          });
+          nav.querySelectorAll("a").forEach(function (a) {
+            a.addEventListener("click", function () {
+              nav.classList.remove("open");
+              btn.setAttribute("aria-expanded", "false");
+            });
+          });
+        })();
+
+        /* Header scroll shadow */
+        (function () {
+          var hdr = document.getElementById("site-header");
+          if (!hdr) return;
+          window.addEventListener(
+            "scroll",
+            function () {
+              hdr.classList.toggle("scrolled", window.scrollY > 8);
+            },
+            { passive: true },
+          );
+        })();
+      </script>
+    </th:block>
+
+    <!-- Header dùng chung cho ba trang storefront. -->
+    <header
+      th:fragment="storefrontHeader(activePage)"
+      class="sf-header"
+      id="storefront-header"
+    >
+      <style>
+        .sf-header {
+          position: fixed;
+          inset: 0 0 auto;
+          z-index: 50;
+          height: 80px;
+          background: #fff8f6;
+          border-bottom: 1px solid rgba(139, 38, 62, 0.1);
+          font-family: "Plus Jakarta Sans", sans-serif;
         }
-      });
-      nav.querySelectorAll('a').forEach(function (a) {
-        a.addEventListener('click', function () {
-          nav.classList.remove('open');
-          btn.setAttribute('aria-expanded', 'false');
-        });
-      });
-    })();
+        .sf-header * {
+          box-sizing: border-box;
+        }
+        .sf-header__inner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: min(1280px, calc(100% - 48px));
+          height: 100%;
+          margin: 0 auto;
+          gap: 24px;
+        }
+        .sf-header__brand {
+          display: inline-flex;
+          align-items: baseline;
+          color: #8b263e;
+          font:
+            700 28px/1 "Playfair Display",
+            serif;
+          letter-spacing: -0.04em;
+          text-decoration: none;
+        }
+        .sf-header__brand-dot {
+          color: #536443;
+        }
+        .sf-header__brand small {
+          margin-left: 8px;
+          color: #564244;
+          font:
+            700 9px/1.2 "Plus Jakarta Sans",
+            sans-serif;
+          letter-spacing: 0.14em;
+        }
+        .sf-header__nav {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .sf-header__nav a {
+          padding: 9px 15px;
+          border-radius: 12px;
+          color: #564244;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.05em;
+          text-decoration: none;
+          transition: 0.2s;
+        }
+        .sf-header__nav a:hover,
+        .sf-header__nav a.is-active {
+          background: #ffe9e3;
+          color: #8b263e;
+        }
+        .sf-header__actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .sf-header__search {
+          position: relative;
+          border-radius: 999px;
+          background: #fff1ec;
+          transition: box-shadow 0.2s;
+        }
+        .sf-header__search:focus-within {
+          box-shadow: 0 0 0 2px #8b263e;
+        }
+        #storefront-header .sf-header__search input {
+          appearance: none !important;
+          -webkit-appearance: none !important;
+          width: 230px;
+          border: 0 !important;
+          border-radius: 999px;
+          background: transparent !important;
+          padding: 10px 42px 10px 16px;
+          color: #261814;
+          font:
+            500 13px "Plus Jakarta Sans",
+            sans-serif;
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        .sf-header__search button {
+          position: absolute;
+          top: 5px;
+          right: 7px;
+          display: grid;
+          place-items: center;
+          border: 0;
+          background: transparent;
+          color: #564244;
+          cursor: pointer;
+        }
+        .sf-header__action,
+        .sf-header__menu {
+          display: grid;
+          place-items: center;
+          padding: 8px;
+          border: 0;
+          border-radius: 10px;
+          background: transparent;
+          color: #564244;
+          text-decoration: none;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+        .sf-header__action:hover,
+        .sf-header__menu:hover {
+          background: #ffe9e3;
+          color: #8b263e;
+        }
+        .sf-header__menu,
+        .sf-header__mobile {
+          display: none;
+        }
+        @media (max-width: 980px) {
+          .sf-header__nav,
+          .sf-header__search {
+            display: none;
+          }
+          .sf-header__menu {
+            display: grid;
+          }
+          .sf-header__mobile {
+            position: absolute;
+            top: 80px;
+            right: 0;
+            left: 0;
+            flex-direction: column;
+            padding: 12px 24px 20px;
+            background: #fff8f6;
+            border-bottom: 1px solid #ead5cf;
+            box-shadow: 0 16px 30px rgba(70, 33, 42, 0.08);
+          }
+          .sf-header__mobile.is-open {
+            display: flex;
+          }
+          .sf-header__mobile a {
+            padding: 12px;
+            color: #564244;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+          }
+        }
+        @media (max-width: 520px) {
+          .sf-header__inner {
+            width: calc(100% - 32px);
+          }
+          .sf-header__brand small {
+            display: none;
+          }
+          .sf-header__action--account {
+            display: none;
+          }
+        }
+      </style>
+      <div class="sf-header__inner">
+        <a
+          th:href="@{/}"
+          href="/"
+          class="sf-header__brand"
+          aria-label="LUNE Bakery - Trang chủ"
+          >LUNE<span class="sf-header__brand-dot">.</span
+          ><small>BAKERY &amp; PATISSERIE</small></a
+        >
+        <nav class="sf-header__nav" aria-label="Điều hướng chính">
+          <a
+            th:href="@{/}"
+            href="/"
+            th:classappend="${activePage == 'home'} ? ' is-active'"
+            >Trang chủ</a
+          ><a
+            th:href="@{/products}"
+            href="/products"
+            th:classappend="${activePage == 'products'} ? ' is-active'"
+            >Sản phẩm</a
+          ><a href="#">Giới thiệu</a>
+        </nav>
+        <div class="sf-header__actions">
+          <form
+            class="sf-header__search"
+            id="header-search"
+            th:action="@{/products}"
+            action="/products"
+            method="get"
+          >
+            <input
+              id="search-input"
+              name="q"
+              type="search"
+              placeholder="Tìm bánh..."
+              aria-label="Tìm kiếm bánh"
+            /><button type="submit" aria-label="Tìm kiếm">
+              <span class="material-symbols-outlined">search</span>
+            </button>
+          </form>
+          <a
+            class="sf-header__action sf-header__action--account"
+            th:href="@{/login}"
+            href="/login"
+            aria-label="Tài khoản"
+            ><span class="material-symbols-outlined">account_circle</span></a
+          ><a
+            class="sf-header__action"
+            th:href="@{/cart}"
+            href="/cart"
+            aria-label="Giỏ hàng"
+            ><span class="material-symbols-outlined">shopping_bag</span></a
+          ><button
+            class="sf-header__menu"
+            type="button"
+            aria-label="Mở menu"
+            aria-expanded="false"
+            aria-controls="storefront-mobile-nav"
+          >
+            <span class="material-symbols-outlined">menu</span>
+          </button>
+        </div>
+      </div>
+      <nav
+        class="sf-header__mobile"
+        id="storefront-mobile-nav"
+        aria-label="Điều hướng di động"
+      >
+        <a th:href="@{/}" href="/">Trang chủ</a
+        ><a th:href="@{/products}" href="/products">Sản phẩm</a
+        ><a href="#">Giới thiệu</a
+        ><a th:href="@{/login}" href="/login">Tài khoản</a
+        ><a th:href="@{/cart}" href="/cart">Giỏ hàng</a>
+      </nav>
+      <script>
+        (() => {
+          const header = document.getElementById("storefront-header"),
+            button = header?.querySelector(".sf-header__menu"),
+            nav = header?.querySelector(".sf-header__mobile");
+          if (!button || !nav) return;
+          button.addEventListener("click", () => {
+            const open = nav.classList.toggle("is-open");
+            button.setAttribute("aria-expanded", String(open));
+          });
+        })();
+      </script>
+    </header>
 
-    /* Header scroll shadow */
-    (function () {
-      var hdr = document.getElementById('site-header');
-      if (!hdr) return;
-      window.addEventListener('scroll', function () {
-        hdr.classList.toggle('scrolled', window.scrollY > 8);
-      }, { passive: true });
-    })();
-  </script>
-</th:block>
+    <!-- Storefront footer dùng chung cho home, product list và product detail. -->
+    <footer th:fragment="storefrontFooter" class="sf-footer">
+      <style>
+        .sf-footer {
+          width: 100%;
+          padding: 40px 0;
+          background: #fff1ec;
+          color: #261814;
+          font-family: "Plus Jakarta Sans", sans-serif;
+        }
+        .sf-footer * {
+          box-sizing: border-box;
+        }
+        .sf-footer__inner {
+          width: min(1280px, calc(100% - 48px));
+          margin: 0 auto;
+        }
+        .sf-footer__grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 24px;
+          margin-bottom: 40px;
+        }
+        .sf-footer__brand {
+          color: #8b263e;
+          font:
+            500 32px/1.2 "Playfair Display",
+            serif;
+          text-decoration: none;
+        }
+        .sf-footer h3 {
+          margin: 0 0 16px;
+          color: #3c342b;
+          font:
+            600 20px/1.4 "Playfair Display",
+            serif;
+        }
+        .sf-footer p {
+          margin: 0;
+          color: #564244;
+          font-size: 14px;
+          line-height: 1.65;
+        }
+        .sf-footer ul {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+        .sf-footer li + li {
+          margin-top: 8px;
+        }
+        .sf-footer a:not(.sf-footer__brand) {
+          color: #564244;
+          font-size: 14px;
+          line-height: 1.55;
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+        .sf-footer a:hover {
+          color: #8b263e;
+        }
+        .sf-footer__about {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .sf-footer__seal {
+          display: inline-flex;
+          align-items: center;
+          align-self: flex-start;
+          gap: 4px;
+          padding: 5px 8px;
+          border-radius: 999px;
+          background: #d5e9bf;
+          color: #586a48;
+          font-size: 11px;
+          font-weight: 700;
+        }
+        .sf-footer__seal .material-symbols-outlined {
+          font-size: 14px;
+        }
+        .sf-footer__contact {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .sf-footer__contact p {
+          display: flex;
+          align-items: flex-start;
+          gap: 4px;
+        }
+        .sf-footer__contact .material-symbols-outlined {
+          flex: none;
+          color: #8b263e;
+          font-size: 18px;
+        }
+        .sf-footer__bottom {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+          padding-top: 24px;
+          color: #564244;
+          font-size: 12px;
+        }
+        .sf-footer__bottom span:last-child {
+          color: #536443;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        @media (max-width: 900px) {
+          .sf-footer__grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+        @media (max-width: 560px) {
+          .sf-footer__inner {
+            width: calc(100% - 32px);
+          }
+          .sf-footer__grid {
+            grid-template-columns: 1fr;
+          }
+          .sf-footer__bottom {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+        }
+      </style>
+      <div class="sf-footer__inner">
+        <div class="sf-footer__grid">
+          <div class="sf-footer__about">
+            <a th:href="@{/}" href="/" class="sf-footer__brand">Lune</a>
+            <p>
+              Tận tụy với nguyên liệu thuần khiết và kỹ thuật làm bánh thủ công
+              Pháp. Chúng tôi gửi gắm sự chăm chút và hương vị bơ chuẩn mực
+              trong từng mẻ bánh rạng sáng.
+            </p>
+            <span class="sf-footer__seal"
+              ><span class="material-symbols-outlined">verified</span>Men tự
+              nhiên 100%</span
+            >
+          </div>
+          <div>
+            <h3>Về tiệm bánh</h3>
+            <ul>
+              <li><a th:href="@{/}" href="/">Trang chủ</a></li>
+              <li><a th:href="@{/products}" href="/products">Sản phẩm</a></li>
+              <li><a href="#">Giới thiệu</a></li>
+              <li><a href="#">Cửa hàng</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Hỗ trợ khách hàng</h3>
+            <ul>
+              <li><a href="#">Chính sách giao nhận</a></li>
+              <li><a href="#">Bảo quản bánh tươi</a></li>
+              <li><a href="#">Câu hỏi thường gặp</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3>Thông tin liên hệ</h3>
+            <div class="sf-footer__contact">
+              <p>
+                <span class="material-symbols-outlined">schedule</span
+                ><span>07:30 - 21:30 hàng ngày</span>
+              </p>
+              <p>
+                <span class="material-symbols-outlined">call</span
+                ><span>Hotline: (028) 3824 1955</span>
+              </p>
+              <p>
+                <span class="material-symbols-outlined">location_on</span
+                ><span>42 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. HCM</span>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="sf-footer__bottom">
+          <span>© 2026 Lune. All rights reserved. Craft with care.</span
+          ><span>Boulangerie Traditionnelle &amp; Café</span>
+        </div>
+      </div>
+    </footer>
 
-<!-- ========================================================
+    <!-- ========================================================
      FRAGMENT: head-meta  (Google Fonts + base meta)
      Usage: th:replace="~{fragments/layout :: head-meta(title='Page Title')}"
      ======================================================== -->
-<th:block th:fragment="head-meta(title)">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#fcf8f3" />
-  <title th:text="${title} + ' — LUNE Bakery'">LUNE Bakery</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" th:href="@{/css/app.css}" />
-  <style>
-    .site-header.scrolled { box-shadow: 0 2px 24px rgba(113,53,66,.12); }
-  </style>
-</th:block>
-
-</body>
+    <th:block th:fragment="head-meta(title)">
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <meta name="theme-color" content="#fcf8f3" />
+      <title th:text="${title} + ' — LUNE Bakery'">LUNE Bakery</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
+        rel="stylesheet"
+      />
+      <link rel="stylesheet" th:href="@{/css/app.css}" />
+      <style>
+        .site-header.scrolled {
+          box-shadow: 0 2px 24px rgba(113, 53, 66, 0.12);
+        }
+      </style>
+    </th:block>
+  </body>
 </html>
