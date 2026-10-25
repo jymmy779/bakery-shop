@@ -227,23 +227,8 @@
     ></header>
     <main class="w-full pt-20 bg-surface">
       <div class="flex flex-col w-full">
+        <div th:replace="~{fragments/layout :: storefrontBreadcrumb('Giỏ hàng của bạn', null, null)}"></div>
         <div class="max-w-[1280px] w-full mx-auto px-gutter py-space-lg">
-          <!-- Breadcrumb & Header Section -->
-          <nav
-            aria-label="Đường dẫn trang"
-            class="flex items-center gap-space-xs text-label-md font-label-md text-on-surface-variant mb-space-md"
-          >
-            <a
-              class="hover:text-primary transition-colors flex items-center gap-1"
-              data-path="trang-chu"
-              href="#"
-            >
-              <span class="material-symbols-outlined text-[16px]">home</span>
-              <span>Trang chủ</span>
-            </a>
-            <span class="text-outline-variant">/</span>
-            <span class="text-on-surface font-semibold">Giỏ hàng của bạn</span>
-          </nav>
           <!-- Page Title & Micro Context -->
           <div
             class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-lg"

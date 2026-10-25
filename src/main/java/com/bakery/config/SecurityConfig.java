@@ -77,7 +77,7 @@ public class SecurityConfig {
             return;
           }
 
-          response.sendRedirect(cmsLogin ? "/cms" : "/");
+          response.sendRedirect(cmsLogin ? "/cms" : "/profile");
         })
         .failureHandler((request, response, exception) -> {
           String failureUrl = "cms".equals(request.getParameter("loginType"))

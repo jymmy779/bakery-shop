@@ -248,31 +248,7 @@
     <header th:replace="~{fragments/layout :: storefrontHeader('products')}"></header>
     <main class="w-full pt-20 bg-surface">
       <div class="flex flex-col w-full">
-        <!-- BREADCRUMB & CONTEXT -->
-        <section
-          class="max-w-[1280px] w-full mx-auto px-gutter pt-space-md pb-space-xs"
-        >
-          <nav
-            aria-label="Đường dẫn trang"
-            class="flex items-center gap-space-xs text-label-md font-label-md text-on-surface-variant"
-          >
-            <a
-              class="cursor-pointer hover:text-primary transition-colors"
-              href="#"
-              >Trang chủ</a
-            >
-            <span class="text-tertiary-fixed-dim">/</span>
-            <a
-              class="cursor-pointer hover:text-primary transition-colors"
-              href="#"
-              >Bánh Mì &amp; Viennoiserie</a
-            >
-            <span class="text-tertiary-fixed-dim">/</span>
-            <span aria-current="page" class="text-on-surface font-semibold"
-              >Croissant Bơ Pháp Normandie</span
-            >
-          </nav>
-        </section>
+        <div th:replace="~{fragments/layout :: storefrontBreadcrumb('Croissant Bơ Pháp Normandie', 'Sản phẩm', '/products')}"></div>
         <!-- MAIN PRODUCT SHOWCASE (Editorial Split Layout) -->
         <section class="max-w-[1280px] w-full mx-auto px-gutter py-space-md">
           <div
@@ -1119,5 +1095,6 @@
       </script>
     </main>
     <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+    <th:block th:replace="~{fragments/layout :: storefrontScrollReveal}"></th:block>
   </body>
 </html>
