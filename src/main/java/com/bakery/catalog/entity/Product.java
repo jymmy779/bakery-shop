@@ -42,6 +42,19 @@ public class Product extends BaseEntity {
   @Column(nullable = false, columnDefinition = "TEXT")
   private String description;
 
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20)
+  private ProductBadge badge;
+
+  @Column(columnDefinition = "TEXT")
+  private String ingredients;
+
+  @Column(name = "storage_instructions", columnDefinition = "TEXT")
+  private String storageInstructions;
+
+  @Column(name = "allergen_info", columnDefinition = "TEXT")
+  private String allergenInfo;
+
   @Column(nullable = false, precision = 12, scale = 2)
   private BigDecimal price;
 

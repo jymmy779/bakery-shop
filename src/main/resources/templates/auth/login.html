@@ -213,29 +213,7 @@
     ></header>
     <main class="w-full pt-20 bg-surface">
       <div class="flex flex-col w-full">
-        <!-- Top Breadcrumb & Ambient Sub-navigation -->
-        <section
-          class="max-w-[1280px] w-full mx-auto px-gutter pt-space-md pb-space-xs"
-        >
-          <nav
-            aria-label="Đường dẫn liên kết"
-            class="flex items-center gap-space-xs text-label-md font-label-md text-on-surface-variant"
-          >
-            <a
-              class="hover:text-primary transition-colors flex items-center gap-1"
-              th:href="@{/}"
-            >
-              <span class="material-symbols-outlined text-[15px]">home</span>
-              <span class="">Trang chủ</span>
-            </a>
-            <span class="text-outline-variant font-normal">/</span>
-            <a class="hover:text-primary transition-colors" th:href="@{/login}"
-              >Tài khoản</a
-            >
-            <span class="text-outline-variant font-normal">/</span>
-            <span class="text-primary font-bold">Đăng nhập</span>
-          </nav>
-        </section>
+        <div th:replace="~{fragments/layout :: storefrontBreadcrumb('Đăng nhập', 'Tài khoản', '/login')}"></div>
         <!-- Main Split Canvas: Atelier Craft Artistry + Thymeleaf Authentication Module -->
         <section
           class="max-w-[1280px] w-full mx-auto px-gutter py-space-lg mb-space-xl"

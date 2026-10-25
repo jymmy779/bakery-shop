@@ -556,12 +556,7 @@
       th:replace="~{fragments/layout :: storefrontHeader('products')}"
     ></header>
     <main>
-      <div class="crumb">
-        <div class="container">
-          <a th:href="@{/}" href="/">Trang chủ</a> &nbsp;/&nbsp;
-          <strong>Tất cả sản phẩm</strong>
-        </div>
-      </div>
+      <div th:replace="~{fragments/layout :: storefrontBreadcrumb('Tất cả sản phẩm', null, null)}"></div>
       <section class="intro">
         <div class="container">
           <div class="intro-grid">
@@ -659,7 +654,7 @@
           name: "Pain au Chocolat Đen",
           category: "Bánh mới",
           price: 52000,
-          badge: "BEST_SELLER",
+          badge: null,
           description: "Bánh ngàn lớp kết hợp chocolate đen đậm vị.",
           image:
             "https://lh3.googleusercontent.com/aida-public/AB6AXuAUR_uFeyfcj5uZ-FXSYBqLG7QQFwZs4vGJo1D8jOPVilZ2ZWBN_VhP0dYNCb7ejVdr4o3ighUuXkO4Xk5t4VIxa2FsEJ_Tk5HM6SPH4kdGk3QFJtmdjGrsbJRLdsH1NfDmVjE_UM_520mKKpAnoTZ2AZYFQwQI10cmEIOZCPZIu6wI4MEKie_vEwgWQpHXVY4NmKcPcGs9mRRQ-gPn5Zp-CC1rrZf_HwX3Dp26XY_3MN-dpplg2g91cg",
@@ -699,7 +694,7 @@
           name: "Mousse Phúc Bồn Tử",
           category: "Dessert",
           price: 165000,
-          badge: "NEW",
+          badge: null,
           description: "Mousse mịn nhẹ với lớp quả mọng chua thanh.",
           image:
             "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=900&q=85",
@@ -730,7 +725,7 @@
           name: "Éclair Trà Xanh Uji",
           category: "Dessert",
           price: 69000,
-          badge: "SEASONAL",
+          badge: null,
           description: "Vỏ choux mềm nhẹ, nhân trà xanh thanh và thơm.",
           image:
             "https://images.unsplash.com/photo-1612203985729-70726954388c?auto=format&fit=crop&w=900&q=85",
@@ -750,7 +745,7 @@
           name: "Hộp Tuile Hạnh Nhân",
           category: "Bánh hộp thiếc",
           price: 320000,
-          badge: "LIMITED",
+          badge: null,
           description: "Tuile mỏng giòn, nhiều hạnh nhân rang thơm.",
           image:
             "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?auto=format&fit=crop&w=900&q=85",
@@ -835,5 +830,6 @@
         });
       render();
     </script>
+    <th:block th:replace="~{fragments/layout :: storefrontScrollReveal}"></th:block>
   </body>
 </html>

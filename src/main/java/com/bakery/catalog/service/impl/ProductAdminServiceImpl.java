@@ -5,6 +5,7 @@ import com.bakery.catalog.dto.ProductDetailResponse;
 import com.bakery.catalog.dto.ProductSummaryResponse;
 import com.bakery.catalog.dto.ProductUpdateRequest;
 import com.bakery.catalog.entity.Product;
+import com.bakery.catalog.entity.ProductBadge;
 import com.bakery.catalog.entity.ProductImage;
 import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.repository.CategoryRepository;
@@ -48,7 +49,8 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     Product product = new Product();
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), ProductStatus.SELLING,
-        request.getCategoryId());
+        request.getCategoryId(), request.getBadge(), request.getIngredients(),
+        request.getStorageInstructions(), request.getAllergenInfo());
     List<String> storedPaths = new ArrayList<>();
     try {
       product = products.save(product);
@@ -68,7 +70,8 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     List<MultipartFile> validImages = validateImages(request.getNewImages(), existingImageCount, false);
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), request.getStatus(),
-        request.getCategoryId());
+        request.getCategoryId(), request.getBadge(), request.getIngredients(),
+        request.getStorageInstructions(), request.getAllergenInfo());
     List<String> storedPaths = new ArrayList<>();
     try {
       products.save(product);
@@ -166,15 +169,24 @@ public class ProductAdminServiceImpl implements ProductAdminService {
   }
 
   private void copy(Product product, String name, String description, java.math.BigDecimal price,
-      Integer stock, Integer preparationDays, ProductStatus status, Long categoryId) {
+      Integer stock, Integer preparationDays, ProductStatus status, Long categoryId,
+      ProductBadge badge, String ingredients, String storageInstructions, String allergenInfo) {
     product.setName(name.trim());
     product.setDescription(description);
+    product.setBadge(badge);
+    product.setIngredients(trimToNull(ingredients));
+    product.setStorageInstructions(trimToNull(storageInstructions));
+    product.setAllergenInfo(trimToNull(allergenInfo));
     product.setPrice(price);
     product.setStockQuantity(stock);
     product.setPreparationDays(preparationDays);
     product.setStatus(status);
     product.setCategory(categories.findById(categoryId)
         .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy danh mục")));
+  }
+
+  private String trimToNull(String value) {
+    return StringUtils.hasText(value) ? value.trim() : null;
   }
 
   private void saveImages(Product product, List<MultipartFile> files, List<String> storedPaths) {
@@ -246,6 +258,10 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     response.setId(product.getId());
     response.setName(product.getName());
     response.setDescription(product.getDescription());
+    response.setBadge(product.getBadge());
+    response.setIngredients(product.getIngredients());
+    response.setStorageInstructions(product.getStorageInstructions());
+    response.setAllergenInfo(product.getAllergenInfo());
     response.setImagePaths(imagePaths);
     response.setImageIds(imageIds);
     response.setPrimaryImagePath(imagePaths.isEmpty() ? null : imagePaths.get(0));
