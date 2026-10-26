@@ -95,11 +95,55 @@ class AccountSecurityIntegrationTest {
             .param("email", customerEmail)
             .param("password", "customer-password"))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/"))
+        .andExpect(redirectedUrl("/profile"))
         .andReturn().getRequest().getSession();
 
     mvc.perform(get("/profile").session(session))
         .andExpect(status().isOk());
+  }
+
+  @Test
+  void customerReturnsToSavedPageAfterLogin() throws Exception {
+    MockHttpSession session = (MockHttpSession) mvc.perform(
+            get("/orders/42?tab=details"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/login"))
+        .andReturn().getRequest().getSession();
+
+    mvc.perform(post("/login").session(session).with(csrf())
+            .param("email", customerEmail)
+            .param("password", "customer-password"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/orders/42?tab=details"));
+  }
+
+  @Test
+  void adminAlwaysReturnsToCmsDashboardAfterLogin() throws Exception {
+    MockHttpSession session = (MockHttpSession) mvc.perform(get("/cms/accounts?page=1&size=10"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms/login"))
+        .andReturn().getRequest().getSession();
+
+    mvc.perform(post("/login").session(session).with(csrf())
+            .param("email", adminEmail)
+            .param("password", "admin-password")
+            .param("loginType", "cms"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms"));
+  }
+
+  @Test
+  void customerDoesNotReturnToSavedCmsPage() throws Exception {
+    MockHttpSession session = (MockHttpSession) mvc.perform(get("/cms/accounts"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms/login"))
+        .andReturn().getRequest().getSession();
+
+    mvc.perform(post("/login").session(session).with(csrf())
+            .param("email", customerEmail)
+            .param("password", "customer-password"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/profile"));
   }
 
   @Test

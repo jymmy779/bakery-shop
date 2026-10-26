@@ -1,5 +1,8 @@
 package com.bakery.config;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 
 @Configuration
 @EnableWebSecurity
@@ -77,7 +82,12 @@ public class SecurityConfig {
             return;
           }
 
-          response.sendRedirect(cmsLogin ? "/cms" : "/profile");
+          HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+          SavedRequest savedRequest = requestCache.getRequest(request, response);
+          String fallbackUrl = cmsLogin ? "/cms" : "/profile";
+          String targetUrl = cmsLogin ? null : savedCustomerTarget(savedRequest);
+          requestCache.removeRequest(request, response);
+          response.sendRedirect(targetUrl != null ? targetUrl : fallbackUrl);
         })
         .failureHandler((request, response, exception) -> {
           String failureUrl = "cms".equals(request.getParameter("loginType"))
@@ -96,5 +106,41 @@ public class SecurityConfig {
       );
 
     return http.build();
+  }
+
+  private String savedCustomerTarget(SavedRequest savedRequest) {
+    if (savedRequest == null || !"GET".equalsIgnoreCase(savedRequest.getMethod())) {
+      return null;
+    }
+
+    try {
+      URI savedUri = URI.create(savedRequest.getRedirectUrl());
+      String path = savedUri.getRawPath();
+      if (path == null || !path.startsWith("/")) {
+        return null;
+      }
+
+      boolean cmsPath = path.equals("/cms") || path.startsWith("/cms/");
+      if (cmsPath) {
+        return null;
+      }
+
+      String query = sanitizedQuery(savedUri.getRawQuery());
+      return query == null ? path : path + "?" + query;
+    } catch (IllegalArgumentException exception) {
+      return null;
+    }
+  }
+
+  private String sanitizedQuery(String rawQuery) {
+    if (rawQuery == null) {
+      return null;
+    }
+
+    String query = Arrays.stream(rawQuery.split("&"))
+        .filter(parameter -> !parameter.equals("continue")
+            && !parameter.startsWith("continue="))
+        .collect(Collectors.joining("&"));
+    return query.isBlank() ? null : query;
   }
 }
