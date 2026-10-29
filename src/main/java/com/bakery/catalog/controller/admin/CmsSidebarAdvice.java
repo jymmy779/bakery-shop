@@ -7,7 +7,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-@ControllerAdvice(assignableTypes = {ProductAdminController.class, CategoryAdminController.class})
+@ControllerAdvice(basePackages = {
+    "com.bakery.account.controller.admin",
+    "com.bakery.catalog.controller.admin",
+    "com.bakery.dashboard.controller.admin",
+    "com.bakery.order.controller.admin"
+})
 public class CmsSidebarAdvice {
   private final AccountRepository accounts;
 

@@ -99,7 +99,12 @@ public class SecurityConfig {
       )
       .logout(logout -> logout
         .logoutUrl("/logout")
-        .logoutSuccessUrl("/login?logout")
+        .logoutSuccessHandler((request, response, authentication) -> {
+          String loginPage = "cms".equals(request.getParameter("loginType"))
+              ? "/cms/login?logout"
+              : "/login?logout";
+          response.sendRedirect(request.getContextPath() + loginPage);
+        })
         .invalidateHttpSession(true)
         .clearAuthentication(true)
         .permitAll()

@@ -6,9 +6,9 @@
   <aside class="cms-sidebar-nav" aria-label="Điều hướng quản trị">
     <a class="cms-sidebar-brand" th:href="@{/cms}">LUNE<span>.</span> CMS</a>
     <div class="cms-sidebar-user">
-      <span class="cms-sidebar-avatar" th:text="${#strings.isEmpty(cmsDisplayName) ? 'A' : #strings.toUpperCase(#strings.substring(cmsDisplayName, 0, 1))}">A</span>
+      <span class="cms-sidebar-avatar" th:text="${#strings.isEmpty(cmsDisplayName) ? #strings.toUpperCase(#strings.substring(#authentication.name, 0, 1)) : #strings.toUpperCase(#strings.substring(cmsDisplayName, 0, 1))}">A</span>
       <div>
-        <strong th:text="${cmsDisplayName}">Tên tài khoản</strong>
+        <strong th:text="${#strings.isEmpty(cmsDisplayName) ? #authentication.name : cmsDisplayName}">Tên tài khoản</strong>
         <small sec:authorize="hasRole('ADMIN')">Quản trị viên</small>
         <small sec:authorize="!hasRole('ADMIN')">Nhân viên</small>
       </div>
@@ -21,7 +21,9 @@
       <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/staff}" th:classappend="${active == 'staff'} ? ' active'">Quản lý nhân viên</a>
       <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}" th:classappend="${active == 'accounts'} ? ' active'">Quản lý tài khoản</a>
     </nav>
-    <a class="cms-sidebar-logout" th:href="@{/logout}">Đăng xuất</a>
+    <form class="cms-sidebar-logout-form"     th:action="@{/logout(loginType='cms')}" method="post">
+      <button class="cms-sidebar-logout" type="submit">Đăng xuất</button>
+    </form>
   </aside>
 </th:block>
 <div th:fragment="image-preview" class="cms-image-modal" id="cms-image-modal" hidden>

@@ -28,7 +28,9 @@
     <a th:href="@{/cms/products}">Sản phẩm</a>
     <a th:href="@{/cms/categories}">Danh mục</a>
     <a th:href="@{/cms/orders}">Đơn hàng</a>
-    <a th:href="@{/logout}">Đăng xuất</a>
+    <form th:action="@{/logout(loginType='cms')}" method="post">
+      <button type="submit">Đăng xuất</button>
+    </form>
   </nav>
 </header>
 <footer th:fragment="footer" class="cms-footer">
@@ -43,13 +45,63 @@
 </div>
 <th:block th:fragment="scripts">
   <script>
-    document.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!window.confirm(form.dataset.confirmMessage)) {
-          event.preventDefault();
+    (function () {
+      var overlay;
+      function show(text, kind) {
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.className = 'cms-saving';
+          overlay.setAttribute('role', 'status');
+          overlay.innerHTML = '<i aria-hidden="true"></i><b></b>';
+          document.body.appendChild(overlay);
         }
+        overlay.hidden = false;
+        overlay.className = 'cms-saving' + (kind ? ' ' + kind : '');
+        overlay.querySelector('b').textContent = text;
+      }
+      function submitAjax(form) {
+        var started = Date.now();
+        var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+        show('Đang xử lý...');
+        fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin' })
+          .then(function (response) {
+            return response.text().then(function (html) { return { response: response, html: html }; });
+          })
+          .then(function (result) {
+            var doc = new DOMParser().parseFromString(result.html, 'text/html');
+            var toast = doc.querySelector('.toast.show');
+            if (!result.response.redirected && !toast) {
+              document.open(); document.write(result.html); document.close();
+              return null;
+            }
+            var failed = !result.response.ok || (toast && toast.classList.contains('error'));
+            var text = toast ? toast.textContent.trim() : (failed ? 'Thao tác không thành công.' : 'Đã cập nhật thành công!');
+            return wait(Math.max(0, 1000 - (Date.now() - started))).then(function () {
+              show(text, failed ? 'error' : 'done');
+              return wait(failed ? 2000 : 1200).then(function () { window.location.reload(); });
+            });
+          })
+          .catch(function () {
+            show('Không thể kết nối máy chủ. Vui lòng thử lại.', 'error');
+            setTimeout(function () { overlay.hidden = true; }, 2500);
+          });
+      }
+      document.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+          if (!window.confirm(form.dataset.confirmMessage)) {
+            event.preventDefault();
+            return;
+          }
+          if (form.id !== 'product-form' && !event.defaultPrevented) {
+            event.preventDefault();
+            submitAjax(form);
+          }
+        });
       });
-    });
+      document.querySelectorAll('.toast.show').forEach(function (toast) {
+        setTimeout(function () { toast.classList.remove('show'); }, 4000);
+      });
+    })();
   </script>
 </th:block>
 <aside th:fragment="login-brand" class="cms-login-brand">
