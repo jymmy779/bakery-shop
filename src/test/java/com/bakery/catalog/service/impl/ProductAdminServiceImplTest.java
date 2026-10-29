@@ -227,6 +227,27 @@ class ProductAdminServiceImplTest {
   }
 
   @Test
+  void newImageUsesNextFreeDisplayOrderAfterGap() {
+    Product product = product(5L);
+    when(products.findById(5L)).thenReturn(Optional.of(product));
+    when(categories.findById(1L)).thenReturn(Optional.of(category));
+    com.bakery.catalog.entity.ProductImage first = new com.bakery.catalog.entity.ProductImage();
+    first.setDisplayOrder(0);
+    com.bakery.catalog.entity.ProductImage third = new com.bakery.catalog.entity.ProductImage();
+    third.setDisplayOrder(2);
+    when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(5L)))
+        .thenReturn(List.of(first, third));
+    when(fileStorage.store(any())).thenReturn("/uploads/new.png");
+    ProductUpdateRequest request = updateRequest(ProductStatus.SELLING);
+    request.setNewImages(List.of(validImage()));
+
+    service.update(5L, request);
+
+    verify(images).save(org.mockito.ArgumentMatchers.argThat(
+        (com.bakery.catalog.entity.ProductImage image) -> image.getDisplayOrder() == 3));
+  }
+
+  @Test
   void rejectsNonImageFile() {
     ProductCreateRequest request = createRequest();
     request.setImages(List.of(new MockMultipartFile("images", "notes.txt", "image/png",

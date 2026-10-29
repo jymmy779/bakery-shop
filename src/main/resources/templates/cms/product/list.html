@@ -2,7 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/cms-layout :: head('Quản lý sản phẩm')}"></head>
 <body>
-<div th:replace="~{fragments/cms-layout :: header}"></div>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('products')}"></th:block>
 <main class="cms-page">
   <div class="wrap">
     <header class="cms-top">
@@ -41,7 +41,10 @@
                         th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, 1)">&#8250;</button>
               </div>
             </td>
-            <td><strong th:text="${product.name}">Tên sản phẩm</strong><br><small th:text="${product.description}">Mô tả</small></td>
+            <td><strong th:text="${product.name}">Tên sản phẩm</strong>
+              <span class="cms-badge" th:if="${product.badge != null}" th:switch="${product.badge.name()}">
+                <span th:case="'NEW'">Mới</span><span th:case="'BEST_SELLER'">Bán chạy</span><span th:case="'LIMITED'">Giới hạn</span><span th:case="'SEASONAL'">Theo mùa</span>
+              </span><br><small th:text="${product.description}">Mô tả</small></td>
             <td th:text="${product.categoryName}">Danh mục</td>
             <td th:text="${product.price} + ' đ'">0 đ</td>
             <td th:text="${product.stockQuantity}">0</td>
@@ -53,7 +56,7 @@
                       th:text="${product.status.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}">Đang bán</button>
             </form></td>
             <td class="cms-actions">
-              <button class="btn btn-plain" type="button" th:attr="data-product-id=${product.id},data-name=${product.name},data-description=${product.description},data-badge=${product.badge},data-ingredients=${product.ingredients},data-storage-instructions=${product.storageInstructions},data-allergen-info=${product.allergenInfo},data-price=${product.price},data-stock=${product.stockQuantity},data-preparation=${product.preparationDays},data-category=${product.categoryId},data-status=${product.status},data-image=${product.primaryImagePath},data-images=${product.imagePathsCsv},data-image-ids=${product.imageIdsCsv}" onclick="selectProduct(this)">Sửa</button>
+              <button class="btn btn-plain" type="button" th:attr="data-product-id=${product.id},data-name=${product.name},data-description=${product.description},data-badge=${product.badge},data-ingredients=${product.ingredients},data-storage-instructions=${product.storageInstructions},data-allergen-info=${product.allergenInfo},data-price=${product.price},data-stock=${product.stockQuantity},data-preparation=${product.preparationDays},data-category=${product.categoryId},data-category-name=${product.categoryName},data-status=${product.status},data-image=${product.primaryImagePath},data-images=${product.imagePathsCsv},data-image-ids=${product.imageIdsCsv}" onclick="selectProduct(this)">Sửa</button>
               <form method="post" th:action="@{/cms/products/delete/{id}(id=${product.id})}" data-confirm-message="Bạn có chắc muốn xóa sản phẩm này?" data-confirm-danger="true"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn danger-action" type="submit">Xóa</button></form>
             </td>
           </tr>
@@ -77,7 +80,7 @@
         <label>Tồn kho</label><input th:field="*{stockQuantity}" type="number" min="0" required>
         <label>Số ngày chuẩn bị</label><input th:field="*{preparationDays}" type="number" min="0" required>
         <label>Danh mục</label><select th:field="*{categoryId}" required><option value="">Chọn danh mục</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
-        <label>Badge marketing</label><select th:field="*{badge}"><option value="">Không có badge</option><option value="NEW">Mới</option><option value="BEST_SELLER">Bán chạy</option><option value="LIMITED">Phiên bản giới hạn</option><option value="SEASONAL">Theo mùa</option></select>
+        <label>Badge marketing</label><select th:field="*{badge}"><option value="">Không có badge</option><option value="NEW">Mới</option><option value="BEST_SELLER">Bán chạy</option><option value="LIMITED">Giới hạn</option><option value="SEASONAL">Theo mùa</option></select>
         <label>Mô tả</label><textarea th:field="*{description}" required></textarea>
         <label>Thành phần &amp; hương vị</label><textarea th:field="*{ingredients}" maxlength="10000"></textarea>
         <label>Hướng dẫn bảo quản &amp; hâm nóng</label><textarea th:field="*{storageInstructions}" maxlength="10000"></textarea>
@@ -97,7 +100,7 @@
         <label>Số ngày chuẩn bị</label><input name="preparationDays" id="product-preparation" type="number" min="0" required>
         <label>Danh mục</label><select name="categoryId" id="product-category" required><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
         <label>Trạng thái bán</label><select name="status" id="product-status" required><option value="SELLING">Đang bán</option><option value="STOPPED">Ngừng bán</option></select>
-        <label>Badge marketing</label><select name="badge" id="product-badge"><option value="">Không có badge</option><option value="NEW">Mới</option><option value="BEST_SELLER">Bán chạy</option><option value="LIMITED">Phiên bản giới hạn</option><option value="SEASONAL">Theo mùa</option></select>
+        <label>Badge marketing</label><select name="badge" id="product-badge"><option value="">Không có badge</option><option value="NEW">Mới</option><option value="BEST_SELLER">Bán chạy</option><option value="LIMITED">Giới hạn</option><option value="SEASONAL">Theo mùa</option></select>
         <label>Mô tả</label><textarea name="description" id="product-description" required></textarea>
         <label>Thành phần &amp; hương vị</label><textarea name="ingredients" id="product-ingredients" maxlength="10000"></textarea>
         <label>Hướng dẫn bảo quản &amp; hâm nóng</label><textarea name="storageInstructions" id="product-storage-instructions" maxlength="10000"></textarea>
@@ -106,7 +109,8 @@
         <input name="newImages" id="update-product-images" type="file" multiple accept="image/*">
         <small class="image-upload-hint">Chọn bổ sung ảnh mới. Backend sẽ kiểm tra tổng số ảnh không vượt quá 4.</small>
         <div class="image-upload-preview" id="update-image-preview" aria-live="polite"></div>
-        <button class="btn btn-primary" type="submit">Cập nhật sản phẩm</button>
+        <button class="btn btn-primary" type="submit" id="update-submit">Cập nhật sản phẩm</button>
+        <span class="cms-saving" id="update-saving" role="status" hidden><i></i><b id="update-saving-text">Đang cập nhật...</b></span>
       </form>
       <div class="edit-image-preview" id="edit-image-preview" aria-live="polite"></div>
     </aside>
@@ -115,9 +119,21 @@
 </main>
 <div th:replace="~{fragments/cms-layout :: footer}"></div>
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+<div th:replace="~{fragments/cms-sidebar :: image-preview}"></div>
+<th:block th:replace="~{fragments/cms-sidebar :: image-preview-script}"></th:block>
 <script>
 function openProductCreate() { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Thêm sản phẩm'; document.getElementById('product-create-form').hidden = false; document.getElementById('product-update-form').hidden = true; }
-function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-badge').value = button.dataset.badge || ''; document.getElementById('product-description').value = button.dataset.description || ''; document.getElementById('product-ingredients').value = button.dataset.ingredients || ''; document.getElementById('product-storage-instructions').value = button.dataset.storageInstructions || ''; document.getElementById('product-allergen-info').value = button.dataset.allergenInfo || ''; document.getElementById('update-product-images').value = ''; document.getElementById('update-image-preview').replaceChildren(); renderEditImages(button.dataset.productId, button.dataset.images, button.dataset.imageIds); updatePriceSuggestions('product-price', 'update-price-suggestions'); }
+function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; ensureCategoryOption(button.dataset.category, button.dataset.categoryName); document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-badge').value = button.dataset.badge || ''; document.getElementById('product-description').value = button.dataset.description || ''; document.getElementById('product-ingredients').value = button.dataset.ingredients || ''; document.getElementById('product-storage-instructions').value = button.dataset.storageInstructions || ''; document.getElementById('product-allergen-info').value = button.dataset.allergenInfo || ''; document.getElementById('update-product-images').value = ''; document.getElementById('update-product-images').dispatchEvent(new Event('picker-reset')); document.getElementById('update-image-preview').replaceChildren(); renderEditImages(button.dataset.productId, button.dataset.images, button.dataset.imageIds); updatePriceSuggestions('product-price', 'update-price-suggestions'); }
+function ensureCategoryOption(id, name) {
+  const select = document.getElementById('product-category');
+  select.querySelectorAll('option[data-inactive]').forEach(function (option) { option.remove(); });
+  if (Array.from(select.options).some(function (option) { return option.value === id; })) return;
+  const option = document.createElement('option');
+  option.value = id;
+  option.textContent = name + ' (ngừng hoạt động)';
+  option.dataset.inactive = 'true';
+  select.appendChild(option);
+}
 function renderEditImages(productId, imageCsv, imageIdsCsv) {
   const preview = document.getElementById('edit-image-preview');
   preview.replaceChildren();
@@ -162,6 +178,7 @@ function setupImagePicker(inputId, previewId, maxFiles) {
   const input = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
   let selectedFiles = [];
+  input.addEventListener('picker-reset', function () { selectedFiles = []; });
   input.addEventListener('change', function () {
     selectedFiles = selectedFiles.concat(Array.from(input.files));
     const uniqueFiles = [];
@@ -178,10 +195,21 @@ function setupImagePicker(inputId, previewId, maxFiles) {
     const transfer = new DataTransfer();
     selectedFiles.forEach(function (file) { transfer.items.add(file); });
     input.files = transfer.files;
+    preview.querySelectorAll('img').forEach(function (img) { URL.revokeObjectURL(img.src); });
     preview.replaceChildren();
-    selectedFiles.forEach(function (file) {
-      const item = document.createElement('span');
-      item.textContent = file.name;
+    selectedFiles.forEach(function (file, index) {
+      const item = document.createElement('figure');
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      img.alt = file.name;
+      img.addEventListener('click', function () {
+        const urls = Array.from(preview.querySelectorAll('img')).map(function (node) { return node.src; });
+        if (window.openImagePreview) window.openImagePreview(urls, index);
+      });
+      const caption = document.createElement('figcaption');
+      caption.textContent = file.name;
+      caption.title = file.name;
+      item.append(img, caption);
       preview.appendChild(item);
     });
   });
@@ -209,6 +237,42 @@ document.getElementById('create-product-price').addEventListener('input', functi
 document.getElementById('product-price').addEventListener('input', function () { updatePriceSuggestions('product-price', 'update-price-suggestions'); });
 setupImagePicker('create-product-images', 'create-image-preview', 4);
 setupImagePicker('update-product-images', 'update-image-preview', 4);
+document.getElementById('product-update-form').addEventListener('submit', function (event) {
+  if (event.defaultPrevented) return;
+  event.preventDefault();
+  const form = event.currentTarget;
+  const submit = document.getElementById('update-submit');
+  const saving = document.getElementById('update-saving');
+  const savingText = document.getElementById('update-saving-text');
+  const productId = form.getAttribute('action').split('/').pop();
+  submit.disabled = true;
+  saving.classList.remove('done');
+  savingText.textContent = 'Đang cập nhật...';
+  saving.hidden = false;
+  const minimumDelay = new Promise(function (resolve) { setTimeout(resolve, 1000); });
+  const save = fetch(form.action, { method: 'POST', body: new FormData(form), credentials: 'same-origin' })
+    .then(function () { return fetch(window.location.href, { credentials: 'same-origin' }); })
+    .then(function (response) { return response.text(); });
+  Promise.all([save, minimumDelay]).then(function (results) {
+    const doc = new DOMParser().parseFromString(results[0], 'text/html');
+    const newPanel = doc.querySelector('.cms-catalog-layout > section.cms-panel');
+    const layout = document.querySelector('.cms-catalog-layout');
+    if (!newPanel) { window.location.reload(); return; }
+    layout.querySelector(':scope > section.cms-panel').replaceWith(newPanel);
+    document.querySelectorAll('.wrap > .toast').forEach(function (toast) { toast.remove(); });
+    doc.querySelectorAll('.wrap > .toast').forEach(function (toast) { layout.before(toast); });
+    const button = newPanel.querySelector('button[data-product-id="' + productId + '"]');
+    if (button) selectProduct(button);
+    saving.classList.add('done');
+    savingText.textContent = 'Đã cập nhật ✓';
+    setTimeout(function () { saving.hidden = true; }, 1200);
+  }).catch(function () {
+    saving.hidden = true;
+    window.alert('Không thể cập nhật sản phẩm. Vui lòng thử lại.');
+  }).finally(function () {
+    submit.disabled = false;
+  });
+});
 </script>
 </body>
 </html>

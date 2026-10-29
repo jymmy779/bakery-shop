@@ -191,7 +191,8 @@ public class ProductAdminServiceImpl implements ProductAdminService {
 
   private void saveImages(Product product, List<MultipartFile> files, List<String> storedPaths) {
     if (files == null) return;
-    int order = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(product.getId())).size();
+    int order = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(product.getId())).stream()
+        .mapToInt(ProductImage::getDisplayOrder).max().orElse(-1) + 1;
     for (MultipartFile file : files) {
       if (file == null || file.isEmpty() || !StringUtils.hasText(file.getOriginalFilename())) continue;
       try {

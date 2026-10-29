@@ -2,7 +2,7 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/cms-layout :: head('Quản lý danh mục')}"></head>
 <body>
-<div th:replace="~{fragments/cms-layout :: header}"></div>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('categories')}"></th:block>
 <main class="cms-page"><div class="wrap">
   <header class="cms-top"><div><span class="eyebrow">CMS / CATALOG</span><h1 class="section-title">Quản lý <em>danh mục</em></h1></div></header>
   <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div><div th:if="${errorMessage}" class="toast show" th:text="${errorMessage}"></div>
