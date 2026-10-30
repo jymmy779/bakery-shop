@@ -101,7 +101,7 @@ không lưu HTML do CMS chưa có nhu cầu quản lý cấu trúc phức tạp.
 - Form thêm/sửa sản phẩm trong CMS.
 - API danh sách và chi tiết sản phẩm.
 - Template card và trang chi tiết sản phẩm.
-- Database schema và `docs/sample-cakes.sql`.
+- Database schema và dữ liệu mẫu trong `docs/seed-catalog-products.sql`.
 - Validation, unit test và integration test liên quan.
 
 Các service interface hiện nhận/trả DTO nên không cần đổi chữ ký chỉ để bổ sung
