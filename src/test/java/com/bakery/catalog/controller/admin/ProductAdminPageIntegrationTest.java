@@ -94,7 +94,11 @@ class ProductAdminPageIntegrationTest {
         .andExpect(content().string(org.hamcrest.Matchers.containsString("viewBox=\"0 0 24 24\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/products/42/edit\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/products/toggle-status/42\"")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/products/delete/42\"")));
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/products/delete/42\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("<footer"))))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("<header class=\"cms-header\">"))));
   }
 
   @Test
@@ -109,15 +113,44 @@ class ProductAdminPageIntegrationTest {
     mvc.perform(get("/cms/categories"))
         .andExpect(status().isOk())
         .andExpect(content().string(org.hamcrest.Matchers.containsString("CMS Test Admin")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/categories/add\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("placeholder=\"Tra cứu tên danh mục...\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("data-category-row")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("data-category-no-results")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("viewBox=\"0 0 24 24\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/categories/add\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/categories/3/edit\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/categories/toggle-status/3\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/categories/delete/3\"")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString(
-            "'/cms/categories/update/' + button.dataset.categoryId")));
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("category-sidebar"))))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("<footer"))))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("<header class=\"cms-header\">"))));
+  }
+
+  @Test
+  void rendersCategoryCreateFormOnSeparatePage() throws Exception {
+    mvc.perform(get("/cms/categories/add"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Thêm danh mục")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/categories/add\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"name\"")));
+  }
+
+  @Test
+  void rendersCategoryUpdateFormWithExistingValuesOnSeparatePage() throws Exception {
+    CategoryResponse category = category();
+    category.setName("Category Name");
+    category.setDescription("Special description");
+    when(categoryAdminService.getById(3L)).thenReturn(category);
+
+    mvc.perform(get("/cms/categories/3/edit"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Cập nhật danh mục")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/categories/update/3\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"Category Name\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Special description")));
   }
 
   @Test

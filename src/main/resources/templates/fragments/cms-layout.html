@@ -21,21 +21,6 @@
   <link rel="stylesheet" th:href="@{/css/app.css}">
 </th:block>
 <body class="cms-shell">
-<header th:fragment="header" class="cms-header">
-  <a class="cms-brand" th:href="@{/cms}">LUNE Bakery CMS</a>
-  <nav class="cms-nav" aria-label="Điều hướng quản trị">
-    <a th:href="@{/cms}">Tổng quan</a>
-    <a th:href="@{/cms/products}">Sản phẩm</a>
-    <a th:href="@{/cms/categories}">Danh mục</a>
-    <a th:href="@{/cms/orders}">Đơn hàng</a>
-    <form th:action="@{/logout(loginType='cms')}" method="post">
-      <button type="submit">Đăng xuất</button>
-    </form>
-  </nav>
-</header>
-<footer th:fragment="footer" class="cms-footer">
-  <span>LUNE Bakery CMS</span>
-</footer>
 <div th:fragment="confirm-dialog" id="confirm-dialog" hidden>
   <div class="confirm-dialog__content">
     <p id="confirm-dialog-message"></p>

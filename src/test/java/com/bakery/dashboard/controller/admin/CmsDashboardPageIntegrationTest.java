@@ -59,17 +59,35 @@ class CmsDashboardPageIntegrationTest {
     mvc.perform(get("/cms"))
         .andExpect(status().isOk())
         .andExpect(content().string(org.hamcrest.Matchers.containsString("CMS Test Admin")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("Tổng số sản phẩm")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("Sản phẩm đang bán")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("Sản phẩm ngừng bán")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("cms-dashboard-chart-column")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("cms-dashboard-metrics-column")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("cms-dashboard-products__chart")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Biểu đồ tỷ lệ sản phẩm đang bán và ngừng bán")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString(">Tổng số sản phẩm</span>")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString(">Đang bán</span>")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString(">Ngừng bán</span>")))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("cms-dashboard-card product-selling"))))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("cms-dashboard-card product-stopped"))))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("Tổng số danh mục")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("Tổng số người dùng")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("Doanh thu đã giao")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/products?status=SELLING\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString(
+            "Mỗi chiếc bánh nướng tại Lune là một bản giao hưởng giữa thời gian ủ men và đôi tay người thợ bánh.")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("cms-dashboard-hero__watermark")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Quản lý<br> sản phẩm")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/products\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/categories\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/accounts\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/logout?loginType=cms\"")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"_csrf\"")));
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"_csrf\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString(
+            "<main class=\"cms-page cms-dashboard-page\">")))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("<footer"))))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("<header class=\"cms-header\">"))));
   }
 
   @Test

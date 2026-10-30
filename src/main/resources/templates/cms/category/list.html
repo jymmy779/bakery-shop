@@ -4,11 +4,13 @@
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('categories')}"></th:block>
 <main class="cms-page"><div class="wrap">
-  <header class="cms-top"><div><span class="eyebrow">CMS / CATALOG</span><h1 class="section-title">Quản lý <em>danh mục</em></h1></div></header>
+  <header class="cms-top">
+    <div><span class="eyebrow">CMS / CATALOG</span><h1 class="section-title">Quản lý <em>danh mục</em></h1></div>
+    <a class="btn btn-primary" th:href="@{/cms/categories/add}">+ Thêm danh mục</a>
+  </header>
   <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div><div th:if="${errorMessage}" class="toast show error" th:text="${errorMessage}"></div>
-  <div class="cms-catalog-layout">
   <section class="cms-panel">
-    <div class="cms-toolbar"><h2>Danh sách danh mục</h2><button class="btn btn-primary" type="button" onclick="openCategoryCreate()">+ Thêm danh mục</button></div>
+    <div class="cms-toolbar"><h2>Danh sách danh mục</h2><span th:text="${categories.size()} + ' danh mục'">0 danh mục</span></div>
     <label class="cms-search-field cms-category-search">
       <span class="sr-only">Tra cứu theo tên danh mục</span>
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -28,27 +30,17 @@
                   th:classappend="${category.active} ? ' selling' : ' stopped'"
                   th:text="${category.active ? 'Hoạt động' : 'Ngừng hoạt động'}">Hoạt động</button>
         </form></td>
-        <td class="cms-actions"><button class="btn btn-plain" type="button" th:attr="data-category-id=${category.id},data-name=${category.name},data-description=${category.description}" onclick="selectCategory(this)">Sửa</button>
+        <td class="cms-actions">
+          <a class="btn btn-plain" th:href="@{/cms/categories/{id}/edit(id=${category.id})}">Sửa</a>
           <form method="post" th:action="@{/cms/categories/delete/{id}(id=${category.id})}" data-confirm-message="Bạn có chắc muốn xóa danh mục này?" data-confirm-danger="true"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn danger-action" type="submit">Xóa</button></form>
         </td>
       </tr><tr th:if="${#lists.isEmpty(categories)}" data-category-empty><td colspan="4">Không có danh mục.</td></tr>
       <tr data-category-no-results hidden><td colspan="4">Không tìm thấy danh mục phù hợp.</td></tr></tbody>
     </table></div>
   </section>
-  <aside class="cms-side-panel" id="category-sidebar"><h2 id="category-sidebar-title">Thêm danh mục</h2>
-    <form method="post" th:action="@{/cms/categories/add}" th:object="${categoryRequest}" id="category-create-form" data-confirm-message="Bạn có muốn thêm danh mục này không?">
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><label>Tên danh mục</label><input th:field="*{name}" required><label>Mô tả</label><textarea th:field="*{description}"></textarea><button class="btn btn-primary" type="submit">Lưu danh mục</button>
-    </form>
-    <form method="post" action="/cms/categories/update/0" id="category-update-form" hidden data-confirm-message="Bạn có muốn cập nhật danh mục này không?">
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><label>Tên danh mục</label><input name="name" id="category-name" required><label>Mô tả</label><textarea name="description" id="category-description"></textarea><button class="btn btn-primary" type="submit">Cập nhật danh mục</button>
-    </form>
-  </aside>
-  </div>
 </div></main>
-<div th:replace="~{fragments/cms-layout :: footer}"></div><th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
 <script>
-function openCategoryCreate() { document.getElementById('category-sidebar').hidden = false; document.getElementById('category-create-form').hidden = false; document.getElementById('category-update-form').hidden = true; document.getElementById('category-sidebar-title').textContent = 'Thêm danh mục'; }
-function selectCategory(button) { document.getElementById('category-sidebar').hidden = false; document.getElementById('category-create-form').hidden = true; document.getElementById('category-update-form').hidden = false; document.getElementById('category-update-form').action = '/cms/categories/update/' + button.dataset.categoryId; document.getElementById('category-name').value = button.dataset.name; document.getElementById('category-description').value = button.dataset.description || ''; document.getElementById('category-sidebar-title').textContent = 'Chỉnh sửa danh mục'; }
 const categorySearch = document.getElementById('category-search');
 categorySearch.addEventListener('input', function () {
   const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')

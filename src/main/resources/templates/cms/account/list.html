@@ -1,10 +1,81 @@
-<!doctype html>
-<html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <title>CMS - Tài khoản</title>
-  </head>
-  <body>
-    <main><h1>Quản lý tài khoản</h1></main>
-  </body>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/cms-layout :: head('Quản lý tài khoản')}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('accounts')}"></th:block>
+<main class="cms-page">
+  <div class="wrap cms-management-page">
+    <header class="cms-management-hero">
+      <div>
+        <span class="eyebrow">CMS / TÀI KHOẢN</span>
+        <h1 class="section-title">Quản lý <em>tài khoản</em></h1>
+        <p>Danh sách khách hàng và trạng thái tài khoản trong cửa hàng.</p>
+      </div>
+      <span class="cms-management-count" th:text="${accounts.totalElements} + ' khách hàng'">0 khách hàng</span>
+    </header>
+
+    <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="toast show error" th:text="${errorMessage}"></div>
+
+    <section class="cms-panel">
+      <div class="cms-management-panel-heading">
+        <div>
+          <span class="cms-management-eyebrow">KHÁCH HÀNG</span>
+          <h2>Danh sách tài khoản</h2>
+        </div>
+        <span class="cms-management-count" th:text="${accounts.number + 1 + ' / ' + accounts.totalPages}">1 / 1</span>
+      </div>
+      <div class="cms-table-wrap">
+        <table class="cms-table cms-management-table">
+          <thead>
+          <tr>
+            <th>Khách hàng</th>
+            <th>Email</th>
+            <th>Số điện thoại</th>
+            <th>Ngày tham gia</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="account : ${accounts.content}">
+            <td><strong th:text="${account.fullName}">Tên khách hàng</strong></td>
+            <td th:text="${account.email}">email@example.com</td>
+            <td th:text="${account.phone != null ? account.phone : '—'}">—</td>
+            <td th:text="${account.createdAt != null ? #temporals.format(account.createdAt, 'dd/MM/yyyy') : '—'}">—</td>
+            <td>
+              <span class="cms-status-pill"
+                    th:classappend="${account.status.name() == 'ACTIVE'} ? ' active' : ' locked'"
+                    th:text="${account.status.name() == 'ACTIVE' ? 'Đang hoạt động' : 'Đã khóa'}">Đang hoạt động</span>
+            </td>
+            <td>
+              <form method="post" class="cms-inline-action"
+                    th:action="@{/cms/accounts/{id}/status(id=${account.id})}"
+                    th:attr="data-confirm-message=${account.status.name() == 'ACTIVE' ? 'Bạn có chắc muốn khóa tài khoản này?' : 'Bạn có chắc muốn mở khóa tài khoản này?'}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <input type="hidden" name="status"
+                       th:value="${account.status.name() == 'ACTIVE' ? 'LOCKED' : 'ACTIVE'}">
+                <button class="btn btn-plain" type="submit"
+                        th:text="${account.status.name() == 'ACTIVE' ? 'Khóa tài khoản' : 'Mở khóa'}">Khóa tài khoản</button>
+              </form>
+            </td>
+          </tr>
+          <tr th:if="${accounts.empty}">
+            <td colspan="6" class="cms-table-empty">Chưa có tài khoản khách hàng.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <nav class="pagination cms-product-pagination" th:if="${accounts.totalPages > 1}" aria-label="Phân trang tài khoản">
+        <a class="small-button" th:if="${accounts.hasPrevious()}"
+           th:href="@{/cms/accounts(page=${accounts.number - 1},size=${accounts.size})}">Trước</a>
+        <span th:text="${accounts.number + 1 + ' / ' + accounts.totalPages}">1 / 1</span>
+        <a class="small-button" th:if="${accounts.hasNext()}"
+           th:href="@{/cms/accounts(page=${accounts.number + 1},size=${accounts.size})}">Sau</a>
+      </nav>
+    </section>
+  </div>
+</main>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+</body>
 </html>

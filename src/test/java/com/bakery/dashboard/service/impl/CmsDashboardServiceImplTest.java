@@ -54,4 +54,5 @@ class CmsDashboardServiceImplTest {
   private PageImpl<ProductSummaryResponse> pageWithTotal(long total) {
     return new PageImpl<>(List.of(), PageRequest.of(0, 1), total);
   }
+
 }
