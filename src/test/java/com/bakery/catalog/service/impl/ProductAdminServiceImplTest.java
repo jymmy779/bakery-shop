@@ -285,13 +285,21 @@ class ProductAdminServiceImplTest {
   @Test
   void passesKeywordCategoryAndStatusToAdminFilter() {
     var pageable = org.springframework.data.domain.PageRequest.of(0, 10);
-    when(products.searchAdmin("cake", 1L, ProductStatus.SELLING, pageable))
+    when(products.searchAdmin("cake", 1L, ProductStatus.SELLING, "newest", pageable))
         .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of(), pageable, 0));
 
-    var result = service.search(" cake ", 1L, ProductStatus.SELLING, pageable);
+    var result = service.search(" cake ", 1L, ProductStatus.SELLING, "newest", pageable);
 
     assertEquals(0, result.getTotalElements());
-    verify(products).searchAdmin("cake", 1L, ProductStatus.SELLING, pageable);
+    verify(products).searchAdmin("cake", 1L, ProductStatus.SELLING, "newest", pageable);
+  }
+
+  @Test
+  void rejectsUnsupportedAdminSort() {
+    assertThrows(IllegalArgumentException.class,
+        () -> service.search("", null, null, "unsupported", org.springframework.data.domain.PageRequest.of(0, 10)));
+    verify(products, org.mockito.Mockito.never())
+        .searchAdmin(any(), any(), any(), any(), any());
   }
 
   private ProductUpdateRequest updateRequest(ProductStatus status) {

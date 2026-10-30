@@ -42,7 +42,7 @@ class ProductAdminControllerTest {
 
   @Test
   void rendersCmsProductTableWithFilters() throws Exception {
-    when(productAdminService.search("cake", 2L, ProductStatus.SELLING,
+    when(productAdminService.search("cake", 2L, ProductStatus.SELLING, "newest",
         org.springframework.data.domain.PageRequest.of(0, 10)))
         .thenReturn(new PageImpl<>(List.of()));
     when(categoryAdminService.findAllActive()).thenReturn(List.of());
@@ -51,7 +51,22 @@ class ProductAdminControllerTest {
             .param("categoryId", "2").param("status", "SELLING"))
         .andExpect(status().isOk())
         .andExpect(view().name("cms/product/list"))
-        .andExpect(model().attributeExists("products", "categories"));
+        .andExpect(model().attributeExists("products", "categories"))
+        .andExpect(model().attribute("sort", "newest"));
+  }
+
+  @Test
+  void passesSelectedProductSortToService() throws Exception {
+    var pageable = org.springframework.data.domain.PageRequest.of(0, 10);
+    when(productAdminService.search("", null, null, "price_desc", pageable))
+        .thenReturn(new PageImpl<>(List.of()));
+    when(categoryAdminService.findAllActive()).thenReturn(List.of());
+
+    mvc.perform(get("/cms/products").param("sort", "price_desc"))
+        .andExpect(status().isOk())
+        .andExpect(model().attribute("sort", "price_desc"));
+
+    verify(productAdminService).search("", null, null, "price_desc", pageable);
   }
 
   @Test

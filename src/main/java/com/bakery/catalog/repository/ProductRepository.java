@@ -19,11 +19,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
       WHERE (:status IS NULL OR p.status = :status)
         AND (:categoryId IS NULL OR c.id = :categoryId)
         AND (:keyword IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
-      ORDER BY p.name ASC, p.id ASC
+      ORDER BY
+        CASE WHEN :sort = 'newest' THEN p.createdAt END DESC,
+        CASE WHEN :sort = 'oldest' THEN p.createdAt END ASC,
+        CASE WHEN :sort = 'price_asc' THEN p.price END ASC,
+        CASE WHEN :sort = 'price_desc' THEN p.price END DESC,
+        CASE WHEN :sort = 'name' THEN p.name END ASC,
+        p.id DESC
       """)
   Page<Product> searchAdmin(@Param("keyword") String keyword,
       @Param("categoryId") Long categoryId,
       @Param("status") com.bakery.catalog.entity.ProductStatus status,
+      @Param("sort") String sort,
       Pageable pageable);
   @Override
   @EntityGraph(attributePaths = "category")

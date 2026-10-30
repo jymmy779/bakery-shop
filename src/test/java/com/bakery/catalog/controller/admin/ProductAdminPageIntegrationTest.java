@@ -69,7 +69,9 @@ class ProductAdminPageIntegrationTest {
         .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/products/add\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"product-saving\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"product-upload-progress\"")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("Đang tải ảnh lên...")));
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Đang tải ảnh lên...")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"price-suggestions\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("[100, 1000, 10000]")));
   }
 
   @Test
@@ -82,7 +84,7 @@ class ProductAdminPageIntegrationTest {
     summary.setStockQuantity(5);
     summary.setStatus(ProductStatus.SELLING);
     summary.setCategoryName("Bánh kem");
-    when(productAdminService.search("", null, null, PageRequest.of(0, 10)))
+    when(productAdminService.search("", null, null, "newest", PageRequest.of(0, 10)))
         .thenReturn(new PageImpl<>(List.of(summary)));
 
     mvc.perform(get("/cms/products"))
@@ -90,6 +92,9 @@ class ProductAdminPageIntegrationTest {
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/products/add\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("CMS Test Admin")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("placeholder=\"Tra cứu tên sản phẩm...\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("aria-label=\"Sắp xếp sản phẩm\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"newest\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("Mới nhất")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("aria-label=\"Tra cứu theo tên sản phẩm\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("viewBox=\"0 0 24 24\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/products/42/edit\"")))

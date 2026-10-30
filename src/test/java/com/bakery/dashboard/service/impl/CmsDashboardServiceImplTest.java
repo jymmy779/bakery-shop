@@ -34,11 +34,11 @@ class CmsDashboardServiceImplTest {
   @Test
   void aggregatesCurrentCmsMetricsFromFeatureServices() {
     PageRequest countOnly = PageRequest.of(0, 1);
-    when(products.search("", null, null, countOnly))
+    when(products.search("", null, null, "newest", countOnly))
         .thenReturn(pageWithTotal(12));
-    when(products.search("", null, ProductStatus.SELLING, countOnly))
+    when(products.search("", null, ProductStatus.SELLING, "newest", countOnly))
         .thenReturn(pageWithTotal(9));
-    when(products.search("", null, ProductStatus.STOPPED, countOnly))
+    when(products.search("", null, ProductStatus.STOPPED, "newest", countOnly))
         .thenReturn(pageWithTotal(3));
     when(categories.findAll()).thenReturn(List.of(new CategoryResponse(), new CategoryResponse()));
     when(accounts.countUsers()).thenReturn(27L);

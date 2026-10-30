@@ -41,6 +41,13 @@
           <option value="SELLING" th:selected="${status != null and status.name() == 'SELLING'}">Đang bán</option>
           <option value="STOPPED" th:selected="${status != null and status.name() == 'STOPPED'}">Ngừng bán</option>
         </select>
+        <select name="sort" aria-label="Sắp xếp sản phẩm">
+          <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
+          <option value="oldest" th:selected="${sort == 'oldest'}">Cũ nhất</option>
+          <option value="name" th:selected="${sort == 'name'}">Tên A-Z</option>
+          <option value="price_asc" th:selected="${sort == 'price_asc'}">Giá thấp đến cao</option>
+          <option value="price_desc" th:selected="${sort == 'price_desc'}">Giá cao đến thấp</option>
+        </select>
         <button class="btn btn-plain" type="submit">Lọc</button>
       </form>
 
@@ -111,10 +118,10 @@
       </div>
       <nav class="pagination cms-product-pagination" th:if="${products.totalPages > 1}" aria-label="Phân trang sản phẩm">
         <a class="small-button" th:if="${products.hasPrevious()}"
-           th:href="@{/cms/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId},status=${status})}">Trước</a>
+           th:href="@{/cms/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId},status=${status},sort=${sort})}">Trước</a>
         <span th:text="${products.number + 1 + ' / ' + products.totalPages}">1 / 1</span>
         <a class="small-button" th:if="${products.hasNext()}"
-           th:href="@{/cms/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId},status=${status})}">Sau</a>
+           th:href="@{/cms/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId},status=${status},sort=${sort})}">Sau</a>
       </nav>
     </section>
   </div>

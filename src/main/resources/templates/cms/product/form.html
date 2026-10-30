@@ -42,6 +42,7 @@
             <div class="cms-form-field">
               <label for="product-price">Giá (VNĐ)</label>
               <input id="product-price" th:field="*{price}" type="number" min="1" step="1" required>
+              <div class="price-suggestions" id="price-suggestions" aria-label="Gợi ý giá"></div>
               <small class="field-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></small>
             </div>
             <div class="cms-form-field">
@@ -212,6 +213,32 @@ function setupImagePicker(inputId, previewId, maxFiles) {
 
 setupImagePicker('product-images', 'new-image-preview',
     Number(document.getElementById('product-images').dataset.maxFiles));
+
+const priceInput = document.getElementById('product-price');
+const priceSuggestions = document.getElementById('price-suggestions');
+
+function updatePriceSuggestions() {
+  const basePrice = Number(priceInput.value);
+  priceSuggestions.replaceChildren();
+  if (!Number.isFinite(basePrice) || basePrice <= 0) return;
+
+  [100, 1000, 10000].forEach(function (multiplier) {
+    const suggestedPrice = basePrice * multiplier;
+    if (!Number.isSafeInteger(suggestedPrice)) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'price-suggestion';
+    button.textContent = suggestedPrice.toLocaleString('vi-VN') + ' đ';
+    button.addEventListener('click', function () {
+      priceInput.value = suggestedPrice;
+      priceInput.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    priceSuggestions.appendChild(button);
+  });
+}
+
+priceInput.addEventListener('input', updatePriceSuggestions);
+updatePriceSuggestions();
 
 const productForm = document.getElementById('product-form');
 const productSubmitButton = document.getElementById('product-submit-button');

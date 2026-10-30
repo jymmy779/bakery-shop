@@ -25,11 +25,11 @@ public class CmsDashboardServiceImpl implements CmsDashboardService {
   @Transactional(readOnly = true)
   public CmsDashboardResponse getSummary() {
     PageRequest countOnly = PageRequest.of(0, 1);
-    long totalProducts = products.search("", null, null, countOnly).getTotalElements();
+    long totalProducts = products.search("", null, null, "newest", countOnly).getTotalElements();
     long sellingProducts =
-        products.search("", null, ProductStatus.SELLING, countOnly).getTotalElements();
+        products.search("", null, ProductStatus.SELLING, "newest", countOnly).getTotalElements();
     long stoppedProducts =
-        products.search("", null, ProductStatus.STOPPED, countOnly).getTotalElements();
+        products.search("", null, ProductStatus.STOPPED, "newest", countOnly).getTotalElements();
 
     return new CmsDashboardResponse(totalProducts, sellingProducts, stoppedProducts,
         categories.findAll().size(), accounts.countUsers(), revenue.deliveredPaidRevenue());

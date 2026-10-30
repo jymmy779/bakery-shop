@@ -33,13 +33,15 @@ public class ProductAdminController {
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(defaultValue = "") String keyword,
       @RequestParam(required = false) Long categoryId,
-      @RequestParam(required = false) ProductStatus status, Model model) {
-    model.addAttribute("products", productAdminService.search(keyword, categoryId, status,
+      @RequestParam(required = false) ProductStatus status,
+      @RequestParam(defaultValue = "newest") String sort, Model model) {
+    model.addAttribute("products", productAdminService.search(keyword, categoryId, status, sort,
         PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100))));
     model.addAttribute("categories", categoryAdminService.findAllActive());
     model.addAttribute("keyword", keyword);
     model.addAttribute("categoryId", categoryId);
     model.addAttribute("status", status);
+    model.addAttribute("sort", sort);
     return "cms/product/list";
   }
 
