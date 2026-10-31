@@ -41,8 +41,9 @@ public class ProductQueryServiceImpl implements ProductQueryService {
         || (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0)) {
       throw new IllegalArgumentException("Khoảng giá không hợp lệ: 0 <= minPrice <= maxPrice");
     }
-    if (!Set.of("name", "price_asc", "price_desc", "best_selling").contains(sort)) {
-      throw new IllegalArgumentException("sort phải là name, price_asc, price_desc hoặc best_selling");
+    if (!Set.of("name", "price_asc", "price_desc", "best_selling", "newest").contains(sort)) {
+      throw new IllegalArgumentException(
+          "sort phải là name, price_asc, price_desc, best_selling hoặc newest");
     }
     String pattern = keyword == null || keyword.isBlank() ? null : searchPattern(keyword);
     Page<Product> result = products.filter(pattern, categoryId, minPrice, maxPrice, sort,

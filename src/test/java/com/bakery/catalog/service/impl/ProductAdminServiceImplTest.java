@@ -104,6 +104,36 @@ class ProductAdminServiceImplTest {
   }
 
   @Test
+  void updatesPrimaryImageAndSecondaryImageOrder() {
+    Product product = product(5L);
+    ProductImage first = new ProductImage();
+    first.setId(11L);
+    first.setProduct(product);
+    first.setImagePath("/uploads/first.png");
+    first.setDisplayOrder(0);
+    ProductImage second = new ProductImage();
+    second.setId(12L);
+    second.setProduct(product);
+    second.setImagePath("/uploads/second.png");
+    second.setDisplayOrder(1);
+    when(products.findById(5L)).thenReturn(Optional.of(product));
+    when(categories.findById(1L)).thenReturn(Optional.of(category));
+    when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(5L)))
+        .thenReturn(List.of(first, second));
+    when(fileStorage.store(any())).thenReturn("/uploads/new.png");
+    ProductUpdateRequest request = updateRequest(ProductStatus.SELLING);
+    request.setNewImages(List.of(validImage()));
+    request.setImageOrder("new:0,existing:12,existing:11");
+
+    service.update(5L, request);
+
+    assertEquals(2, first.getDisplayOrder());
+    assertEquals(1, second.getDisplayOrder());
+    verify(images).saveAll(org.mockito.ArgumentMatchers.<Iterable<ProductImage>>argThat(
+        saved -> saved.iterator().next().getDisplayOrder() == 0));
+  }
+
+  @Test
   void doesNotDeleteProductReferencedByOrder() {
     Product product = product(5L);
     when(products.findById(5L)).thenReturn(Optional.of(product));
@@ -227,13 +257,15 @@ class ProductAdminServiceImplTest {
   }
 
   @Test
-  void newImageUsesNextFreeDisplayOrderAfterGap() {
+  void newImageFollowsExistingImagesAndCompactsDisplayOrder() {
     Product product = product(5L);
     when(products.findById(5L)).thenReturn(Optional.of(product));
     when(categories.findById(1L)).thenReturn(Optional.of(category));
     com.bakery.catalog.entity.ProductImage first = new com.bakery.catalog.entity.ProductImage();
+    first.setId(21L);
     first.setDisplayOrder(0);
     com.bakery.catalog.entity.ProductImage third = new com.bakery.catalog.entity.ProductImage();
+    third.setId(23L);
     third.setDisplayOrder(2);
     when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(5L)))
         .thenReturn(List.of(first, third));
@@ -243,8 +275,8 @@ class ProductAdminServiceImplTest {
 
     service.update(5L, request);
 
-    verify(images).save(org.mockito.ArgumentMatchers.argThat(
-        (com.bakery.catalog.entity.ProductImage image) -> image.getDisplayOrder() == 3));
+    verify(images).saveAll(org.mockito.ArgumentMatchers.<Iterable<ProductImage>>argThat(
+        saved -> saved.iterator().next().getDisplayOrder() == 2));
   }
 
   @Test
@@ -285,13 +317,16 @@ class ProductAdminServiceImplTest {
   @Test
   void passesKeywordCategoryAndStatusToAdminFilter() {
     var pageable = org.springframework.data.domain.PageRequest.of(0, 10);
-    when(products.searchAdmin("cake", 1L, ProductStatus.SELLING, "newest", pageable))
+    when(products.searchAdmin("cake", 1L, ProductBadge.BEST_SELLER, ProductStatus.SELLING,
+        "newest", pageable))
         .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of(), pageable, 0));
 
-    var result = service.search(" cake ", 1L, ProductStatus.SELLING, "newest", pageable);
+    var result = service.search(" cake ", 1L, ProductBadge.BEST_SELLER,
+        ProductStatus.SELLING, "newest", pageable);
 
     assertEquals(0, result.getTotalElements());
-    verify(products).searchAdmin("cake", 1L, ProductStatus.SELLING, "newest", pageable);
+    verify(products).searchAdmin("cake", 1L, ProductBadge.BEST_SELLER, ProductStatus.SELLING,
+        "newest", pageable);
   }
 
   @Test
@@ -299,7 +334,7 @@ class ProductAdminServiceImplTest {
     assertThrows(IllegalArgumentException.class,
         () -> service.search("", null, null, "unsupported", org.springframework.data.domain.PageRequest.of(0, 10)));
     verify(products, org.mockito.Mockito.never())
-        .searchAdmin(any(), any(), any(), any(), any());
+        .searchAdmin(any(), any(), any(), any(), any(), any());
   }
 
   private ProductUpdateRequest updateRequest(ProductStatus status) {

@@ -4,6 +4,7 @@ import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductDetailResponse;
 import com.bakery.catalog.dto.ProductSummaryResponse;
 import com.bakery.catalog.dto.ProductUpdateRequest;
+import com.bakery.catalog.entity.ProductBadge;
 import com.bakery.catalog.entity.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,9 +24,19 @@ public interface ProductAdminService {
       String sort,
       Pageable pageable);
 
+  Page<ProductSummaryResponse> search(
+      String keyword,
+      Long categoryId,
+      ProductBadge badge,
+      ProductStatus status,
+      String sort,
+      Pageable pageable);
+
   ProductRemovalResult deleteOrStopSelling(Long productId);
 
   void toggleStatus(Long productId);
 
   void deleteImage(Long productId, Long imageId);
+
+  void deleteAllImages(Long productId);
 }

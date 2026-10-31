@@ -84,7 +84,7 @@ class ProductAdminPageIntegrationTest {
     summary.setStockQuantity(5);
     summary.setStatus(ProductStatus.SELLING);
     summary.setCategoryName("Bánh kem");
-    when(productAdminService.search("", null, null, "newest", PageRequest.of(0, 10)))
+    when(productAdminService.search("", null, null, null, "newest", PageRequest.of(0, 10)))
         .thenReturn(new PageImpl<>(List.of(summary)));
 
     mvc.perform(get("/cms/products"))

@@ -48,6 +48,15 @@
             <option value="STOPPED" th:selected="${status != null and status.name() == 'STOPPED'}">Ngừng bán</option>
           </select>
         </label>
+        <label class="cms-products-select"><span class="sr-only">Lọc theo badge</span>
+          <select name="badge" aria-label="Lọc theo badge">
+            <option value="">Mọi badge</option>
+            <option value="NEW" th:selected="${badge != null and badge.name() == 'NEW'}">Mới</option>
+            <option value="BEST_SELLER" th:selected="${badge != null and badge.name() == 'BEST_SELLER'}">Bán chạy</option>
+            <option value="LIMITED" th:selected="${badge != null and badge.name() == 'LIMITED'}">Giới hạn</option>
+            <option value="SEASONAL" th:selected="${badge != null and badge.name() == 'SEASONAL'}">Theo mùa</option>
+          </select>
+        </label>
         <label class="cms-products-select cms-products-sort"><span class="sr-only">Sắp xếp sản phẩm</span>
           <select name="sort" aria-label="Sắp xếp sản phẩm">
             <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
@@ -69,11 +78,7 @@
           <tbody>
           <tr th:each="product : ${products.content}">
             <td class="cms-products-table__product">
-              <div class="cms-image-carousel" th:attr="data-images=${product.imagePathsCsv}">
-                <button class="image-arrow previous" type="button" aria-label="Ảnh trước" th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, -1)">&#8249;</button>
-                <img class="cms-product-thumb" th:src="${product.primaryImagePath != null ? product.primaryImagePath : '/assets/product-placeholder.svg'}" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg';" th:alt="${product.name}" loading="lazy" width="58" height="58">
-                <button class="image-arrow next" type="button" aria-label="Ảnh sau" th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, 1)">&#8250;</button>
-              </div>
+              <img class="cms-product-thumb" th:src="${product.primaryImagePath != null ? product.primaryImagePath : '/assets/product-placeholder.svg'}" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg';" th:alt="${product.name}" loading="lazy" width="58" height="58">
               <div class="cms-products-table__identity">
                 <strong th:text="${product.name}">Tên sản phẩm</strong>
                 <span class="cms-products-badge" th:if="${product.badge != null}" th:switch="${product.badge.name()}">
@@ -106,9 +111,9 @@
         </table>
       </div>
       <nav class="cms-products-pagination" th:if="${products.totalPages > 1}" aria-label="Phân trang sản phẩm">
-        <a th:if="${products.hasPrevious()}" th:href="@{/cms/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId},status=${status},sort=${sort})}">← Trước</a>
+        <a th:if="${products.hasPrevious()}" th:href="@{/cms/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId},badge=${badge},status=${status},sort=${sort})}">← Trước</a>
         <span th:text="${'Trang ' + (products.number + 1) + ' / ' + products.totalPages}">Trang 1 / 1</span>
-        <a th:if="${products.hasNext()}" th:href="@{/cms/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId},status=${status},sort=${sort})}">Sau →</a>
+        <a th:if="${products.hasNext()}" th:href="@{/cms/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId},badge=${badge},status=${status},sort=${sort})}">Sau →</a>
       </nav>
     </section>
   </div>
@@ -116,18 +121,5 @@
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
 <div th:replace="~{fragments/cms-sidebar :: image-preview}"></div>
 <th:block th:replace="~{fragments/cms-sidebar :: image-preview-script}"></th:block>
-<script>
-function moveProductImage(button, direction) {
-  const carousel = button.parentElement;
-  const image = carousel.querySelector('img');
-  const paths = (carousel.dataset.images || '').split('|').filter(Boolean);
-  if (paths.length < 2) return;
-  const current = Number(carousel.dataset.index || 0);
-  const next = (current + direction + paths.length) % paths.length;
-  carousel.dataset.index = next;
-  image.onerror = function () { image.onerror = null; image.src = '/assets/product-placeholder.svg'; };
-  image.src = paths[next];
-}
-</script>
 </body>
 </html>
