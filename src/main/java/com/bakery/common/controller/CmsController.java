@@ -8,7 +8,7 @@ public class CmsController {
 
   @GetMapping("/cms/login")
   public String login() {
-    return "cms/login";
+    return "redirect:/login";
   }
 
 }

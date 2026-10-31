@@ -73,6 +73,10 @@ Có thể đổi thông tin này trong IntelliJ Run Configuration bằng các bi
 `ADMIN_EMAIL`, `ADMIN_PASSWORD` và `ADMIN_NAME`. Dữ liệu bootstrap chỉ tạo tài
 khoản chưa tồn tại, không ghi đè tài khoản đã có.
 
+Customer, Staff và Admin đăng nhập tại cùng trang `/login`. Sau khi xác thực,
+Customer được chuyển về storefront/profile; Staff và Admin được chuyển vào CMS
+theo quyền của tài khoản.
+
 Thư mục `uploads/` cũng được tạo tự động tại thư mục chạy project. File trong
 thư mục này được phục vụ qua URL `/uploads/<ten-file>` và không được commit.
 

@@ -80,7 +80,7 @@ class CmsDashboardPageIntegrationTest {
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/products\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/categories\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/accounts\"")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/logout?loginType=cms\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/logout\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("name=\"_csrf\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString(
             "<main class=\"cms-page cms-dashboard-page\">")))

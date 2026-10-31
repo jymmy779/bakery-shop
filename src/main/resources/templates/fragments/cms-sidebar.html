@@ -21,7 +21,7 @@
       <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/staff}" th:classappend="${active == 'staff'} ? ' active'">Quản lý nhân viên</a>
       <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}" th:classappend="${active == 'accounts'} ? ' active'">Quản lý tài khoản</a>
     </nav>
-    <form class="cms-sidebar-logout-form"     th:action="@{/logout(loginType='cms')}" method="post">
+    <form class="cms-sidebar-logout-form" th:action="@{/logout}" method="post">
       <button class="cms-sidebar-logout" type="submit">Đăng xuất</button>
     </form>
   </aside>
