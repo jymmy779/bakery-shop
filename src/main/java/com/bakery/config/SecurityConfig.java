@@ -38,7 +38,6 @@ public class SecurityConfig {
             "/cart/**",
             "/register/**",
             "/login",
-            "/cms/login",
             "/forgot-password/**",
             "/error",
             "/css/**",
@@ -48,6 +47,7 @@ public class SecurityConfig {
             "/uploads/**").permitAll()
         .requestMatchers("/checkout/**", "/orders/**", "/profile/**")
             .hasRole("CUSTOMER")
+        .requestMatchers("/cms/login").permitAll()
         .requestMatchers("/cms/accounts/**", "/cms/staff/**")
             .hasRole("ADMIN")
         .requestMatchers("/cms/**")
@@ -56,14 +56,16 @@ public class SecurityConfig {
       )
       .exceptionHandling(exceptions -> exceptions
         .authenticationEntryPoint((request, response, exception) -> {
-          String loginPage = request.getRequestURI().startsWith("/cms/")
+          String requestPath = request.getRequestURI().substring(request.getContextPath().length());
+          String loginPage = requestPath.equals("/cms") || requestPath.startsWith("/cms/")
               ? "/cms/login"
               : "/login";
           response.sendRedirect(request.getContextPath() + loginPage);
         })
       )
       .formLogin(form -> form
-        .loginPage("/login")
+        .loginPage("/cms/login")
+        .loginProcessingUrl("/login")
         .usernameParameter("email")
         .successHandler((request, response, authentication) -> {
           boolean cmsLogin = "cms".equals(request.getParameter("loginType"));

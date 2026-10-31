@@ -3,21 +3,23 @@
 <head th:replace="~{fragments/cms-layout :: head(${isEdit ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm'})}"></head>
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('products')}"></th:block>
-<main class="cms-page">
-  <div class="wrap">
-    <header class="cms-top">
+<main class="cms-page cms-product-editor-page">
+  <div class="wrap cms-product-editor-wrap">
+    <header class="cms-product-editor-header">
       <div>
-        <span class="eyebrow">CMS / CATALOG / SẢN PHẨM</span>
-        <h1 class="section-title" th:if="${isEdit}">Cập nhật <em>sản phẩm</em></h1>
-        <h1 class="section-title" th:unless="${isEdit}">Thêm <em>sản phẩm</em></h1>
+        <span class="cms-products-kicker">CATALOG <span aria-hidden="true">/</span> SẢN PHẨM <span aria-hidden="true">/</span> <span th:text="${isEdit ? 'CHỈNH SỬA' : 'SẢN PHẨM MỚI'}">SẢN PHẨM</span></span>
+        <h1 th:if="${isEdit}">Cập nhật sản phẩm</h1>
+        <h1 th:unless="${isEdit}">Thêm sản phẩm mới</h1>
+        <p th:if="${isEdit}" th:text="${'Chỉnh sửa thông tin, giá và hình ảnh của ' + product.name + '.'}">Chỉnh sửa thông tin, giá và hình ảnh sản phẩm.</p>
+        <p th:unless="${isEdit}">Nhập thông tin sản phẩm để hiển thị trong cửa hàng.</p>
       </div>
-      <a class="btn btn-plain" th:href="@{/cms/products}">← Danh sách sản phẩm</a>
+      <a class="cms-product-editor-back" th:href="@{/cms/products}"><span aria-hidden="true">←</span> Danh sách sản phẩm</a>
     </header>
 
     <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="toast show error" th:text="${errorMessage}"></div>
 
-    <section class="cms-panel cms-product-form-panel">
+    <section class="cms-panel cms-product-form-panel cms-product-editor-card">
       <form class="cms-product-form" id="product-form" method="post" enctype="multipart/form-data"
             th:object="${productRequest}"
             th:action="${isEdit ? '/cms/products/update/' + product.id : '/cms/products/add'}"
@@ -31,8 +33,11 @@
           </ul>
         </div>
 
-        <section class="cms-form-section">
-          <h2>Thông tin sản phẩm</h2>
+        <section class="cms-form-section cms-product-form__details">
+          <div class="cms-product-form__section-heading">
+            <span class="cms-product-form__section-number">01</span>
+            <div><h2>Thông tin sản phẩm</h2><p>Tên, giá bán và thông tin khách hàng cần biết.</p></div>
+          </div>
           <div class="cms-product-form__grid">
             <div class="cms-form-field cms-form-field--wide">
               <label for="product-name">Tên sản phẩm</label>
@@ -74,15 +79,19 @@
               </select>
               <small class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></small>
             </div>
-            <div class="cms-form-field">
-              <label for="product-badge">Badge marketing</label>
-              <select id="product-badge" th:field="*{badge}">
-                <option value="">Không có badge</option>
+            <div class="cms-form-field cms-form-field--wide cms-product-badge-field">
+              <div class="cms-product-badge-field__heading">
+                <label for="product-badge">Nhãn tiếp thị sản phẩm</label>
+                <span class="cms-product-badge-field__optional">Tùy chọn · tối đa 1 nhãn</span>
+              </div>
+              <select id="product-badge" th:field="*{badge}" aria-describedby="product-badge-hint">
+                <option value="">Không gắn nhãn</option>
                 <option value="NEW">Mới</option>
                 <option value="BEST_SELLER">Bán chạy</option>
-                <option value="LIMITED">Giới hạn</option>
+                <option value="LIMITED">Phiên bản giới hạn</option>
                 <option value="SEASONAL">Theo mùa</option>
               </select>
+              <small id="product-badge-hint">Nhãn sẽ hiển thị cùng sản phẩm trên cửa hàng. Chọn một nhãn phù hợp hoặc để trống.</small>
             </div>
             <div class="cms-form-field cms-form-field--wide">
               <label for="product-description">Mô tả</label>
@@ -107,8 +116,11 @@
           </div>
         </section>
 
-        <section class="cms-form-section">
-          <h2>Hình ảnh sản phẩm</h2>
+        <section class="cms-form-section cms-product-form__media">
+          <div class="cms-product-form__section-heading">
+            <span class="cms-product-form__section-number">02</span>
+            <div><h2>Hình ảnh</h2><p>Ảnh rõ nét giúp khách chọn bánh dễ hơn.</p></div>
+          </div>
           <div class="image-upload-preview cms-existing-images" id="existing-image-preview" th:if="${isEdit}">
             <figure th:each="image : ${product.images}">
               <img class="cms-product-thumb" th:src="${image.imagePath}"
@@ -119,8 +131,8 @@
                       th:if="${product.images.size() > 1}">Xóa ảnh</button>
             </figure>
           </div>
-          <p class="image-upload-hint" th:if="${isEdit}">Có thể tải ảnh mới bổ sung; tổng số ảnh của sản phẩm tối đa là 4.</p>
-          <p class="image-upload-hint" th:unless="${isEdit}">Chọn từ 1 đến 4 ảnh. Có thể chọn nhiều ảnh cùng lúc hoặc chọn bổ sung.</p>
+          <p class="image-upload-hint cms-product-form__media-hint" th:if="${isEdit}">Tải ảnh mới để bổ sung vào bộ ảnh hiện tại. Tối đa 4 ảnh cho mỗi sản phẩm.</p>
+          <p class="image-upload-hint cms-product-form__media-hint" th:unless="${isEdit}">Chọn từ 1 đến 4 ảnh. Bạn có thể chọn nhiều ảnh cùng lúc.</p>
           <input id="product-images" th:name="${isEdit ? 'newImages' : 'images'}" type="file"
                  multiple accept="image/*" th:required="${!isEdit}"
                  th:attr="data-max-files=${isEdit ? 4 - product.images.size() : 4}"
@@ -130,9 +142,9 @@
           <div class="image-upload-preview" id="new-image-preview" aria-live="polite"></div>
         </section>
 
-        <div class="cms-form-actions">
+        <div class="cms-form-actions cms-product-form__actions">
           <a class="btn btn-plain" th:href="@{/cms/products}">Hủy</a>
-          <button class="btn btn-primary" id="product-submit-button" type="submit"
+          <button class="btn btn-primary cms-product-form__submit" id="product-submit-button" type="submit"
                   th:text="${isEdit ? 'Lưu thay đổi' : 'Thêm sản phẩm'}">Lưu sản phẩm</button>
         </div>
       </form>
