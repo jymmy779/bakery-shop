@@ -6,90 +6,83 @@
 <th:block th:replace="~{fragments/cms-sidebar :: nav('dashboard')}"></th:block>
 <main class="cms-page cms-dashboard-page">
   <div class="wrap cms-dashboard">
-    <header class="cms-dashboard-hero">
-      <svg class="cms-dashboard-hero__watermark" viewBox="0 0 240 220" aria-hidden="true" focusable="false">
-        <path d="M25 181h190a10 10 0 0 1 0 20H25a10 10 0 0 1 0-20Z"/>
-        <path d="M42 181v-62a17 17 0 0 1 17-17h122a17 17 0 0 1 17 17v62"/>
-        <path d="M42 123c0-11 8-20 18-20s18 9 18 20v8c0 8 6 14 14 14s14-6 14-14v-8c0-11 8-20 18-20s18 9 18 20v22c0 8 6 14 14 14s14-6 14-14v-10c0-11 8-20 18-20s18 9 18 20v6c0 8 6 14 14 14"/>
-        <path d="M77 102V55m0 0c-10-12-10-17 0-31 10 14 10 19 0 31Zm-8 12h16m-16 13h16"/>
-        <path d="M120 102V55m0 0c-10-12-10-17 0-31 10 14 10 19 0 31Zm-8 12h16m-16 13h16"/>
-        <path d="M163 102V55m0 0c-10-12-10-17 0-31 10 14 10 19 0 31Zm-8 12h16m-16 13h16"/>
-      </svg>
+    <header class="cms-dashboard-topbar">
       <div>
-        <span class="cms-dashboard-kicker">KHÔNG GIAN QUẢN TRỊ LUNE</span>
-        <h1>Tổng quan <em>cửa hàng</em></h1>
-        <p>“Mỗi chiếc bánh nướng tại Lune là một bản giao hưởng giữa thời gian ủ men và đôi tay người thợ bánh.”</p>
+        <span class="cms-dashboard-kicker">LUNE · KHÔNG GIAN QUẢN TRỊ</span>
+        <h1>Tổng quan cửa hàng</h1>
+        <p>Theo dõi những chỉ số quan trọng và tiếp tục công việc của bạn.</p>
       </div>
-      <a class="cms-dashboard-hero__action" th:href="@{/cms/products}">
-        <span>Quản lý<br> sản phẩm</span>
-        <span class="cms-dashboard-hero__arrow" aria-hidden="true">→</span>
+      <a class="cms-dashboard-primary" th:href="@{/cms/products}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Quản lý sản phẩm
       </a>
     </header>
 
     <section class="cms-dashboard-section" aria-labelledby="dashboard-metrics-title">
       <div class="cms-dashboard-section__heading">
         <div>
-          <span class="eyebrow">SỨC KHỎE CỬA HÀNG</span>
-          <h2 id="dashboard-metrics-title">Các chỉ số chính</h2>
+          <span class="eyebrow">TỔNG QUAN KINH DOANH</span>
+          <h2 id="dashboard-metrics-title">Chỉ số cửa hàng</h2>
         </div>
-        <small>Dữ liệu hiện tại</small>
+        <span class="cms-dashboard-period">Số liệu hiện có</span>
       </div>
-      <div class="cms-dashboard-columns">
-        <div class="cms-dashboard-chart-column">
-          <a class="cms-dashboard-card cms-dashboard-products" th:href="@{/cms/products}">
-          <div class="cms-dashboard-products__heading">
-            <span class="cms-dashboard-card__icon" aria-hidden="true">▧</span>
-            <span class="cms-dashboard-card__tag">SẢN PHẨM</span>
-            <span class="cms-dashboard-card__label">Tổng số sản phẩm</span>
-            <strong th:text="${#numbers.formatInteger(dashboard.totalProducts(), 0, 'POINT')}">0</strong>
-          </div>
-          <div class="cms-dashboard-products__details">
-            <span class="cms-dashboard-products__chart"
-                  role="img"
-                  aria-label="Biểu đồ tỷ lệ sản phẩm đang bán và ngừng bán"
-                  th:classappend="${dashboard.totalProducts() == 0} ? ' is-empty' : ''"
-                  th:style="|--selling-share: ${dashboard.totalProducts() == 0 ? 0 : dashboard.sellingProducts() * 100.0 / dashboard.totalProducts()}%|"></span>
-            <div class="cms-dashboard-products__legend">
-              <span><i class="cms-dashboard-products__dot is-selling" aria-hidden="true"></i>Đang bán</span>
-              <strong th:text="${#numbers.formatInteger(dashboard.sellingProducts(), 0, 'POINT')}">0</strong>
-              <span><i class="cms-dashboard-products__dot is-stopped" aria-hidden="true"></i>Ngừng bán</span>
-              <strong th:text="${#numbers.formatInteger(dashboard.stoppedProducts(), 0, 'POINT')}">0</strong>
-            </div>
-          </div>
-          </a>
+
+      <div class="cms-dashboard-summary">
+        <a class="cms-dashboard-stat cms-dashboard-stat--products" th:href="@{/cms/products}">
+          <span class="cms-dashboard-stat__top"><span>Sản phẩm</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5zM4.5 7.8 12 12l7.5-4.2M12 12v8.5"/></svg></span></span>
+          <strong th:text="${#numbers.formatInteger(dashboard.totalProducts(), 0, 'POINT')}">0</strong>
+          <span class="cms-dashboard-stat__foot"><i class="is-green"></i><span th:text="${#numbers.formatInteger(dashboard.sellingProducts(), 0, 'POINT')}">0</span> đang bán <span class="cms-dashboard-separator">·</span> <span th:text="${#numbers.formatInteger(dashboard.stoppedProducts(), 0, 'POINT')}">0</span> ngừng bán</span>
+        </a>
+        <a class="cms-dashboard-stat cms-dashboard-stat--categories" th:href="@{/cms/categories}">
+          <span class="cms-dashboard-stat__top"><span>Danh mục</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span></span>
+          <strong th:text="${#numbers.formatInteger(dashboard.totalCategories(), 0, 'POINT')}">0</strong>
+          <span class="cms-dashboard-stat__foot">Danh mục trong cửa hàng</span>
+        </a>
+        <a class="cms-dashboard-stat cms-dashboard-stat--users" sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}">
+          <span class="cms-dashboard-stat__top"><span>Tài khoản</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span></span>
+          <strong th:text="${#numbers.formatInteger(dashboard.totalUsers(), 0, 'POINT')}">0</strong>
+          <span class="cms-dashboard-stat__foot">Tài khoản trong cửa hàng</span>
+        </a>
+        <div class="cms-dashboard-stat cms-dashboard-stat--users" sec:authorize="!hasRole('ADMIN')">
+          <span class="cms-dashboard-stat__top"><span>Tài khoản</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span></span>
+          <strong th:text="${#numbers.formatInteger(dashboard.totalUsers(), 0, 'POINT')}">0</strong>
+          <span class="cms-dashboard-stat__foot">Tài khoản trong cửa hàng</span>
         </div>
-        <div class="cms-dashboard-metrics-column">
-          <a class="cms-dashboard-card category-total" th:href="@{/cms/categories}">
-            <span class="cms-dashboard-card__icon" aria-hidden="true">◇</span>
-            <span class="cms-dashboard-card__tag">DANH MỤC</span>
-            <span class="cms-dashboard-card__label">Tổng số danh mục</span>
-            <strong th:text="${#numbers.formatInteger(dashboard.totalCategories(), 0, 'POINT')}">0</strong>
-            <small>Danh mục đang hoạt động và ngừng hoạt động</small>
-          </a>
-          <a class="cms-dashboard-card user-total" sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}">
-            <span class="cms-dashboard-card__icon" aria-hidden="true">♙</span>
-            <span class="cms-dashboard-card__tag">NGƯỜI DÙNG</span>
-            <span class="cms-dashboard-card__label">Tổng số người dùng</span>
-            <strong th:text="${#numbers.formatInteger(dashboard.totalUsers(), 0, 'POINT')}">0</strong>
-            <small>Tài khoản trong cửa hàng</small>
-          </a>
-          <div class="cms-dashboard-card user-total" sec:authorize="!hasRole('ADMIN')">
-            <span class="cms-dashboard-card__icon" aria-hidden="true">♙</span>
-            <span class="cms-dashboard-card__tag">NGƯỜI DÙNG</span>
-            <span class="cms-dashboard-card__label">Tổng số người dùng</span>
-            <strong th:text="${#numbers.formatInteger(dashboard.totalUsers(), 0, 'POINT')}">0</strong>
-            <small>Tài khoản trong cửa hàng</small>
-          </div>
-          <div class="cms-dashboard-card revenue-total">
-            <span class="cms-dashboard-card__icon" aria-hidden="true">₫</span>
-            <span class="cms-dashboard-card__tag">DOANH THU</span>
-            <span class="cms-dashboard-card__label">Doanh thu đã giao</span>
-            <strong><span th:text="${#numbers.formatInteger(dashboard.deliveredRevenue(), 0, 'POINT')}">0</span> đ</strong>
-            <small>Đơn đã giao và thanh toán thành công</small>
-          </div>
+        <div class="cms-dashboard-stat cms-dashboard-stat--revenue">
+          <span class="cms-dashboard-stat__top"><span>Doanh thu đã giao</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.8v18.4M17 7.2c0-1.8-2-3.2-5-3.2S7 5.4 7 7.2s1.4 2.7 5 3.6 5 2 5 4-2 3.5-5 3.5-5-1.5-5-3.5"/></svg></span></span>
+          <strong><span th:text="${#numbers.formatInteger(dashboard.deliveredRevenue(), 0, 'POINT')}">0</span><small>đ</small></strong>
+          <span class="cms-dashboard-stat__foot">Đơn đã giao và thanh toán thành công</span>
         </div>
       </div>
     </section>
+
+    <div class="cms-dashboard-lower">
+      <section class="cms-dashboard-panel cms-dashboard-inventory" aria-labelledby="inventory-title">
+        <div class="cms-dashboard-panel__heading">
+          <div><span class="eyebrow">DANH MỤC SẢN PHẨM</span><h2 id="inventory-title">Tình trạng sản phẩm</h2></div>
+          <a th:href="@{/cms/products}">Xem danh sách <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="cms-dashboard-inventory__body">
+          <div class="cms-dashboard-donut" role="img" aria-label="Biểu đồ tỷ lệ sản phẩm đang bán và ngừng bán" th:classappend="${dashboard.totalProducts() == 0} ? ' is-empty' : ''" th:style="|--selling-share: ${dashboard.totalProducts() == 0 ? 0 : dashboard.sellingProducts() * 100.0 / dashboard.totalProducts()}%|"><div><strong th:text="${#numbers.formatInteger(dashboard.totalProducts(), 0, 'POINT')}">0</strong><span>sản phẩm</span></div></div>
+          <div class="cms-dashboard-inventory__legend">
+            <div><span><i class="is-green"></i>Đang bán</span><strong th:text="${#numbers.formatInteger(dashboard.sellingProducts(), 0, 'POINT')}">0</strong></div>
+            <div><span><i class="is-rose"></i>Ngừng bán</span><strong th:text="${#numbers.formatInteger(dashboard.stoppedProducts(), 0, 'POINT')}">0</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cms-dashboard-panel cms-dashboard-shortcuts" aria-labelledby="shortcuts-title">
+        <div class="cms-dashboard-panel__heading">
+          <div><span class="eyebrow">LỐI TẮT</span><h2 id="shortcuts-title">Công việc quản trị</h2></div>
+        </div>
+        <nav aria-label="Lối tắt quản trị">
+          <a th:href="@{/cms/products}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 7.5 8-4.5 8 4.5v9L12 21l-8-4.5zM4.5 7.8 12 12l7.5-4.2M12 12v8.5"/></svg></span><span><strong>Sản phẩm</strong><small>Quản lý bánh và tồn kho</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
+          <a th:href="@{/cms/categories}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span><span><strong>Danh mục</strong><small>Sắp xếp nhóm sản phẩm</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
+          <a th:href="@{/cms/orders}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg></span><span><strong>Đơn hàng</strong><small>Xem và xử lý đơn hàng</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
+          <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span><span><strong>Tài khoản</strong><small>Quản lý người dùng</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
+        </nav>
+      </section>
+    </div>
   </div>
 </main>
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>

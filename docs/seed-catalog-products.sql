@@ -202,4 +202,74 @@ INSERT INTO product_images (product_id, image_path, display_order, created_at, u
 SELECT p.id, '/uploads/b0932cdb-b420-4ef8-a340-67d8e4b956b7-rv2.png', 1, NOW(), NOW() FROM products p WHERE p.name = 'Bánh Kem Red Velvet'
   AND NOT EXISTS (SELECT 1 FROM product_images i WHERE i.product_id = p.id AND i.display_order = 1);
 
+-- Basque cheesecake vị mè đen (1 miếng)
+INSERT INTO products (name, description, badge, ingredients, storage_instructions, allergen_info, price, stock_quantity, preparation_days, status, category_id, version, created_at, updated_at)
+SELECT 'Basque cheesecake vị mè đen (1 miếng)', 'Cheesecake nướng kiểu Basque với lớp mặt caramel cháy nhẹ, phần nhân mềm mịn và vị mè đen rang bùi thơm. Một miếng bánh nhỏ gọn, đậm vị, hợp dùng cùng trà hoặc cà phê.', 'NEW', 'Phô mai kem, kem tươi, trứng gà, đường, mè đen rang xay, bột mì.', 'Bảo quản trong ngăn mát tủ lạnh ở 2–6°C, dùng ngon nhất trong vòng 3 ngày. Để bánh ở nhiệt độ phòng khoảng 10–15 phút trước khi ăn để nhân mềm và thơm hơn. Không để bánh ở nhiệt độ phòng quá 2 giờ.', 'Có chứa sữa, trứng, mè đen và gluten (lúa mì). Có thể có dấu vết của các loại hạt do chế biến cùng khu vực.', 75000.00, 3, 0, 'SELLING', c.id, 0, NOW(), NOW()
+FROM categories c WHERE c.name = 'Bánh Kem & Bánh Tiệc'
+  AND NOT EXISTS (SELECT 1 FROM products e WHERE e.name = 'Basque cheesecake vị mè đen (1 miếng)');
+UPDATE products p JOIN categories c ON c.id = p.category_id AND c.name = 'Bánh Kem & Bánh Tiệc'
+SET p.description = 'Cheesecake nướng kiểu Basque với lớp mặt caramel cháy nhẹ, phần nhân mềm mịn và vị mè đen rang bùi thơm. Một miếng bánh nhỏ gọn, đậm vị, hợp dùng cùng trà hoặc cà phê.',
+    p.badge = 'NEW', p.ingredients = 'Phô mai kem, kem tươi, trứng gà, đường, mè đen rang xay, bột mì.',
+    p.storage_instructions = 'Bảo quản trong ngăn mát tủ lạnh ở 2–6°C, dùng ngon nhất trong vòng 3 ngày. Để bánh ở nhiệt độ phòng khoảng 10–15 phút trước khi ăn để nhân mềm và thơm hơn. Không để bánh ở nhiệt độ phòng quá 2 giờ.',
+    p.allergen_info = 'Có chứa sữa, trứng, mè đen và gluten (lúa mì). Có thể có dấu vết của các loại hạt do chế biến cùng khu vực.',
+    p.price = 75000.00, p.stock_quantity = 3, p.preparation_days = 0, p.status = 'SELLING', p.updated_at = NOW()
+WHERE p.name = 'Basque cheesecake vị mè đen (1 miếng)';
+INSERT INTO product_images (product_id, image_path, display_order, created_at, updated_at)
+SELECT p.id, '/uploads/94fe2933-1ff2-4adc-a0b6-1d6f3f671d4b-black-sesame-basque-3.jpg', 0, NOW(), NOW() FROM products p WHERE p.name = 'Basque cheesecake vị mè đen (1 miếng)'
+  AND NOT EXISTS (SELECT 1 FROM product_images i WHERE i.product_id = p.id AND i.display_order = 0);
+INSERT INTO product_images (product_id, image_path, display_order, created_at, updated_at)
+SELECT p.id, '/uploads/09959dd7-19cb-48b7-9024-b561db5066bf-black-sesame-basque-1.jpg', 1, NOW(), NOW() FROM products p WHERE p.name = 'Basque cheesecake vị mè đen (1 miếng)'
+  AND NOT EXISTS (SELECT 1 FROM product_images i WHERE i.product_id = p.id AND i.display_order = 1);
+INSERT INTO product_images (product_id, image_path, display_order, created_at, updated_at)
+SELECT p.id, '/uploads/0334408d-8eb6-44d9-8dc1-c44bcbe15095-black-sesame-basque-2.jpg', 2, NOW(), NOW() FROM products p WHERE p.name = 'Basque cheesecake vị mè đen (1 miếng)'
+  AND NOT EXISTS (SELECT 1 FROM product_images i WHERE i.product_id = p.id AND i.display_order = 2);
+-- Hộp Thiếc Biscotti Hạt & Nam Việt Quất
+INSERT INTO products (name, description, badge, ingredients, storage_instructions, allergen_info, price, stock_quantity, preparation_days, status, category_id, version, created_at, updated_at)
+SELECT 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất', 'Biscotti Hạt & Nam Việt Quất là dòng bánh quy nướng giòn theo phong cách Ý, được làm từ bột mì kết hợp cùng các loại hạt dinh dưỡng và nam việt quất sấy. Bánh có kết cấu giòn chắc, hình dáng lát dài đặc trưng, thích hợp dùng làm món ăn nhẹ cùng trà hoặc cà phê. Sản phẩm được đóng gói trong hộp thiếc sang trọng, thích hợp sử dụng hằng ngày hoặc làm quà tặng.', NULL, 'Thành phần: Bột mì, hạnh nhân, trứng gà, đường, bơ, nam việt quất sấy, dầu thực vật, muối và các nguyên liệu phụ trợ làm bánh.\n\nHương vị: Vị ngọt dịu, thơm bùi của hạnh nhân, xen lẫn vị chua ngọt tự nhiên của nam việt quất. Bánh có độ giòn đặc trưng, hậu vị béo nhẹ và không quá ngấy.', 'Bảo quản bánh trong hộp kín, đặt tại nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp. Đậy kín nắp hộp sau mỗi lần sử dụng để giữ độ giòn. Tránh để bánh tiếp xúc với môi trường ẩm hoặc gần các thực phẩm có mùi mạnh. Nếu bánh bị giảm độ giòn, có thể sấy bằng lò nướng ở 120°C trong khoảng 3–5 phút, sau đó để nguội hoàn toàn trước khi thưởng thức. Không cần hâm nóng trước khi ăn.', 'Có chứa: Gluten (lúa mì), hạnh nhân (hạt cây), trứng và sữa (nếu sử dụng bơ sữa).\nCó thể chứa dấu vết của các loại hạt khác do quá trình sản xuất và chế biến chung.\nKhông phù hợp với người bị dị ứng với các thành phần nêu trên.', 159000.00, 0, 1, 'SELLING', c.id, 0, NOW(), NOW()
+FROM categories c WHERE c.name = 'Bánh Hộp Thiếc & Quà Tặng'
+  AND NOT EXISTS (SELECT 1 FROM products e WHERE e.name = 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất');
+UPDATE products p JOIN categories c ON c.id = p.category_id AND c.name = 'Bánh Hộp Thiếc & Quà Tặng'
+SET p.description = 'Biscotti Hạt & Nam Việt Quất là dòng bánh quy nướng giòn theo phong cách Ý, được làm từ bột mì kết hợp cùng các loại hạt dinh dưỡng và nam việt quất sấy. Bánh có kết cấu giòn chắc, hình dáng lát dài đặc trưng, thích hợp dùng làm món ăn nhẹ cùng trà hoặc cà phê. Sản phẩm được đóng gói trong hộp thiếc sang trọng, thích hợp sử dụng hằng ngày hoặc làm quà tặng.',
+    p.badge = NULL,
+    p.ingredients = 'Thành phần: Bột mì, hạnh nhân, trứng gà, đường, bơ, nam việt quất sấy, dầu thực vật, muối và các nguyên liệu phụ trợ làm bánh.\n\nHương vị: Vị ngọt dịu, thơm bùi của hạnh nhân, xen lẫn vị chua ngọt tự nhiên của nam việt quất. Bánh có độ giòn đặc trưng, hậu vị béo nhẹ và không quá ngấy.',
+    p.storage_instructions = 'Bảo quản bánh trong hộp kín, đặt tại nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp. Đậy kín nắp hộp sau mỗi lần sử dụng để giữ độ giòn. Tránh để bánh tiếp xúc với môi trường ẩm hoặc gần các thực phẩm có mùi mạnh. Nếu bánh bị giảm độ giòn, có thể sấy bằng lò nướng ở 120°C trong khoảng 3–5 phút, sau đó để nguội hoàn toàn trước khi thưởng thức. Không cần hâm nóng trước khi ăn.',
+    p.allergen_info = 'Có chứa: Gluten (lúa mì), hạnh nhân (hạt cây), trứng và sữa (nếu sử dụng bơ sữa).\nCó thể chứa dấu vết của các loại hạt khác do quá trình sản xuất và chế biến chung.\nKhông phù hợp với người bị dị ứng với các thành phần nêu trên.',
+    p.price = 159000.00, p.stock_quantity = 0, p.preparation_days = 1, p.status = 'SELLING', p.updated_at = NOW()
+WHERE p.name = 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất';
+INSERT INTO product_images (product_id, image_path, display_order, created_at, updated_at)
+SELECT p.id, '/uploads/e0ac2d06-9d26-4db1-8f5e-68ab681fdf38-cranberry-nut-biscotti-1.jpg', 0, NOW(), NOW() FROM products p WHERE p.name = 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất'
+  AND NOT EXISTS (SELECT 1 FROM product_images i WHERE i.product_id = p.id AND i.display_order = 0);
+INSERT INTO product_images (product_id, image_path, display_order, created_at, updated_at)
+SELECT p.id, '/uploads/ce52e4a7-f0e7-4480-b78f-f215c1fdfad7-cranberry-nut-biscotti-4.jpg', 1, NOW(), NOW() FROM products p WHERE p.name = 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất'
+  AND NOT EXISTS (SELECT 1 FROM product_images i WHERE i.product_id = p.id AND i.display_order = 1);
+INSERT INTO product_images (product_id, image_path, display_order, created_at, updated_at)
+SELECT p.id, '/uploads/339e548e-c4df-467d-9680-2b93fc4cc59c-cranberry-nut-biscotti-3.jpg', 2, NOW(), NOW() FROM products p WHERE p.name = 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất'
+  AND NOT EXISTS (SELECT 1 FROM product_images i WHERE i.product_id = p.id AND i.display_order = 2);
+INSERT INTO product_images (product_id, image_path, display_order, created_at, updated_at)
+SELECT p.id, '/uploads/139c1125-afe3-4cc5-9b7c-cc6eebb522ea-cranberry-nut-biscotti-2.jpg', 3, NOW(), NOW() FROM products p WHERE p.name = 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất'
+  AND NOT EXISTS (SELECT 1 FROM product_images i WHERE i.product_id = p.id AND i.display_order = 3);
+
+-- Đồng bộ đường dẫn ảnh nếu seed đã chạy trên database trước đó.
+UPDATE product_images i
+JOIN products p ON p.id = i.product_id
+JOIN (
+  SELECT 'Basque cheesecake vị mè đen (1 miếng)' AS product_name, 0 AS display_order,
+    '/uploads/94fe2933-1ff2-4adc-a0b6-1d6f3f671d4b-black-sesame-basque-3.jpg' AS image_path
+  UNION ALL SELECT 'Basque cheesecake vị mè đen (1 miếng)', 1,
+    '/uploads/09959dd7-19cb-48b7-9024-b561db5066bf-black-sesame-basque-1.jpg'
+  UNION ALL SELECT 'Basque cheesecake vị mè đen (1 miếng)', 2,
+    '/uploads/0334408d-8eb6-44d9-8dc1-c44bcbe15095-black-sesame-basque-2.jpg'
+  UNION ALL SELECT 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất', 0,
+    '/uploads/e0ac2d06-9d26-4db1-8f5e-68ab681fdf38-cranberry-nut-biscotti-1.jpg'
+  UNION ALL SELECT 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất', 1,
+    '/uploads/ce52e4a7-f0e7-4480-b78f-f215c1fdfad7-cranberry-nut-biscotti-4.jpg'
+  UNION ALL SELECT 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất', 2,
+    '/uploads/339e548e-c4df-467d-9680-2b93fc4cc59c-cranberry-nut-biscotti-3.jpg'
+  UNION ALL SELECT 'Hộp Thiếc Biscotti Hạt & Nam Việt Quất', 3,
+    '/uploads/139c1125-afe3-4cc5-9b7c-cc6eebb522ea-cranberry-nut-biscotti-2.jpg'
+) AS seed_images ON seed_images.product_name = p.name
+  AND seed_images.display_order = i.display_order
+SET i.image_path = seed_images.image_path
+WHERE i.image_path <> seed_images.image_path;
+
 COMMIT;

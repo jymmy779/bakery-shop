@@ -17,7 +17,7 @@ class CategoryControllerTest {
   private final CategoryAdminService categoryService = mock(CategoryAdminService.class);
 
   @Test
-  void returnsOnlyCategoriesProvidedByActiveCategoryQuery() throws Exception {
+  void returnsActiveCategories() throws Exception {
     CategoryResponse category = new CategoryResponse();
     category.setId(1L);
     category.setName("Bánh Kem & Bánh Tiệc");

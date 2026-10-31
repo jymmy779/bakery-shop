@@ -3,21 +3,23 @@
 <head th:replace="~{fragments/cms-layout :: head(${isEdit ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm'})}"></head>
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('products')}"></th:block>
-<main class="cms-page">
-  <div class="wrap">
-    <header class="cms-top">
+<main class="cms-page cms-product-editor-page">
+  <div class="wrap cms-product-editor-wrap">
+    <header class="cms-product-editor-header">
       <div>
-        <span class="eyebrow">CMS / CATALOG / SẢN PHẨM</span>
-        <h1 class="section-title" th:if="${isEdit}">Cập nhật <em>sản phẩm</em></h1>
-        <h1 class="section-title" th:unless="${isEdit}">Thêm <em>sản phẩm</em></h1>
+        <span class="cms-products-kicker">CATALOG <span aria-hidden="true">/</span> SẢN PHẨM <span aria-hidden="true">/</span> <span th:text="${isEdit ? 'CHỈNH SỬA' : 'SẢN PHẨM MỚI'}">SẢN PHẨM</span></span>
+        <h1 th:if="${isEdit}">Cập nhật sản phẩm</h1>
+        <h1 th:unless="${isEdit}">Thêm sản phẩm mới</h1>
+        <p th:if="${isEdit}" th:text="${'Chỉnh sửa thông tin, giá và hình ảnh của ' + product.name + '.'}">Chỉnh sửa thông tin, giá và hình ảnh sản phẩm.</p>
+        <p th:unless="${isEdit}">Nhập thông tin sản phẩm để hiển thị trong cửa hàng.</p>
       </div>
-      <a class="btn btn-plain" th:href="@{/cms/products}">← Danh sách sản phẩm</a>
+      <a class="cms-product-editor-back" th:href="@{/cms/products}"><span aria-hidden="true">←</span> Danh sách sản phẩm</a>
     </header>
 
     <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="toast show error" th:text="${errorMessage}"></div>
 
-    <section class="cms-panel cms-product-form-panel">
+    <section class="cms-panel cms-product-form-panel cms-product-editor-card">
       <form class="cms-product-form" id="product-form" method="post" enctype="multipart/form-data"
             th:object="${productRequest}"
             th:action="${isEdit ? '/cms/products/update/' + product.id : '/cms/products/add'}"
@@ -31,8 +33,11 @@
           </ul>
         </div>
 
-        <section class="cms-form-section">
-          <h2>Thông tin sản phẩm</h2>
+        <section class="cms-form-section cms-product-form__details">
+          <div class="cms-product-form__section-heading">
+            <span class="cms-product-form__section-number">01</span>
+            <div><h2>Thông tin sản phẩm</h2><p>Tên, giá bán và thông tin khách hàng cần biết.</p></div>
+          </div>
           <div class="cms-product-form__grid">
             <div class="cms-form-field cms-form-field--wide">
               <label for="product-name">Tên sản phẩm</label>
@@ -74,15 +79,19 @@
               </select>
               <small class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></small>
             </div>
-            <div class="cms-form-field">
-              <label for="product-badge">Badge marketing</label>
-              <select id="product-badge" th:field="*{badge}">
-                <option value="">Không có badge</option>
+            <div class="cms-form-field cms-form-field--wide cms-product-badge-field">
+              <div class="cms-product-badge-field__heading">
+                <label for="product-badge">Nhãn tiếp thị sản phẩm</label>
+                <span class="cms-product-badge-field__optional">Tùy chọn · tối đa 1 nhãn</span>
+              </div>
+              <select id="product-badge" th:field="*{badge}" aria-describedby="product-badge-hint">
+                <option value="">Không gắn nhãn</option>
                 <option value="NEW">Mới</option>
                 <option value="BEST_SELLER">Bán chạy</option>
-                <option value="LIMITED">Giới hạn</option>
+                <option value="LIMITED">Phiên bản giới hạn</option>
                 <option value="SEASONAL">Theo mùa</option>
               </select>
+              <small id="product-badge-hint">Nhãn sẽ hiển thị cùng sản phẩm trên cửa hàng. Chọn một nhãn phù hợp hoặc để trống.</small>
             </div>
             <div class="cms-form-field cms-form-field--wide">
               <label for="product-description">Mô tả</label>
@@ -107,32 +116,43 @@
           </div>
         </section>
 
-        <section class="cms-form-section">
-          <h2>Hình ảnh sản phẩm</h2>
-          <div class="image-upload-preview cms-existing-images" id="existing-image-preview" th:if="${isEdit}">
-            <figure th:each="image : ${product.images}">
+        <section class="cms-form-section cms-product-form__media">
+          <div class="cms-product-form__section-heading">
+            <span class="cms-product-form__section-number">02</span>
+            <div><h2>Hình ảnh</h2><p>Ảnh rõ nét giúp khách chọn bánh dễ hơn.</p></div>
+          </div>
+          <div class="image-upload-preview cms-existing-images" id="product-image-gallery">
+            <figure th:each="image : ${isEdit ? product.images : null}" th:attr="data-image-token=${'existing:' + image.id}">
               <img class="cms-product-thumb" th:src="${image.imagePath}"
                    onerror="this.onerror=null;this.src='/assets/product-placeholder.svg';"
                    th:alt="${'Ảnh sản phẩm ' + image.displayOrder}">
-              <figcaption th:text="${'Ảnh ' + image.displayOrder}">Ảnh sản phẩm</figcaption>
+              <figcaption th:text="${image.displayOrder == 0 ? 'Ảnh chính' : 'Ảnh phụ ' + image.displayOrder}">Ảnh chính</figcaption>
+              <div class="cms-image-order-actions">
+                <button type="button" class="image-order-button" data-image-move="-1" aria-label="Đưa ảnh lên trước">↑</button>
+                <button type="button" class="image-order-button" data-image-move="1" aria-label="Đưa ảnh xuống sau">↓</button>
+                <span class="image-primary-indicator" th:hidden="${image.displayOrder != 0}">Ảnh chính</span>
+                <button type="button" class="image-primary-button" data-image-primary="true" th:hidden="${image.displayOrder == 0}">Đặt làm ảnh chính</button>
+              </div>
               <button class="image-delete-button" type="submit" th:form="${'delete-image-' + image.id}"
                       th:if="${product.images.size() > 1}">Xóa ảnh</button>
             </figure>
           </div>
-          <p class="image-upload-hint" th:if="${isEdit}">Có thể tải ảnh mới bổ sung; tổng số ảnh của sản phẩm tối đa là 4.</p>
-          <p class="image-upload-hint" th:unless="${isEdit}">Chọn từ 1 đến 4 ảnh. Có thể chọn nhiều ảnh cùng lúc hoặc chọn bổ sung.</p>
+          <p class="image-upload-hint cms-product-form__media-hint" th:if="${isEdit}">Chọn “Đặt làm ảnh chính” cho ảnh bìa; dùng mũi tên để sắp xếp các ảnh khác. Tối đa 4 ảnh cho mỗi sản phẩm.</p>
+          <p class="image-upload-hint cms-product-form__media-hint" th:unless="${isEdit}">Chọn từ 1 đến 4 ảnh; dùng “Đặt làm ảnh chính” và mũi tên để sắp xếp ảnh.</p>
+          <button class="btn btn-plain image-delete-all-button" type="submit" form="delete-all-product-images"
+                  th:if="${isEdit and !product.images.isEmpty()}">Xóa toàn bộ ảnh</button>
+          <input type="hidden" th:field="*{imageOrder}" id="product-image-order">
           <input id="product-images" th:name="${isEdit ? 'newImages' : 'images'}" type="file"
                  multiple accept="image/*" th:required="${!isEdit}"
                  th:attr="data-max-files=${isEdit ? 4 - product.images.size() : 4}"
                  th:disabled="${isEdit and product.images.size() >= 4}">
           <small class="field-error" th:if="${isEdit and #fields.hasErrors('newImages')}" th:text="${#fields.errors('newImages')}"></small>
           <small class="field-error" th:if="${!isEdit and #fields.hasErrors('images')}" th:text="${#fields.errors('images')}"></small>
-          <div class="image-upload-preview" id="new-image-preview" aria-live="polite"></div>
         </section>
 
-        <div class="cms-form-actions">
+        <div class="cms-form-actions cms-product-form__actions">
           <a class="btn btn-plain" th:href="@{/cms/products}">Hủy</a>
-          <button class="btn btn-primary" id="product-submit-button" type="submit"
+          <button class="btn btn-primary cms-product-form__submit" id="product-submit-button" type="submit"
                   th:text="${isEdit ? 'Lưu thay đổi' : 'Thêm sản phẩm'}">Lưu sản phẩm</button>
         </div>
       </form>
@@ -143,6 +163,12 @@
           <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
         </form>
       </th:block>
+      <form th:if="${isEdit and !product.images.isEmpty()}" id="delete-all-product-images" method="post"
+            th:action="@{/cms/products/update/{productId}/images/delete-all(productId=${product.id})}"
+            data-confirm-message="Bạn có chắc muốn xóa toàn bộ ảnh của sản phẩm này không?"
+            data-confirm-danger="true">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+      </form>
     </section>
   </div>
 </main>
@@ -161,58 +187,130 @@
 function setupImagePicker(inputId, previewId, maxFiles) {
   const input = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
-  let selectedFiles = [];
+  const orderInput = document.getElementById('product-image-order');
+  let entries = Array.from(preview.querySelectorAll('figure[data-image-token]')).map(function (node) {
+    return {type: 'existing', token: node.dataset.imageToken, node: node};
+  });
 
-  function render() {
-    preview.querySelectorAll('img').forEach(function (img) { URL.revokeObjectURL(img.src); });
-    preview.replaceChildren();
-    selectedFiles.forEach(function (file, index) {
-      const item = document.createElement('figure');
-      const img = document.createElement('img');
-      img.className = 'cms-product-thumb';
-      img.src = URL.createObjectURL(file);
-      img.alt = file.name;
-      const caption = document.createElement('figcaption');
-      caption.textContent = file.name;
-      caption.title = file.name;
-      const remove = document.createElement('button');
-      remove.type = 'button';
-      remove.className = 'image-delete-button';
-      remove.textContent = 'Bỏ ảnh';
-      remove.setAttribute('aria-label', 'Bỏ ' + file.name);
-      remove.addEventListener('click', function () {
-        selectedFiles.splice(index, 1);
-        const transfer = new DataTransfer();
-        selectedFiles.forEach(function (selectedFile) { transfer.items.add(selectedFile); });
-        input.files = transfer.files;
-        render();
-      });
-      item.append(img, caption, remove);
-      preview.appendChild(item);
-    });
+  function syncOrder() {
+    const transfer = new DataTransfer();
+    const newEntries = entries.filter(function (entry) { return entry.type === 'new'; });
+    newEntries.forEach(function (entry) { transfer.items.add(entry.file); });
+    input.files = transfer.files;
+    orderInput.value = entries.map(function (entry) {
+      return entry.type === 'existing' ? entry.token : 'new:' + newEntries.indexOf(entry);
+    }).join(',');
   }
 
-  input.addEventListener('change', function () {
-    selectedFiles = selectedFiles.concat(Array.from(input.files));
-    const uniqueFiles = [];
-    selectedFiles.forEach(function (file) {
-      if (!uniqueFiles.some(function (item) {
-        return item.name === file.name && item.size === file.size && item.lastModified === file.lastModified;
-      })) uniqueFiles.push(file);
+  function makeNewFigure(entry) {
+    const item = document.createElement('figure');
+    item.dataset.imageToken = 'new';
+    const img = document.createElement('img');
+    img.className = 'cms-product-thumb';
+    entry.objectUrl = entry.objectUrl || URL.createObjectURL(entry.file);
+    img.src = entry.objectUrl;
+    img.alt = entry.file.name;
+    const caption = document.createElement('figcaption');
+    caption.title = entry.file.name;
+    const orderActions = document.createElement('div');
+    orderActions.className = 'cms-image-order-actions';
+    const moveUp = document.createElement('button');
+    moveUp.type = 'button';
+    moveUp.className = 'image-order-button';
+    moveUp.dataset.imageMove = '-1';
+    moveUp.setAttribute('aria-label', 'Đưa ảnh lên trước');
+    moveUp.textContent = '↑';
+    const moveDown = document.createElement('button');
+    moveDown.type = 'button';
+    moveDown.className = 'image-order-button';
+    moveDown.dataset.imageMove = '1';
+    moveDown.setAttribute('aria-label', 'Đưa ảnh xuống sau');
+    moveDown.textContent = '↓';
+    const primary = document.createElement('span');
+    primary.className = 'image-primary-indicator';
+    primary.textContent = 'Ảnh chính';
+    const setPrimary = document.createElement('button');
+    setPrimary.type = 'button';
+    setPrimary.className = 'image-primary-button';
+    setPrimary.dataset.imagePrimary = 'true';
+    setPrimary.textContent = 'Đặt làm ảnh chính';
+    orderActions.append(moveUp, moveDown, primary, setPrimary);
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'image-delete-button';
+    remove.dataset.imageRemove = 'true';
+    remove.textContent = 'Bỏ ảnh';
+    remove.setAttribute('aria-label', 'Bỏ ' + entry.file.name);
+    item.append(img, caption, orderActions, remove);
+    return item;
+  }
+
+  function render() {
+    const nodes = entries.map(function (entry, index) {
+      const node = entry.type === 'existing' ? entry.node : makeNewFigure(entry);
+      node.dataset.imageToken = entry.type === 'existing' ? entry.token : 'new';
+      node.dataset.entryIndex = index;
+      const caption = node.querySelector('figcaption');
+      const primary = node.querySelector('.image-primary-indicator');
+      const setPrimary = node.querySelector('[data-image-primary]');
+      if (entry.type === 'new') caption.textContent = entry.file.name;
+      else caption.textContent = index === 0 ? 'Ảnh chính' : 'Ảnh phụ ' + index;
+      if (primary) primary.hidden = index !== 0;
+      if (setPrimary) setPrimary.hidden = index === 0;
+      node.querySelectorAll('[data-image-move]').forEach(function (button) {
+        button.disabled = index === 0 && button.dataset.imageMove === '-1'
+          || index === entries.length - 1 && button.dataset.imageMove === '1';
+      });
+      return node;
     });
-    selectedFiles = uniqueFiles;
-    if (selectedFiles.length > maxFiles) {
-      selectedFiles = selectedFiles.slice(0, maxFiles);
-      window.alert('Chỉ được chọn tối đa ' + maxFiles + ' ảnh mới.');
-    }
-    const transfer = new DataTransfer();
-    selectedFiles.forEach(function (file) { transfer.items.add(file); });
-    input.files = transfer.files;
+    preview.replaceChildren.apply(preview, nodes);
+    syncOrder();
+  }
+
+  preview.addEventListener('click', function (event) {
+    const button = event.target.closest('button');
+    if (!button) return;
+    const figure = button.closest('figure[data-image-token]');
+    const index = Number(figure.dataset.entryIndex);
+    if (index < 0) return;
+    if (button.hasAttribute('data-image-primary')) {
+      entries.unshift(entries.splice(index, 1)[0]);
+    } else if (button.hasAttribute('data-image-move')) {
+      const target = index + Number(button.dataset.imageMove);
+      if (target < 0 || target >= entries.length) return;
+      entries.splice(target, 0, entries.splice(index, 1)[0]);
+    } else if (button.hasAttribute('data-image-remove')) {
+      const removed = entries.splice(index, 1)[0];
+      if (removed.objectUrl) URL.revokeObjectURL(removed.objectUrl);
+    } else return;
     render();
   });
+
+  input.addEventListener('change', function () {
+    const selectedFiles = Array.from(input.files);
+    const currentNew = entries.filter(function (entry) { return entry.type === 'new'; });
+    selectedFiles.forEach(function (file) {
+      const duplicate = entries.some(function (entry) {
+        const existingFile = entry.type === 'new' ? entry.file : null;
+        return existingFile && existingFile.name === file.name && existingFile.size === file.size
+          && existingFile.lastModified === file.lastModified;
+      });
+      if (!duplicate && currentNew.length < maxFiles) {
+        const entry = {type: 'new', file: file};
+        currentNew.push(entry);
+        entries.push(entry);
+      }
+    });
+    if (currentNew.length >= maxFiles && selectedFiles.length > currentNew.length) {
+      window.alert('Chỉ được chọn tối đa ' + maxFiles + ' ảnh mới.');
+    }
+    render();
+  });
+
+  render();
 }
 
-setupImagePicker('product-images', 'new-image-preview',
+setupImagePicker('product-images', 'product-image-gallery',
     Number(document.getElementById('product-images').dataset.maxFiles));
 
 const priceInput = document.getElementById('product-price');

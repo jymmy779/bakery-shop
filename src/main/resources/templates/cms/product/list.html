@@ -3,125 +3,117 @@
 <head th:replace="~{fragments/cms-layout :: head('Quản lý sản phẩm')}"></head>
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('products')}"></th:block>
-<main class="cms-page">
-  <div class="wrap">
-    <header class="cms-top">
+<main class="cms-page cms-products-page">
+  <div class="wrap cms-products-wrap">
+    <header class="cms-products-header">
       <div>
-        <span class="eyebrow">CMS / CATALOG</span>
-        <h1 class="section-title">Quản lý <em>sản phẩm</em></h1>
+        <span class="cms-products-kicker">DANH MỤC CỬA HÀNG <span aria-hidden="true">/</span> CATALOG</span>
+        <h1>Quản lý sản phẩm</h1>
+        <p>Quản lý danh mục bánh, giá bán, tồn kho và trạng thái kinh doanh.</p>
       </div>
-      <a class="btn btn-primary" th:href="@{/cms/products/add}">+ Thêm sản phẩm</a>
+      <a class="cms-products-create" th:href="@{/cms/products/add}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Thêm sản phẩm
+      </a>
     </header>
 
-    <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="toast show error" th:text="${errorMessage}"></div>
+    <div th:if="${successMessage}" class="toast show" role="status" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="toast show error" role="alert" th:text="${errorMessage}"></div>
 
-    <section class="cms-panel">
-      <div class="cms-toolbar">
-        <h2>Danh sách sản phẩm</h2>
-        <span th:text="${products.totalElements} + ' sản phẩm'">0 sản phẩm</span>
+    <section class="cms-products-panel" aria-labelledby="cms-products-list-title">
+      <div class="cms-products-panel__heading">
+        <div>
+          <h2 id="cms-products-list-title">Danh sách sản phẩm</h2>
+          <p><strong th:text="${products.totalElements}">0</strong> sản phẩm trong cửa hàng</p>
+        </div>
+        <span class="cms-products-page-count" th:if="${products.totalPages > 0}" th:text="${'Trang ' + (products.number + 1) + ' / ' + products.totalPages}">Trang 1 / 1</span>
       </div>
-      <form class="cms-filter" method="get" th:action="@{/cms/products}">
-        <label class="cms-search-field">
-          <span class="sr-only">Tra cứu theo tên sản phẩm</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <circle cx="10.8" cy="10.8" r="6.8"></circle>
-            <path d="m16 16 4.5 4.5"></path>
-          </svg>
-          <input type="search" name="keyword" th:value="${keyword}"
-                 placeholder="Tra cứu tên sản phẩm..." aria-label="Tra cứu theo tên sản phẩm">
+
+      <form class="cms-products-filter" method="get" th:action="@{/cms/products}">
+        <label class="cms-products-search">
+          <span class="sr-only">Tìm sản phẩm theo tên</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+          <input type="search" name="keyword" th:value="${keyword}" placeholder="Tìm theo tên sản phẩm..." aria-label="Tìm sản phẩm theo tên">
         </label>
-        <select name="categoryId" aria-label="Lọc theo danh mục">
-          <option value="">Tất cả danh mục</option>
-          <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
-                  th:selected="${category.id == categoryId}"></option>
-        </select>
-        <select name="status" aria-label="Lọc theo trạng thái">
-          <option value="">Tất cả trạng thái</option>
-          <option value="SELLING" th:selected="${status != null and status.name() == 'SELLING'}">Đang bán</option>
-          <option value="STOPPED" th:selected="${status != null and status.name() == 'STOPPED'}">Ngừng bán</option>
-        </select>
-        <select name="sort" aria-label="Sắp xếp sản phẩm">
-          <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
-          <option value="oldest" th:selected="${sort == 'oldest'}">Cũ nhất</option>
-          <option value="name" th:selected="${sort == 'name'}">Tên A-Z</option>
-          <option value="price_asc" th:selected="${sort == 'price_asc'}">Giá thấp đến cao</option>
-          <option value="price_desc" th:selected="${sort == 'price_desc'}">Giá cao đến thấp</option>
-        </select>
-        <button class="btn btn-plain" type="submit">Lọc</button>
+        <label class="cms-products-select"><span class="sr-only">Lọc theo danh mục</span>
+          <select name="categoryId" aria-label="Lọc theo danh mục">
+            <option value="">Tất cả danh mục</option>
+            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}" th:selected="${category.id == categoryId}"></option>
+          </select>
+        </label>
+        <label class="cms-products-select"><span class="sr-only">Lọc theo trạng thái</span>
+          <select name="status" aria-label="Lọc theo trạng thái">
+            <option value="">Mọi trạng thái</option>
+            <option value="SELLING" th:selected="${status != null and status.name() == 'SELLING'}">Đang bán</option>
+            <option value="STOPPED" th:selected="${status != null and status.name() == 'STOPPED'}">Ngừng bán</option>
+          </select>
+        </label>
+        <label class="cms-products-select"><span class="sr-only">Lọc theo badge</span>
+          <select name="badge" aria-label="Lọc theo badge">
+            <option value="">Mọi badge</option>
+            <option value="NEW" th:selected="${badge != null and badge.name() == 'NEW'}">Mới</option>
+            <option value="BEST_SELLER" th:selected="${badge != null and badge.name() == 'BEST_SELLER'}">Bán chạy</option>
+            <option value="LIMITED" th:selected="${badge != null and badge.name() == 'LIMITED'}">Giới hạn</option>
+            <option value="SEASONAL" th:selected="${badge != null and badge.name() == 'SEASONAL'}">Theo mùa</option>
+          </select>
+        </label>
+        <label class="cms-products-select cms-products-sort"><span class="sr-only">Sắp xếp sản phẩm</span>
+          <select name="sort" aria-label="Sắp xếp sản phẩm">
+            <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
+            <option value="oldest" th:selected="${sort == 'oldest'}">Cũ nhất</option>
+            <option value="name" th:selected="${sort == 'name'}">Tên A-Z</option>
+            <option value="price_asc" th:selected="${sort == 'price_asc'}">Giá thấp đến cao</option>
+            <option value="price_desc" th:selected="${sort == 'price_desc'}">Giá cao đến thấp</option>
+          </select>
+        </label>
+        <button class="cms-products-filter__submit" type="submit">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4"/></svg>
+          Áp dụng
+        </button>
       </form>
 
-      <div class="cms-table-wrap">
-        <table class="cms-table cms-product-table">
-          <thead>
-          <tr>
-            <th>Ảnh</th>
-            <th>Sản phẩm</th>
-            <th>Danh mục</th>
-            <th>Giá</th>
-            <th>Tồn kho</th>
-            <th>Trạng thái</th>
-            <th>Thao tác</th>
-          </tr>
-          </thead>
+      <div class="cms-products-table-scroll" tabindex="0" role="region" aria-label="Danh sách sản phẩm, có thể cuộn ngang trên màn hình nhỏ">
+        <table class="cms-products-table">
+          <thead><tr><th scope="col">Sản phẩm</th><th scope="col">Danh mục</th><th scope="col">Giá bán</th><th scope="col">Tồn kho</th><th scope="col">Trạng thái</th><th scope="col"><span class="sr-only">Thao tác</span></th></tr></thead>
           <tbody>
           <tr th:each="product : ${products.content}">
-            <td>
-              <div class="cms-image-carousel" th:attr="data-images=${product.imagePathsCsv}">
-                <button class="image-arrow previous" type="button" aria-label="Ảnh trước"
-                        th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, -1)">&#8249;</button>
-                <img class="cms-product-thumb"
-                     th:src="${product.primaryImagePath != null ? product.primaryImagePath : '/assets/product-placeholder.svg'}"
-                     onerror="this.onerror=null;this.src='/assets/product-placeholder.svg';"
-                     th:alt="${product.name}">
-                <button class="image-arrow next" type="button" aria-label="Ảnh sau"
-                        th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, 1)">&#8250;</button>
+            <td class="cms-products-table__product">
+              <img class="cms-product-thumb" th:src="${product.primaryImagePath != null ? product.primaryImagePath : '/assets/product-placeholder.svg'}" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg';" th:alt="${product.name}" loading="lazy" width="58" height="58">
+              <div class="cms-products-table__identity">
+                <strong th:text="${product.name}">Tên sản phẩm</strong>
+                <span class="cms-products-badge" th:if="${product.badge != null}" th:switch="${product.badge.name()}">
+                  <span th:case="'NEW'">Mới</span><span th:case="'BEST_SELLER'">Bán chạy</span><span th:case="'LIMITED'">Giới hạn</span><span th:case="'SEASONAL'">Theo mùa</span>
+                </span>
+                <small th:text="${product.description}">Mô tả sản phẩm</small>
               </div>
             </td>
-            <td class="cms-product-name">
-              <strong th:text="${product.name}">Tên sản phẩm</strong>
-              <span class="cms-badge" th:if="${product.badge != null}" th:switch="${product.badge.name()}">
-                <span th:case="'NEW'">Mới</span>
-                <span th:case="'BEST_SELLER'">Bán chạy</span>
-                <span th:case="'LIMITED'">Giới hạn</span>
-                <span th:case="'SEASONAL'">Theo mùa</span>
-              </span>
-              <small th:text="${product.description}">Mô tả</small>
-            </td>
-            <td th:text="${product.categoryName}">Danh mục</td>
-            <td class="cms-product-number" th:text="${#numbers.formatInteger(product.price, 0, 'POINT')} + ' đ'">0 đ</td>
-            <td class="cms-product-number" th:text="${product.stockQuantity}">0</td>
-            <td>
-              <form method="post" th:action="@{/cms/products/toggle-status/{id}(id=${product.id})}"
-                    data-confirm-message="Bạn có chắc muốn thay đổi trạng thái sản phẩm này?">
+            <td><span class="cms-products-category" th:text="${product.categoryName}">Danh mục</span></td>
+            <td class="cms-products-price" th:text="${#numbers.formatInteger(product.price, 0, 'POINT')} + ' đ'">0 đ</td>
+            <td><span class="cms-products-stock" th:classappend="${product.stockQuantity == 0} ? ' is-empty' : (${product.stockQuantity < 5} ? ' is-low' : '')" th:text="${product.stockQuantity}">0</span></td>
+            <td><form method="post" th:action="@{/cms/products/toggle-status/{id}(id=${product.id})}" data-confirm-message="Bạn có chắc muốn thay đổi trạng thái sản phẩm này?">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+              <button class="cms-products-status" type="submit" th:classappend="${product.status.name() == 'SELLING'} ? ' is-selling' : ' is-stopped'" th:text="${product.status.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}">Đang bán</button>
+            </form></td>
+            <td><div class="cms-products-actions">
+              <a th:href="@{/cms/products/{id}/edit(id=${product.id})}">Chỉnh sửa</a>
+              <form method="post" th:action="@{/cms/products/delete/{id}(id=${product.id})}" data-confirm-message="Bạn có chắc muốn xóa sản phẩm này?" data-confirm-danger="true">
                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button class="product-status" type="submit"
-                        th:classappend="${product.status.name() == 'SELLING'} ? ' selling' : ' stopped'"
-                        th:text="${product.status.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}">Đang bán</button>
+                <button type="submit">Xóa</button>
               </form>
-            </td>
-            <td class="cms-actions">
-              <a class="btn btn-plain" th:href="@{/cms/products/{id}/edit(id=${product.id})}">Sửa</a>
-              <form method="post" th:action="@{/cms/products/delete/{id}(id=${product.id})}"
-                    data-confirm-message="Bạn có chắc muốn xóa sản phẩm này?"
-                    data-confirm-danger="true">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                <button class="btn danger-action" type="submit">Xóa</button>
-              </form>
-            </td>
+            </div></td>
           </tr>
-          <tr th:if="${products.empty}">
-            <td colspan="7" class="cms-table-empty">Không có sản phẩm phù hợp.</td>
-          </tr>
+          <tr th:if="${products.empty}"><td colspan="6" class="cms-products-empty">
+            <span class="cms-products-empty__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5zM4.5 7.8 12 12l7.5-4.2M12 12v8.5"/></svg></span>
+            <strong>Chưa tìm thấy sản phẩm</strong>
+            <span>Thử đổi từ khóa hoặc bộ lọc để xem kết quả khác.</span>
+          </td></tr>
           </tbody>
         </table>
       </div>
-      <nav class="pagination cms-product-pagination" th:if="${products.totalPages > 1}" aria-label="Phân trang sản phẩm">
-        <a class="small-button" th:if="${products.hasPrevious()}"
-           th:href="@{/cms/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId},status=${status},sort=${sort})}">Trước</a>
-        <span th:text="${products.number + 1 + ' / ' + products.totalPages}">1 / 1</span>
-        <a class="small-button" th:if="${products.hasNext()}"
-           th:href="@{/cms/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId},status=${status},sort=${sort})}">Sau</a>
+      <nav class="cms-products-pagination" th:if="${products.totalPages > 1}" aria-label="Phân trang sản phẩm">
+        <a th:if="${products.hasPrevious()}" th:href="@{/cms/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId},badge=${badge},status=${status},sort=${sort})}">← Trước</a>
+        <span th:text="${'Trang ' + (products.number + 1) + ' / ' + products.totalPages}">Trang 1 / 1</span>
+        <a th:if="${products.hasNext()}" th:href="@{/cms/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId},badge=${badge},status=${status},sort=${sort})}">Sau →</a>
       </nav>
     </section>
   </div>
@@ -129,21 +121,5 @@
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
 <div th:replace="~{fragments/cms-sidebar :: image-preview}"></div>
 <th:block th:replace="~{fragments/cms-sidebar :: image-preview-script}"></th:block>
-<script>
-function moveProductImage(button, direction) {
-  const carousel = button.parentElement;
-  const image = carousel.querySelector('img');
-  const paths = (carousel.dataset.images || '').split('|').filter(Boolean);
-  if (paths.length < 2) return;
-  const current = Number(carousel.dataset.index || 0);
-  const next = (current + direction + paths.length) % paths.length;
-  carousel.dataset.index = next;
-  image.onerror = function () {
-    image.onerror = null;
-    image.src = '/assets/product-placeholder.svg';
-  };
-  image.src = paths[next];
-}
-</script>
 </body>
 </html>

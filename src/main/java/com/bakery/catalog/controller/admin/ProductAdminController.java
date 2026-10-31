@@ -3,6 +3,7 @@ package com.bakery.catalog.controller.admin;
 import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductDetailResponse;
 import com.bakery.catalog.dto.ProductUpdateRequest;
+import com.bakery.catalog.entity.ProductBadge;
 import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.service.CategoryAdminService;
 import com.bakery.catalog.service.ProductAdminService;
@@ -33,13 +34,15 @@ public class ProductAdminController {
       @RequestParam(defaultValue = "10") int size,
       @RequestParam(defaultValue = "") String keyword,
       @RequestParam(required = false) Long categoryId,
+      @RequestParam(required = false) ProductBadge badge,
       @RequestParam(required = false) ProductStatus status,
       @RequestParam(defaultValue = "newest") String sort, Model model) {
-    model.addAttribute("products", productAdminService.search(keyword, categoryId, status, sort,
+    model.addAttribute("products", productAdminService.search(keyword, categoryId, badge, status, sort,
         PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 100))));
     model.addAttribute("categories", categoryAdminService.findAllActive());
     model.addAttribute("keyword", keyword);
     model.addAttribute("categoryId", categoryId);
+    model.addAttribute("badge", badge);
     model.addAttribute("status", status);
     model.addAttribute("sort", sort);
     return "cms/product/list";
@@ -125,6 +128,17 @@ public class ProductAdminController {
     try {
       productAdminService.deleteImage(productId, imageId);
       redirect.addFlashAttribute("successMessage", "Đã xóa ảnh sản phẩm.");
+    } catch (RuntimeException exception) {
+      redirect.addFlashAttribute("errorMessage", exception.getMessage());
+    }
+    return "redirect:/cms/products/" + productId + "/edit";
+  }
+
+  @PostMapping("/update/{productId}/images/delete-all")
+  public String deleteAllProductImages(@PathVariable Long productId, RedirectAttributes redirect) {
+    try {
+      productAdminService.deleteAllImages(productId);
+      redirect.addFlashAttribute("successMessage", "Đã xóa toàn bộ ảnh sản phẩm.");
     } catch (RuntimeException exception) {
       redirect.addFlashAttribute("errorMessage", exception.getMessage());
     }

@@ -20,6 +20,7 @@ import com.bakery.storage.FileStorageService;
 import java.util.List;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -54,7 +55,7 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     List<String> storedPaths = new ArrayList<>();
     try {
       product = products.save(product);
-      saveImages(product, validImages, storedPaths);
+      saveImages(product, validImages, storedPaths, request.getImageOrder(), List.of());
       return productQueryService.getById(product.getId());
     } catch (RuntimeException exception) {
       deleteStoredFiles(storedPaths, exception);
@@ -66,7 +67,9 @@ public class ProductAdminServiceImpl implements ProductAdminService {
   @Transactional
   public ProductDetailResponse update(Long productId, ProductUpdateRequest request) {
     Product product = find(productId);
-    int existingImageCount = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(productId)).size();
+    List<ProductImage> existingImages = images.findByProductIdInOrderByDisplayOrderAscIdAsc(
+        List.of(productId));
+    int existingImageCount = existingImages.size();
     List<MultipartFile> validImages = validateImages(request.getNewImages(), existingImageCount, false);
     copy(product, request.getName(), request.getDescription(), request.getPrice(),
         request.getStockQuantity(), request.getPreparationDays(), request.getStatus(),
@@ -75,7 +78,7 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     List<String> storedPaths = new ArrayList<>();
     try {
       products.save(product);
-      saveImages(product, validImages, storedPaths);
+      saveImages(product, validImages, storedPaths, request.getImageOrder(), existingImages);
       return productQueryService.getById(productId);
     } catch (RuntimeException exception) {
       deleteStoredFiles(storedPaths, exception);
@@ -93,30 +96,30 @@ public class ProductAdminServiceImpl implements ProductAdminService {
   @Transactional(readOnly = true)
   public Page<ProductSummaryResponse> search(String keyword, Long categoryId,
       ProductStatus status, String sort, Pageable pageable) {
+    return search(keyword, categoryId, null, status, sort, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<ProductSummaryResponse> search(String keyword, Long categoryId,
+      ProductBadge badge, ProductStatus status, String sort, Pageable pageable) {
     if (sort == null
         || !java.util.Set.of("newest", "oldest", "price_asc", "price_desc", "name").contains(sort)) {
       throw new IllegalArgumentException(
           "sort phải là newest, oldest, price_asc, price_desc hoặc name");
     }
     String normalized = keyword == null || keyword.isBlank() ? null : keyword.trim();
-    Page<Product> page = products.searchAdmin(normalized, categoryId, status, sort, pageable);
+    Page<Product> page = products.searchAdmin(normalized, categoryId, badge, status, sort, pageable);
     List<Product> content = page.getContent();
-    var productImages = new HashMap<Long, List<String>>();
-    var productImageIds = new HashMap<Long, List<Long>>();
+    var primaryImages = new HashMap<Long, String>();
     if (!content.isEmpty()) {
       images.findByProductIdInOrderByDisplayOrderAscIdAsc(
           content.stream().map(Product::getId).toList())
-          .forEach(image -> {
-            productImages.computeIfAbsent(image.getProduct().getId(),
-                ignored -> new ArrayList<>()).add(image.getImagePath());
-            productImageIds.computeIfAbsent(image.getProduct().getId(),
-                ignored -> new ArrayList<>()).add(image.getId());
-          });
+          .forEach(image -> primaryImages.putIfAbsent(
+              image.getProduct().getId(), image.getImagePath()));
     }
     List<ProductSummaryResponse> summaries = content.stream()
-        .map(product -> summary(product,
-            productImages.getOrDefault(product.getId(), List.of()),
-            productImageIds.getOrDefault(product.getId(), List.of()))).toList();
+        .map(product -> summary(product, primaryImages.get(product.getId()))).toList();
     return new PageImpl<>(summaries, page.getPageable(), page.getTotalElements());
   }
 
@@ -144,6 +147,16 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     }
     fileStorage.delete(image.getImagePath());
     images.delete(image);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllImages(Long productId) {
+    find(productId);
+    List<ProductImage> productImages =
+        images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(productId));
+    images.deleteAll(productImages);
+    productImages.forEach(image -> fileStorage.delete(image.getImagePath()));
   }
 
   @Transactional
@@ -194,23 +207,59 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     return StringUtils.hasText(value) ? value.trim() : null;
   }
 
-  private void saveImages(Product product, List<MultipartFile> files, List<String> storedPaths) {
-    if (files == null) return;
-    int order = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(product.getId())).stream()
-        .mapToInt(ProductImage::getDisplayOrder).max().orElse(-1) + 1;
-    for (MultipartFile file : files) {
-      if (file == null || file.isEmpty() || !StringUtils.hasText(file.getOriginalFilename())) continue;
+  private void saveImages(Product product, List<MultipartFile> files, List<String> storedPaths,
+      String requestedOrder, List<ProductImage> existing) {
+    List<String> order = resolveImageOrder(requestedOrder, existing, files.size());
+    if (existing.isEmpty() && files.isEmpty()) return;
+
+    if (!existing.isEmpty()) {
+      int temporaryOffset = existing.stream().mapToInt(ProductImage::getDisplayOrder).max().orElse(0)
+          + existing.size() + files.size() + MAX_IMAGE_COUNT + 1;
+      existing.forEach(image -> image.setDisplayOrder(image.getDisplayOrder() + temporaryOffset));
+      images.saveAllAndFlush(existing);
+    }
+
+    Map<Long, ProductImage> existingById = existing.stream()
+        .collect(java.util.stream.Collectors.toMap(ProductImage::getId, image -> image));
+    List<ProductImage> newImages = new ArrayList<>();
+    int position = 0;
+    for (String token : order) {
+      if (token.startsWith("existing:")) {
+        ProductImage image = existingById.get(Long.parseLong(token.substring("existing:".length())));
+        image.setDisplayOrder(position++);
+        continue;
+      }
+      int fileIndex = Integer.parseInt(token.substring("new:".length()));
+      MultipartFile file = files.get(fileIndex);
       try {
         ProductImage image = new ProductImage();
         image.setProduct(product);
         image.setImagePath(fileStorage.store(file));
         storedPaths.add(image.getImagePath());
-        image.setDisplayOrder(order++);
-        images.save(image);
+        image.setDisplayOrder(position++);
+        newImages.add(image);
       } catch (RuntimeException exception) {
         throw new IllegalStateException("Không thể lưu hình ảnh sản phẩm", exception);
       }
     }
+    if (!newImages.isEmpty()) images.saveAll(newImages);
+    if (!existing.isEmpty()) images.saveAllAndFlush(existing);
+  }
+
+  private List<String> resolveImageOrder(String requestedOrder, List<ProductImage> existing,
+      int newFileCount) {
+    List<String> expected = new ArrayList<>();
+    existing.forEach(image -> expected.add("existing:" + image.getId()));
+    for (int index = 0; index < newFileCount; index++) expected.add("new:" + index);
+    if (requestedOrder == null || requestedOrder.isBlank()) return expected;
+
+    List<String> supplied = java.util.Arrays.stream(requestedOrder.split(","))
+        .map(String::trim).filter(token -> !token.isEmpty()).toList();
+    if (supplied.size() != expected.size()
+        || !new java.util.HashSet<>(supplied).equals(new java.util.HashSet<>(expected))) {
+      throw new IllegalArgumentException("Thứ tự ảnh không hợp lệ. Vui lòng tải lại biểu mẫu.");
+    }
+    return supplied;
   }
 
   private List<MultipartFile> validateImages(List<MultipartFile> files, int existingCount,
@@ -258,8 +307,7 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     return products.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sản phẩm"));
   }
 
-  private ProductSummaryResponse summary(Product product, List<String> imagePaths,
-      List<Long> imageIds) {
+  private ProductSummaryResponse summary(Product product, String primaryImagePath) {
     ProductSummaryResponse response = new ProductSummaryResponse();
     response.setId(product.getId());
     response.setName(product.getName());
@@ -268,9 +316,7 @@ public class ProductAdminServiceImpl implements ProductAdminService {
     response.setIngredients(product.getIngredients());
     response.setStorageInstructions(product.getStorageInstructions());
     response.setAllergenInfo(product.getAllergenInfo());
-    response.setImagePaths(imagePaths);
-    response.setImageIds(imageIds);
-    response.setPrimaryImagePath(imagePaths.isEmpty() ? null : imagePaths.get(0));
+    response.setPrimaryImagePath(primaryImagePath);
     response.setPrice(product.getPrice());
     response.setStockQuantity(product.getStockQuantity());
     response.setPreparationDays(product.getPreparationDays());

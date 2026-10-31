@@ -17,6 +17,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   @Query("""
       SELECT p FROM Product p JOIN FETCH p.category c
       WHERE (:status IS NULL OR p.status = :status)
+        AND (:badge IS NULL OR p.badge = :badge)
         AND (:categoryId IS NULL OR c.id = :categoryId)
         AND (:keyword IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')))
       ORDER BY
@@ -29,6 +30,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
       """)
   Page<Product> searchAdmin(@Param("keyword") String keyword,
       @Param("categoryId") Long categoryId,
+      @Param("badge") com.bakery.catalog.entity.ProductBadge badge,
       @Param("status") com.bakery.catalog.entity.ProductStatus status,
       @Param("sort") String sort,
       Pageable pageable);
@@ -59,6 +61,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
   @Query(value = "SELECT p.* " + FILTER_WHERE + """
       ORDER BY
+        CASE WHEN :sort = 'newest' THEN p.created_at END DESC,
         CASE WHEN :sort = 'price_asc' THEN p.price END ASC,
         CASE WHEN :sort = 'price_desc' THEN p.price END DESC,
         CASE WHEN :sort = 'best_selling' THEN (
@@ -66,6 +69,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
           JOIN orders o ON o.id = od.order_id
           WHERE od.product_id = p.id AND o.status = 'DELIVERED'
         ) END DESC,
+        CASE WHEN :sort = 'newest' THEN p.id END DESC,
         p.name ASC, p.id ASC
       """, countQuery = "SELECT COUNT(*) " + FILTER_WHERE, nativeQuery = true)
   Page<Product> filter(@Param("pattern") String pattern,

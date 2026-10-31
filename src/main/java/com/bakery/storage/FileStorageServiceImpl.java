@@ -46,6 +46,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         throw new IllegalArgumentException("Đường dẫn tệp không hợp lệ.");
       }
       Files.deleteIfExists(target);
+      Files.deleteIfExists(WebpImageCache.pathFor(target));
     } catch (IOException exception) {
       throw new IllegalStateException("Không thể xóa tệp hình ảnh.", exception);
     }

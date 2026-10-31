@@ -58,4 +58,6 @@ public class ProductCreateRequest {
 
   @Size(min = 1, max = 4, message = "Sản phẩm cần từ 1 đến 4 hình ảnh")
   private List<MultipartFile> images = new ArrayList<>();
+
+  private String imageOrder;
 }

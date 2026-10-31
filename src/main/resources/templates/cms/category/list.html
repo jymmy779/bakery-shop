@@ -3,42 +3,63 @@
 <head th:replace="~{fragments/cms-layout :: head('Quản lý danh mục')}"></head>
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('categories')}"></th:block>
-<main class="cms-page"><div class="wrap">
-  <header class="cms-top">
-    <div><span class="eyebrow">CMS / CATALOG</span><h1 class="section-title">Quản lý <em>danh mục</em></h1></div>
-    <a class="btn btn-primary" th:href="@{/cms/categories/add}">+ Thêm danh mục</a>
-  </header>
-  <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div><div th:if="${errorMessage}" class="toast show error" th:text="${errorMessage}"></div>
-  <section class="cms-panel">
-    <div class="cms-toolbar"><h2>Danh sách danh mục</h2><span th:text="${categories.size()} + ' danh mục'">0 danh mục</span></div>
-    <label class="cms-search-field cms-category-search">
-      <span class="sr-only">Tra cứu theo tên danh mục</span>
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle cx="10.8" cy="10.8" r="6.8"></circle>
-        <path d="m16 16 4.5 4.5"></path>
-      </svg>
-      <input type="search" id="category-search" placeholder="Tra cứu tên danh mục..."
-             aria-label="Tra cứu theo tên danh mục" autocomplete="off">
-    </label>
-    <div class="cms-table-wrap"><table class="cms-table"><thead><tr><th>Tên danh mục</th><th>Mô tả</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
-      <tbody><tr th:each="category : ${categories}" data-category-row>
-        <td><strong th:text="${category.name}">Danh mục</strong></td><td th:text="${category.description}">Mô tả</td>
-        <td><form method="post" th:action="@{/cms/categories/toggle-status/{id}(id=${category.id})}"
-                data-confirm-message="Bạn có chắc muốn thay đổi trạng thái danh mục này?">
-          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-          <button class="product-status" type="submit"
-                  th:classappend="${category.active} ? ' selling' : ' stopped'"
-                  th:text="${category.active ? 'Hoạt động' : 'Ngừng hoạt động'}">Hoạt động</button>
-        </form></td>
-        <td class="cms-actions">
-          <a class="btn btn-plain" th:href="@{/cms/categories/{id}/edit(id=${category.id})}">Sửa</a>
-          <form method="post" th:action="@{/cms/categories/delete/{id}(id=${category.id})}" data-confirm-message="Bạn có chắc muốn xóa danh mục này?" data-confirm-danger="true"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn danger-action" type="submit">Xóa</button></form>
-        </td>
-      </tr><tr th:if="${#lists.isEmpty(categories)}" data-category-empty><td colspan="4">Không có danh mục.</td></tr>
-      <tr data-category-no-results hidden><td colspan="4">Không tìm thấy danh mục phù hợp.</td></tr></tbody>
-    </table></div>
-  </section>
-</div></main>
+<main class="cms-page cms-categories-page">
+  <div class="wrap cms-categories-wrap">
+    <header class="cms-categories-header">
+      <div>
+        <span class="cms-products-kicker">DANH MỤC CỬA HÀNG <span aria-hidden="true">/</span> CATALOG</span>
+        <h1>Quản lý danh mục</h1>
+        <p>Nhóm các loại bánh để khách hàng dễ dàng khám phá sản phẩm.</p>
+      </div>
+      <a class="cms-products-create" th:href="@{/cms/categories/add}">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        Thêm danh mục
+      </a>
+    </header>
+
+    <div th:if="${successMessage}" class="toast show" role="status" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="toast show error" role="alert" th:text="${errorMessage}"></div>
+
+    <section class="cms-categories-panel" aria-labelledby="cms-categories-title">
+      <div class="cms-categories-panel__heading">
+        <div><h2 id="cms-categories-title">Danh sách danh mục</h2><p><strong th:text="${categories.size()}">0</strong> danh mục cửa hàng</p></div>
+        <label class="cms-categories-search">
+          <span class="sr-only">Tìm danh mục theo tên</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+          <input type="search" id="category-search" placeholder="Tìm danh mục..." aria-label="Tìm danh mục theo tên" autocomplete="off">
+        </label>
+      </div>
+      <div class="cms-categories-table-scroll" tabindex="0" role="region" aria-label="Danh mục, cuộn ngang để xem thêm trên màn hình nhỏ">
+        <table class="cms-categories-table">
+          <thead><tr><th scope="col">Danh mục</th><th scope="col">Mô tả</th><th scope="col">Trạng thái</th><th scope="col"><span class="sr-only">Thao tác</span></th></tr></thead>
+          <tbody>
+          <tr th:each="category : ${categories}" data-category-row>
+            <td class="cms-categories-identity"><span class="cms-categories-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span><strong th:text="${category.name}">Danh mục</strong></td>
+            <td class="cms-categories-description" th:text="${category.description != null and !category.description.isBlank() ? category.description : 'Chưa có mô tả'}">Mô tả danh mục</td>
+            <td><form method="post" th:action="@{/cms/categories/toggle-status/{id}(id=${category.id})}" data-confirm-message="Bạn có chắc muốn thay đổi trạng thái danh mục này?">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+              <button class="cms-categories-status" type="submit" th:classappend="${category.active} ? ' is-active' : ' is-inactive'" th:text="${category.active ? 'Hoạt động' : 'Ngừng hoạt động'}">Hoạt động</button>
+            </form></td>
+            <td><div class="cms-categories-actions">
+              <a th:href="@{/cms/categories/{id}/edit(id=${category.id})}">Chỉnh sửa</a>
+              <form method="post" th:action="@{/cms/categories/delete/{id}(id=${category.id})}" data-confirm-message="Bạn có chắc muốn xóa danh mục này?" data-confirm-danger="true">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button type="submit">Xóa</button>
+              </form>
+            </div></td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(categories)}" data-category-empty><td colspan="4" class="cms-categories-empty">
+            <span class="cms-categories-empty__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span>
+            <strong>Chưa có danh mục nào</strong><span>Tạo danh mục đầu tiên để bắt đầu sắp xếp sản phẩm.</span>
+            <a th:href="@{/cms/categories/add}">Thêm danh mục</a>
+          </td></tr>
+          <tr data-category-no-results hidden><td colspan="4" class="cms-categories-empty"><strong>Không tìm thấy danh mục phù hợp</strong><span>Thử tìm bằng tên khác.</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
 <script>
 const categorySearch = document.getElementById('category-search');

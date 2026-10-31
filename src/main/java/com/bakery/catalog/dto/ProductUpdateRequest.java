@@ -62,4 +62,6 @@ public class ProductUpdateRequest {
 
   @Size(max = 4, message = "Chỉ được tải tối đa 4 hình ảnh")
   private List<MultipartFile> newImages = new ArrayList<>();
+
+  private String imageOrder;
 }

@@ -42,7 +42,7 @@ class ProductAdminControllerTest {
 
   @Test
   void rendersCmsProductTableWithFilters() throws Exception {
-    when(productAdminService.search("cake", 2L, ProductStatus.SELLING, "newest",
+    when(productAdminService.search("cake", 2L, null, ProductStatus.SELLING, "newest",
         org.springframework.data.domain.PageRequest.of(0, 10)))
         .thenReturn(new PageImpl<>(List.of()));
     when(categoryAdminService.findAllActive()).thenReturn(List.of());
@@ -58,15 +58,17 @@ class ProductAdminControllerTest {
   @Test
   void passesSelectedProductSortToService() throws Exception {
     var pageable = org.springframework.data.domain.PageRequest.of(0, 10);
-    when(productAdminService.search("", null, null, "price_desc", pageable))
+    when(productAdminService.search("", null, null, null, "price_desc", pageable))
         .thenReturn(new PageImpl<>(List.of()));
     when(categoryAdminService.findAllActive()).thenReturn(List.of());
 
-    mvc.perform(get("/cms/products").param("sort", "price_desc"))
+    mvc.perform(get("/cms/products").param("sort", "price_desc").param("badge", "NEW"))
         .andExpect(status().isOk())
-        .andExpect(model().attribute("sort", "price_desc"));
+        .andExpect(model().attribute("sort", "price_desc"))
+        .andExpect(model().attribute("badge", com.bakery.catalog.entity.ProductBadge.NEW));
 
-    verify(productAdminService).search("", null, null, "price_desc", pageable);
+    verify(productAdminService).search("", null, com.bakery.catalog.entity.ProductBadge.NEW,
+        null, "price_desc", pageable);
   }
 
   @Test

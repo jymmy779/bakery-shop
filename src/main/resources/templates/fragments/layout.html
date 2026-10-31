@@ -55,7 +55,7 @@
           </a>
           <!-- User / Login -->
           <a
-            th:href="@{/cms/login}"
+            th:href="@{/login}"
             class="icon-button user-action"
             aria-label="Đăng nhập"
             th:if="${session.user == null}"
@@ -546,13 +546,6 @@
             href="/profile"
             aria-label="Hồ sơ của tôi"
             sec:authorize="hasRole('CUSTOMER')"
-            ><span class="material-symbols-outlined">account_circle</span></a
-          ><a
-            class="sf-header__action sf-header__action--account"
-            th:href="@{/cms}"
-            href="/cms"
-            aria-label="Trang quản trị"
-            sec:authorize="hasAnyRole('STAFF', 'ADMIN')"
             ><span class="material-symbols-outlined">account_circle</span></a
           ><a
             class="sf-header__action"
