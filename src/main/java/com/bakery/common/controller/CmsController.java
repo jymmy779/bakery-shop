@@ -11,8 +11,4 @@ public class CmsController {
     return "cms/login";
   }
 
-  @GetMapping("/cms")
-  public String dashboard() {
-    return "cms/index";
-  }
 }

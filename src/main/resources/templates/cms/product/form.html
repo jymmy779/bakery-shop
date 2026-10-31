@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/cms-layout :: head(${isEdit ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm'})}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('products')}"></th:block>
+<main class="cms-page">
+  <div class="wrap">
+    <header class="cms-top">
+      <div>
+        <span class="eyebrow">CMS / CATALOG / SẢN PHẨM</span>
+        <h1 class="section-title" th:if="${isEdit}">Cập nhật <em>sản phẩm</em></h1>
+        <h1 class="section-title" th:unless="${isEdit}">Thêm <em>sản phẩm</em></h1>
+      </div>
+      <a class="btn btn-plain" th:href="@{/cms/products}">← Danh sách sản phẩm</a>
+    </header>
+
+    <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="toast show error" th:text="${errorMessage}"></div>
+
+    <section class="cms-panel cms-product-form-panel">
+      <form class="cms-product-form" id="product-form" method="post" enctype="multipart/form-data"
+            th:object="${productRequest}"
+            th:action="${isEdit ? '/cms/products/update/' + product.id : '/cms/products/add'}"
+            th:attr="data-is-edit=${isEdit}"
+            data-confirm-message="Bạn có muốn lưu thông tin sản phẩm này không?">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <div class="cms-form-errors" th:if="${#fields.hasErrors()}">
+          <strong>Vui lòng kiểm tra lại thông tin:</strong>
+          <ul>
+            <li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li>
+          </ul>
+        </div>
+
+        <section class="cms-form-section">
+          <h2>Thông tin sản phẩm</h2>
+          <div class="cms-product-form__grid">
+            <div class="cms-form-field cms-form-field--wide">
+              <label for="product-name">Tên sản phẩm</label>
+              <input id="product-name" th:field="*{name}" maxlength="150" required>
+              <small class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+            </div>
+            <div class="cms-form-field">
+              <label for="product-price">Giá (VNĐ)</label>
+              <input id="product-price" name="price"
+                     th:value="${productRequest.price != null ? #numbers.formatInteger(productRequest.price, 0, 'POINT') : ''}"
+                     type="text" inputmode="numeric" autocomplete="off" required>
+              <small class="field-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></small>
+            </div>
+            <div class="cms-form-field">
+              <label for="product-stock">Tồn kho</label>
+              <input id="product-stock" th:field="*{stockQuantity}" type="number" min="0" required>
+              <small class="field-error" th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}"></small>
+            </div>
+            <div class="cms-form-field">
+              <label for="product-preparation">Số ngày chuẩn bị</label>
+              <input id="product-preparation" th:field="*{preparationDays}" type="number" min="0" required>
+              <small class="field-error" th:if="${#fields.hasErrors('preparationDays')}" th:errors="*{preparationDays}"></small>
+            </div>
+            <div class="cms-form-field">
+              <label for="product-category">Danh mục</label>
+              <select id="product-category" th:field="*{categoryId}" required>
+                <option value="">Chọn danh mục</option>
+                <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+                <option th:if="${isEdit and !product.category.active}" th:value="${product.category.id}"
+                        th:text="${product.category.name + ' (ngừng hoạt động)'}"></option>
+              </select>
+              <small class="field-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></small>
+            </div>
+            <div class="cms-form-field" th:if="${isEdit}">
+              <label for="product-status">Trạng thái bán</label>
+              <select id="product-status" th:field="*{status}" required>
+                <option th:each="productStatus : ${statuses}" th:value="${productStatus}"
+                        th:text="${productStatus.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}"></option>
+              </select>
+              <small class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></small>
+            </div>
+            <div class="cms-form-field">
+              <label for="product-badge">Badge marketing</label>
+              <select id="product-badge" th:field="*{badge}">
+                <option value="">Không có badge</option>
+                <option value="NEW">Mới</option>
+                <option value="BEST_SELLER">Bán chạy</option>
+                <option value="LIMITED">Giới hạn</option>
+                <option value="SEASONAL">Theo mùa</option>
+              </select>
+            </div>
+            <div class="cms-form-field cms-form-field--wide">
+              <label for="product-description">Mô tả</label>
+              <textarea id="product-description" th:field="*{description}" required></textarea>
+              <small class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+            </div>
+            <div class="cms-form-field">
+              <label for="product-ingredients">Thành phần &amp; hương vị</label>
+              <textarea id="product-ingredients" th:field="*{ingredients}" maxlength="10000"></textarea>
+              <small class="field-error" th:if="${#fields.hasErrors('ingredients')}" th:errors="*{ingredients}"></small>
+            </div>
+            <div class="cms-form-field">
+              <label for="product-storage-instructions">Hướng dẫn bảo quản &amp; hâm nóng</label>
+              <textarea id="product-storage-instructions" th:field="*{storageInstructions}" maxlength="10000"></textarea>
+              <small class="field-error" th:if="${#fields.hasErrors('storageInstructions')}" th:errors="*{storageInstructions}"></small>
+            </div>
+            <div class="cms-form-field cms-form-field--wide">
+              <label for="product-allergen-info">Thông tin dị ứng</label>
+              <textarea id="product-allergen-info" th:field="*{allergenInfo}" maxlength="5000"></textarea>
+              <small class="field-error" th:if="${#fields.hasErrors('allergenInfo')}" th:errors="*{allergenInfo}"></small>
+            </div>
+          </div>
+        </section>
+
+        <section class="cms-form-section">
+          <h2>Hình ảnh sản phẩm</h2>
+          <div class="image-upload-preview cms-existing-images" id="existing-image-preview" th:if="${isEdit}">
+            <figure th:each="image : ${product.images}">
+              <img class="cms-product-thumb" th:src="${image.imagePath}"
+                   onerror="this.onerror=null;this.src='/assets/product-placeholder.svg';"
+                   th:alt="${'Ảnh sản phẩm ' + image.displayOrder}">
+              <figcaption th:text="${'Ảnh ' + image.displayOrder}">Ảnh sản phẩm</figcaption>
+              <button class="image-delete-button" type="submit" th:form="${'delete-image-' + image.id}"
+                      th:if="${product.images.size() > 1}">Xóa ảnh</button>
+            </figure>
+          </div>
+          <p class="image-upload-hint" th:if="${isEdit}">Có thể tải ảnh mới bổ sung; tổng số ảnh của sản phẩm tối đa là 4.</p>
+          <p class="image-upload-hint" th:unless="${isEdit}">Chọn từ 1 đến 4 ảnh. Có thể chọn nhiều ảnh cùng lúc hoặc chọn bổ sung.</p>
+          <input id="product-images" th:name="${isEdit ? 'newImages' : 'images'}" type="file"
+                 multiple accept="image/*" th:required="${!isEdit}"
+                 th:attr="data-max-files=${isEdit ? 4 - product.images.size() : 4}"
+                 th:disabled="${isEdit and product.images.size() >= 4}">
+          <small class="field-error" th:if="${isEdit and #fields.hasErrors('newImages')}" th:text="${#fields.errors('newImages')}"></small>
+          <small class="field-error" th:if="${!isEdit and #fields.hasErrors('images')}" th:text="${#fields.errors('images')}"></small>
+          <div class="image-upload-preview" id="new-image-preview" aria-live="polite"></div>
+        </section>
+
+        <div class="cms-form-actions">
+          <a class="btn btn-plain" th:href="@{/cms/products}">Hủy</a>
+          <button class="btn btn-primary" id="product-submit-button" type="submit"
+                  th:text="${isEdit ? 'Lưu thay đổi' : 'Thêm sản phẩm'}">Lưu sản phẩm</button>
+        </div>
+      </form>
+      <th:block th:if="${isEdit and product.images.size() > 1}">
+        <form th:each="image : ${product.images}" method="post" th:id="${'delete-image-' + image.id}"
+              th:action="@{/cms/products/update/{productId}/images/{imageId}/delete(productId=${product.id},imageId=${image.id})}"
+              data-confirm-message="Bạn có chắc muốn xóa ảnh này không?">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        </form>
+      </th:block>
+    </section>
+  </div>
+</main>
+<div class="cms-saving" id="product-saving" role="status" aria-live="polite" hidden>
+  <i aria-hidden="true"></i>
+  <div class="cms-saving__message">
+    <b id="product-saving-message">Đang tải ảnh lên...</b>
+    <progress id="product-upload-progress" max="100" value="0"
+              aria-label="Tiến độ tải ảnh lên"></progress>
+  </div>
+</div>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+<div th:replace="~{fragments/cms-sidebar :: image-preview}"></div>
+<th:block th:replace="~{fragments/cms-sidebar :: image-preview-script}"></th:block>
+<script>
+function setupImagePicker(inputId, previewId, maxFiles) {
+  const input = document.getElementById(inputId);
+  const preview = document.getElementById(previewId);
+  let selectedFiles = [];
+
+  function render() {
+    preview.querySelectorAll('img').forEach(function (img) { URL.revokeObjectURL(img.src); });
+    preview.replaceChildren();
+    selectedFiles.forEach(function (file, index) {
+      const item = document.createElement('figure');
+      const img = document.createElement('img');
+      img.className = 'cms-product-thumb';
+      img.src = URL.createObjectURL(file);
+      img.alt = file.name;
+      const caption = document.createElement('figcaption');
+      caption.textContent = file.name;
+      caption.title = file.name;
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'image-delete-button';
+      remove.textContent = 'Bỏ ảnh';
+      remove.setAttribute('aria-label', 'Bỏ ' + file.name);
+      remove.addEventListener('click', function () {
+        selectedFiles.splice(index, 1);
+        const transfer = new DataTransfer();
+        selectedFiles.forEach(function (selectedFile) { transfer.items.add(selectedFile); });
+        input.files = transfer.files;
+        render();
+      });
+      item.append(img, caption, remove);
+      preview.appendChild(item);
+    });
+  }
+
+  input.addEventListener('change', function () {
+    selectedFiles = selectedFiles.concat(Array.from(input.files));
+    const uniqueFiles = [];
+    selectedFiles.forEach(function (file) {
+      if (!uniqueFiles.some(function (item) {
+        return item.name === file.name && item.size === file.size && item.lastModified === file.lastModified;
+      })) uniqueFiles.push(file);
+    });
+    selectedFiles = uniqueFiles;
+    if (selectedFiles.length > maxFiles) {
+      selectedFiles = selectedFiles.slice(0, maxFiles);
+      window.alert('Chỉ được chọn tối đa ' + maxFiles + ' ảnh mới.');
+    }
+    const transfer = new DataTransfer();
+    selectedFiles.forEach(function (file) { transfer.items.add(file); });
+    input.files = transfer.files;
+    render();
+  });
+}
+
+setupImagePicker('product-images', 'new-image-preview',
+    Number(document.getElementById('product-images').dataset.maxFiles));
+
+const priceInput = document.getElementById('product-price');
+function formatVndInput(value) {
+  const digits = value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+priceInput.value = formatVndInput(priceInput.value);
+priceInput.addEventListener('input', function () {
+  const cursorFromEnd = priceInput.value.length - priceInput.selectionStart;
+  priceInput.value = formatVndInput(priceInput.value);
+  const cursor = Math.max(0, priceInput.value.length - cursorFromEnd);
+  priceInput.setSelectionRange(cursor, cursor);
+});
+
+const productForm = document.getElementById('product-form');
+const productSubmitButton = document.getElementById('product-submit-button');
+const savingIndicator = document.getElementById('product-saving');
+const savingMessage = document.getElementById('product-saving-message');
+const uploadProgress = document.getElementById('product-upload-progress');
+
+productForm.addEventListener('submit', function (event) {
+  if (event.defaultPrevented) return;
+  event.preventDefault();
+
+  const isEdit = productForm.dataset.isEdit === 'true';
+  const xhr = new XMLHttpRequest();
+  productSubmitButton.disabled = true;
+  savingIndicator.hidden = false;
+  savingIndicator.classList.remove('done', 'error');
+  savingMessage.textContent = isEdit ? 'Đang tải ảnh và cập nhật sản phẩm...' : 'Đang tải ảnh lên...';
+  uploadProgress.value = 0;
+
+  xhr.open('POST', productForm.action);
+  xhr.upload.addEventListener('progress', function (progressEvent) {
+    if (!progressEvent.lengthComputable) return;
+    const percent = Math.round(progressEvent.loaded / progressEvent.total * 90);
+    uploadProgress.value = percent;
+    savingMessage.textContent = 'Đang tải ảnh lên... ' + percent + '%';
+  });
+  xhr.upload.addEventListener('load', function () {
+    uploadProgress.value = 95;
+    savingMessage.textContent = 'Đang lưu thông tin sản phẩm...';
+  });
+  xhr.addEventListener('load', function () {
+    if (xhr.status < 200 || xhr.status >= 300) {
+      showSaveError();
+      return;
+    }
+
+    const responseUrl = new URL(xhr.responseURL || productForm.action, window.location.href);
+    const responseDocument = new DOMParser().parseFromString(xhr.responseText, 'text/html');
+    if (responseDocument.querySelector('.cms-product-form')) {
+      document.open();
+      document.write(xhr.responseText);
+      document.close();
+      return;
+    }
+
+    if (!responseUrl.pathname.replace(/\/+$/, '').endsWith('/cms/products')) {
+      showSaveError();
+      return;
+    }
+
+    const serverMessage = responseDocument.querySelector('.toast.show')?.textContent.trim();
+    const savedSuccessfully = serverMessage && serverMessage.includes('thành công');
+    savingIndicator.classList.add(savedSuccessfully ? 'done' : 'error');
+    uploadProgress.value = 100;
+    savingMessage.textContent = serverMessage || 'Đã lưu sản phẩm.';
+    window.setTimeout(function () {
+      window.location.assign(responseUrl.href);
+    }, 900);
+  });
+  xhr.addEventListener('error', showSaveError);
+  xhr.addEventListener('abort', showSaveError);
+  const formData = new FormData(productForm);
+  formData.set('price', priceInput.value.replace(/\D/g, ''));
+  xhr.send(formData);
+
+  function showSaveError() {
+    savingIndicator.classList.add('error');
+    savingMessage.textContent = 'Không thể lưu sản phẩm. Vui lòng kiểm tra kết nối và thử lại.';
+    savingIndicator.hidden = false;
+    productSubmitButton.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

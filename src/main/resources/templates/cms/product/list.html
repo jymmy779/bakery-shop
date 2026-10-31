@@ -2,152 +2,134 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/cms-layout :: head('Quản lý sản phẩm')}"></head>
 <body>
-<div th:replace="~{fragments/cms-layout :: header}"></div>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('products')}"></th:block>
 <main class="cms-page">
   <div class="wrap">
     <header class="cms-top">
-      <div><span class="eyebrow">CMS / CATALOG</span><h1 class="section-title">Quản lý <em>sản phẩm</em></h1></div>
+      <div>
+        <span class="eyebrow">CMS / CATALOG</span>
+        <h1 class="section-title">Quản lý <em>sản phẩm</em></h1>
+      </div>
+      <a class="btn btn-primary" th:href="@{/cms/products/add}">+ Thêm sản phẩm</a>
     </header>
+
     <div th:if="${successMessage}" class="toast show" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="toast show" th:text="${errorMessage}"></div>
-    <div class="cms-catalog-layout">
+    <div th:if="${errorMessage}" class="toast show error" th:text="${errorMessage}"></div>
+
     <section class="cms-panel">
       <div class="cms-toolbar">
         <h2>Danh sách sản phẩm</h2>
-        <button class="btn btn-primary" type="button" onclick="openProductCreate()">+ Thêm sản phẩm</button>
+        <span th:text="${products.totalElements} + ' sản phẩm'">0 sản phẩm</span>
       </div>
-      <p class="cms-filter-title">Lọc sản phẩm theo tên, danh mục và trạng thái bán</p>
       <form class="cms-filter" method="get" th:action="@{/cms/products}">
-        <input name="keyword" th:value="${keyword}" placeholder="Tên sản phẩm">
-        <select name="categoryId"><option value="">Tất cả danh mục</option><option
-            th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
-            th:selected="${category.id == categoryId}"></option></select>
-        <select name="status"><option value="">Tất cả trạng thái</option><option value="SELLING"
-            th:selected="${status != null and status.name() == 'SELLING'}">Đang bán</option><option value="STOPPED"
-            th:selected="${status != null and status.name() == 'STOPPED'}">Ngừng bán</option></select>
+        <label class="cms-search-field">
+          <span class="sr-only">Tra cứu theo tên sản phẩm</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="10.8" cy="10.8" r="6.8"></circle>
+            <path d="m16 16 4.5 4.5"></path>
+          </svg>
+          <input type="search" name="keyword" th:value="${keyword}"
+                 placeholder="Tra cứu tên sản phẩm..." aria-label="Tra cứu theo tên sản phẩm">
+        </label>
+        <select name="categoryId" aria-label="Lọc theo danh mục">
+          <option value="">Tất cả danh mục</option>
+          <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
+                  th:selected="${category.id == categoryId}"></option>
+        </select>
+        <select name="status" aria-label="Lọc theo trạng thái">
+          <option value="">Tất cả trạng thái</option>
+          <option value="SELLING" th:selected="${status != null and status.name() == 'SELLING'}">Đang bán</option>
+          <option value="STOPPED" th:selected="${status != null and status.name() == 'STOPPED'}">Ngừng bán</option>
+        </select>
+        <select name="sort" aria-label="Sắp xếp sản phẩm">
+          <option value="newest" th:selected="${sort == 'newest'}">Mới nhất</option>
+          <option value="oldest" th:selected="${sort == 'oldest'}">Cũ nhất</option>
+          <option value="name" th:selected="${sort == 'name'}">Tên A-Z</option>
+          <option value="price_asc" th:selected="${sort == 'price_asc'}">Giá thấp đến cao</option>
+          <option value="price_desc" th:selected="${sort == 'price_desc'}">Giá cao đến thấp</option>
+        </select>
         <button class="btn btn-plain" type="submit">Lọc</button>
       </form>
+
       <div class="cms-table-wrap">
-        <table class="cms-table">
-          <thead><tr><th>Ảnh</th><th>Sản phẩm</th><th>Danh mục</th><th>Giá</th><th>Tồn kho</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+        <table class="cms-table cms-product-table">
+          <thead>
+          <tr>
+            <th>Ảnh</th>
+            <th>Sản phẩm</th>
+            <th>Danh mục</th>
+            <th>Giá</th>
+            <th>Tồn kho</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+          </thead>
           <tbody>
           <tr th:each="product : ${products.content}">
             <td>
               <div class="cms-image-carousel" th:attr="data-images=${product.imagePathsCsv}">
                 <button class="image-arrow previous" type="button" aria-label="Ảnh trước"
                         th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, -1)">&#8249;</button>
-                <img class="cms-product-thumb" th:src="${product.primaryImagePath != null ? product.primaryImagePath : '/assets/product-placeholder.svg'}" th:alt="${product.name}">
+                <img class="cms-product-thumb"
+                     th:src="${product.primaryImagePath != null ? product.primaryImagePath : '/assets/product-placeholder.svg'}"
+                     onerror="this.onerror=null;this.src='/assets/product-placeholder.svg';"
+                     th:alt="${product.name}">
                 <button class="image-arrow next" type="button" aria-label="Ảnh sau"
                         th:if="${product.imagePaths.size() > 1}" onclick="moveProductImage(this, 1)">&#8250;</button>
               </div>
             </td>
-            <td><strong th:text="${product.name}">Tên sản phẩm</strong><br><small th:text="${product.description}">Mô tả</small></td>
+            <td class="cms-product-name">
+              <strong th:text="${product.name}">Tên sản phẩm</strong>
+              <span class="cms-badge" th:if="${product.badge != null}" th:switch="${product.badge.name()}">
+                <span th:case="'NEW'">Mới</span>
+                <span th:case="'BEST_SELLER'">Bán chạy</span>
+                <span th:case="'LIMITED'">Giới hạn</span>
+                <span th:case="'SEASONAL'">Theo mùa</span>
+              </span>
+              <small th:text="${product.description}">Mô tả</small>
+            </td>
             <td th:text="${product.categoryName}">Danh mục</td>
-            <td th:text="${product.price} + ' đ'">0 đ</td>
-            <td th:text="${product.stockQuantity}">0</td>
-            <td><form method="post" th:action="@{/cms/products/toggle-status/{id}(id=${product.id})}"
+            <td class="cms-product-number" th:text="${#numbers.formatInteger(product.price, 0, 'POINT')} + ' đ'">0 đ</td>
+            <td class="cms-product-number" th:text="${product.stockQuantity}">0</td>
+            <td>
+              <form method="post" th:action="@{/cms/products/toggle-status/{id}(id=${product.id})}"
                     data-confirm-message="Bạn có chắc muốn thay đổi trạng thái sản phẩm này?">
-              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-              <button class="product-status" type="submit"
-                      th:classappend="${product.status.name() == 'SELLING'} ? ' selling' : ' stopped'"
-                      th:text="${product.status.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}">Đang bán</button>
-            </form></td>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button class="product-status" type="submit"
+                        th:classappend="${product.status.name() == 'SELLING'} ? ' selling' : ' stopped'"
+                        th:text="${product.status.name() == 'SELLING' ? 'Đang bán' : 'Ngừng bán'}">Đang bán</button>
+              </form>
+            </td>
             <td class="cms-actions">
-              <button class="btn btn-plain" type="button" th:attr="data-product-id=${product.id},data-name=${product.name},data-description=${product.description},data-badge=${product.badge},data-ingredients=${product.ingredients},data-storage-instructions=${product.storageInstructions},data-allergen-info=${product.allergenInfo},data-price=${product.price},data-stock=${product.stockQuantity},data-preparation=${product.preparationDays},data-category=${product.categoryId},data-status=${product.status},data-image=${product.primaryImagePath},data-images=${product.imagePathsCsv},data-image-ids=${product.imageIdsCsv}" onclick="selectProduct(this)">Sửa</button>
-              <form method="post" th:action="@{/cms/products/delete/{id}(id=${product.id})}" data-confirm-message="Bạn có chắc muốn xóa sản phẩm này?" data-confirm-danger="true"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="btn danger-action" type="submit">Xóa</button></form>
+              <a class="btn btn-plain" th:href="@{/cms/products/{id}/edit(id=${product.id})}">Sửa</a>
+              <form method="post" th:action="@{/cms/products/delete/{id}(id=${product.id})}"
+                    data-confirm-message="Bạn có chắc muốn xóa sản phẩm này?"
+                    data-confirm-danger="true">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <button class="btn danger-action" type="submit">Xóa</button>
+              </form>
             </td>
           </tr>
-          <tr th:if="${products.empty}"><td colspan="7">Không có sản phẩm phù hợp.</td></tr>
+          <tr th:if="${products.empty}">
+            <td colspan="7" class="cms-table-empty">Không có sản phẩm phù hợp.</td>
+          </tr>
           </tbody>
         </table>
       </div>
-      <nav class="pagination" th:if="${products.totalPages > 1}">
-        <a class="small-button" th:if="${products.hasPrevious()}" th:href="@{/cms/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId},status=${status})}">Trước</a>
+      <nav class="pagination cms-product-pagination" th:if="${products.totalPages > 1}" aria-label="Phân trang sản phẩm">
+        <a class="small-button" th:if="${products.hasPrevious()}"
+           th:href="@{/cms/products(page=${products.number - 1},keyword=${keyword},categoryId=${categoryId},status=${status},sort=${sort})}">Trước</a>
         <span th:text="${products.number + 1 + ' / ' + products.totalPages}">1 / 1</span>
-        <a class="small-button" th:if="${products.hasNext()}" th:href="@{/cms/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId},status=${status})}">Sau</a>
+        <a class="small-button" th:if="${products.hasNext()}"
+           th:href="@{/cms/products(page=${products.number + 1},keyword=${keyword},categoryId=${categoryId},status=${status},sort=${sort})}">Sau</a>
       </nav>
     </section>
-    <aside class="cms-side-panel" id="product-sidebar">
-      <h2 id="product-sidebar-title">Thêm sản phẩm</h2>
-      <form method="post" enctype="multipart/form-data" th:action="@{/cms/products/add}" th:object="${createRequest}" id="product-create-form" data-confirm-message="Bạn có muốn thêm sản phẩm này không?">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        <label>Tên sản phẩm</label><input th:field="*{name}" required>
-        <label>Giá (VNĐ)</label><input th:field="*{price}" id="create-product-price" type="number" min="1" step="1" required>
-        <div class="price-suggestions" id="create-price-suggestions" aria-label="Gợi ý giá"></div>
-        <label>Tồn kho</label><input th:field="*{stockQuantity}" type="number" min="0" required>
-        <label>Số ngày chuẩn bị</label><input th:field="*{preparationDays}" type="number" min="0" required>
-        <label>Danh mục</label><select th:field="*{categoryId}" required><option value="">Chọn danh mục</option><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
-        <label>Badge marketing</label><select th:field="*{badge}"><option value="">Không có badge</option><option value="NEW">Mới</option><option value="BEST_SELLER">Bán chạy</option><option value="LIMITED">Phiên bản giới hạn</option><option value="SEASONAL">Theo mùa</option></select>
-        <label>Mô tả</label><textarea th:field="*{description}" required></textarea>
-        <label>Thành phần &amp; hương vị</label><textarea th:field="*{ingredients}" maxlength="10000"></textarea>
-        <label>Hướng dẫn bảo quản &amp; hâm nóng</label><textarea th:field="*{storageInstructions}" maxlength="10000"></textarea>
-        <label>Thông tin dị ứng</label><textarea th:field="*{allergenInfo}" maxlength="5000"></textarea>
-        <label>Hình ảnh</label>
-        <input th:field="*{images}" id="create-product-images" type="file" multiple accept="image/*">
-        <small class="image-upload-hint">Chọn từ 1 đến 4 ảnh. Có thể chọn nhiều ảnh cùng lúc hoặc chọn bổ sung.</small>
-        <div class="image-upload-preview" id="create-image-preview" aria-live="polite"></div>
-        <button class="btn btn-primary" type="submit">Thêm sản phẩm</button>
-      </form>
-      <form method="post" enctype="multipart/form-data" action="/cms/products/update/0" id="product-update-form" hidden data-confirm-message="Bạn có muốn cập nhật sản phẩm này không?">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        <label>Tên sản phẩm</label><input name="name" id="product-name" required>
-        <label>Giá (VNĐ)</label><input name="price" id="product-price" type="number" min="1" step="1" required>
-        <div class="price-suggestions" id="update-price-suggestions" aria-label="Gợi ý giá"></div>
-        <label>Tồn kho</label><input name="stockQuantity" id="product-stock" type="number" min="0" required>
-        <label>Số ngày chuẩn bị</label><input name="preparationDays" id="product-preparation" type="number" min="0" required>
-        <label>Danh mục</label><select name="categoryId" id="product-category" required><option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option></select>
-        <label>Trạng thái bán</label><select name="status" id="product-status" required><option value="SELLING">Đang bán</option><option value="STOPPED">Ngừng bán</option></select>
-        <label>Badge marketing</label><select name="badge" id="product-badge"><option value="">Không có badge</option><option value="NEW">Mới</option><option value="BEST_SELLER">Bán chạy</option><option value="LIMITED">Phiên bản giới hạn</option><option value="SEASONAL">Theo mùa</option></select>
-        <label>Mô tả</label><textarea name="description" id="product-description" required></textarea>
-        <label>Thành phần &amp; hương vị</label><textarea name="ingredients" id="product-ingredients" maxlength="10000"></textarea>
-        <label>Hướng dẫn bảo quản &amp; hâm nóng</label><textarea name="storageInstructions" id="product-storage-instructions" maxlength="10000"></textarea>
-        <label>Thông tin dị ứng</label><textarea name="allergenInfo" id="product-allergen-info" maxlength="5000"></textarea>
-        <label>Ảnh mới</label>
-        <input name="newImages" id="update-product-images" type="file" multiple accept="image/*">
-        <small class="image-upload-hint">Chọn bổ sung ảnh mới. Backend sẽ kiểm tra tổng số ảnh không vượt quá 4.</small>
-        <div class="image-upload-preview" id="update-image-preview" aria-live="polite"></div>
-        <button class="btn btn-primary" type="submit">Cập nhật sản phẩm</button>
-      </form>
-      <div class="edit-image-preview" id="edit-image-preview" aria-live="polite"></div>
-    </aside>
-    </div>
   </div>
 </main>
-<div th:replace="~{fragments/cms-layout :: footer}"></div>
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+<div th:replace="~{fragments/cms-sidebar :: image-preview}"></div>
+<th:block th:replace="~{fragments/cms-sidebar :: image-preview-script}"></th:block>
 <script>
-function openProductCreate() { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Thêm sản phẩm'; document.getElementById('product-create-form').hidden = false; document.getElementById('product-update-form').hidden = true; }
-function selectProduct(button) { document.getElementById('product-sidebar').hidden = false; document.getElementById('product-sidebar-title').textContent = 'Chỉnh sửa sản phẩm'; document.getElementById('product-create-form').hidden = true; document.getElementById('product-update-form').hidden = false; document.getElementById('product-update-form').action = '/cms/products/update/' + button.dataset.productId; document.getElementById('product-name').value = button.dataset.name; document.getElementById('product-price').value = button.dataset.price; document.getElementById('product-stock').value = button.dataset.stock; document.getElementById('product-preparation').value = button.dataset.preparation; document.getElementById('product-category').value = button.dataset.category; document.getElementById('product-status').value = button.dataset.status; document.getElementById('product-badge').value = button.dataset.badge || ''; document.getElementById('product-description').value = button.dataset.description || ''; document.getElementById('product-ingredients').value = button.dataset.ingredients || ''; document.getElementById('product-storage-instructions').value = button.dataset.storageInstructions || ''; document.getElementById('product-allergen-info').value = button.dataset.allergenInfo || ''; document.getElementById('update-product-images').value = ''; document.getElementById('update-image-preview').replaceChildren(); renderEditImages(button.dataset.productId, button.dataset.images, button.dataset.imageIds); updatePriceSuggestions('product-price', 'update-price-suggestions'); }
-function renderEditImages(productId, imageCsv, imageIdsCsv) {
-  const preview = document.getElementById('edit-image-preview');
-  preview.replaceChildren();
-  const images = imageCsv ? imageCsv.split('|').filter(Boolean) : [];
-  const imageIds = imageIdsCsv ? imageIdsCsv.split('|').filter(Boolean) : [];
-  images.forEach(function (path, index) {
-    const item = document.createElement('div');
-    item.className = 'edit-image-item';
-    const image = document.createElement('img');
-    image.src = path;
-    image.alt = 'Ảnh sản phẩm ' + (index + 1);
-    const form = document.createElement('form');
-    form.method = 'post';
-    form.action = '/cms/products/update/' + productId + '/images/' + imageIds[index] + '/delete';
-    form.dataset.confirmMessage = 'Bạn có chắc muốn xóa ảnh này không?';
-    const csrf = document.querySelector('#product-update-form input[name="_csrf"]').cloneNode(true);
-    const button = document.createElement('button');
-    button.type = 'submit';
-    button.className = 'image-delete-button';
-    button.textContent = 'Xóa ảnh';
-    form.append(csrf, button);
-    item.append(image, form);
-    preview.appendChild(item);
-  });
-  preview.querySelectorAll('form[data-confirm-message]').forEach(function (form) {
-    form.addEventListener('submit', function (event) {
-      if (!window.confirm(form.dataset.confirmMessage)) event.preventDefault();
-    });
-  });
-}
 function moveProductImage(button, direction) {
   const carousel = button.parentElement;
   const image = carousel.querySelector('img');
@@ -156,59 +138,12 @@ function moveProductImage(button, direction) {
   const current = Number(carousel.dataset.index || 0);
   const next = (current + direction + paths.length) % paths.length;
   carousel.dataset.index = next;
+  image.onerror = function () {
+    image.onerror = null;
+    image.src = '/assets/product-placeholder.svg';
+  };
   image.src = paths[next];
 }
-function setupImagePicker(inputId, previewId, maxFiles) {
-  const input = document.getElementById(inputId);
-  const preview = document.getElementById(previewId);
-  let selectedFiles = [];
-  input.addEventListener('change', function () {
-    selectedFiles = selectedFiles.concat(Array.from(input.files));
-    const uniqueFiles = [];
-    selectedFiles.forEach(function (file) {
-      if (!uniqueFiles.some(function (item) {
-        return item.name === file.name && item.size === file.size && item.lastModified === file.lastModified;
-      })) uniqueFiles.push(file);
-    });
-    selectedFiles = uniqueFiles;
-    if (selectedFiles.length > maxFiles) {
-      selectedFiles = selectedFiles.slice(0, maxFiles);
-      window.alert('Chỉ được chọn tối đa ' + maxFiles + ' ảnh.');
-    }
-    const transfer = new DataTransfer();
-    selectedFiles.forEach(function (file) { transfer.items.add(file); });
-    input.files = transfer.files;
-    preview.replaceChildren();
-    selectedFiles.forEach(function (file) {
-      const item = document.createElement('span');
-      item.textContent = file.name;
-      preview.appendChild(item);
-    });
-  });
-}
-function updatePriceSuggestions(inputId, suggestionsId) {
-  const input = document.getElementById(inputId);
-  const suggestions = document.getElementById(suggestionsId);
-  const value = Number(input.value);
-  suggestions.replaceChildren();
-  if (!Number.isFinite(value) || value <= 0) return;
-  [100, 1000, 10000].forEach(function (multiplier) {
-    const suggestedValue = value * multiplier;
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'price-suggestion';
-    button.textContent = suggestedValue.toLocaleString('vi-VN') + ' đ';
-    button.addEventListener('click', function () {
-      input.value = suggestedValue;
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-    suggestions.appendChild(button);
-  });
-}
-document.getElementById('create-product-price').addEventListener('input', function () { updatePriceSuggestions('create-product-price', 'create-price-suggestions'); });
-document.getElementById('product-price').addEventListener('input', function () { updatePriceSuggestions('product-price', 'update-price-suggestions'); });
-setupImagePicker('create-product-images', 'create-image-preview', 4);
-setupImagePicker('update-product-images', 'update-image-preview', 4);
 </script>
 </body>
 </html>

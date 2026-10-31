@@ -92,9 +92,14 @@ public class ProductAdminServiceImpl implements ProductAdminService {
   @Override
   @Transactional(readOnly = true)
   public Page<ProductSummaryResponse> search(String keyword, Long categoryId,
-      ProductStatus status, Pageable pageable) {
+      ProductStatus status, String sort, Pageable pageable) {
+    if (sort == null
+        || !java.util.Set.of("newest", "oldest", "price_asc", "price_desc", "name").contains(sort)) {
+      throw new IllegalArgumentException(
+          "sort phải là newest, oldest, price_asc, price_desc hoặc name");
+    }
     String normalized = keyword == null || keyword.isBlank() ? null : keyword.trim();
-    Page<Product> page = products.searchAdmin(normalized, categoryId, status, pageable);
+    Page<Product> page = products.searchAdmin(normalized, categoryId, status, sort, pageable);
     List<Product> content = page.getContent();
     var productImages = new HashMap<Long, List<String>>();
     var productImageIds = new HashMap<Long, List<Long>>();
@@ -191,7 +196,8 @@ public class ProductAdminServiceImpl implements ProductAdminService {
 
   private void saveImages(Product product, List<MultipartFile> files, List<String> storedPaths) {
     if (files == null) return;
-    int order = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(product.getId())).size();
+    int order = images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(product.getId())).stream()
+        .mapToInt(ProductImage::getDisplayOrder).max().orElse(-1) + 1;
     for (MultipartFile file : files) {
       if (file == null || file.isEmpty() || !StringUtils.hasText(file.getOriginalFilename())) continue;
       try {

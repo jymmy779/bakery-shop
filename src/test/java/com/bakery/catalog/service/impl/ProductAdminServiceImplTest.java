@@ -227,6 +227,27 @@ class ProductAdminServiceImplTest {
   }
 
   @Test
+  void newImageUsesNextFreeDisplayOrderAfterGap() {
+    Product product = product(5L);
+    when(products.findById(5L)).thenReturn(Optional.of(product));
+    when(categories.findById(1L)).thenReturn(Optional.of(category));
+    com.bakery.catalog.entity.ProductImage first = new com.bakery.catalog.entity.ProductImage();
+    first.setDisplayOrder(0);
+    com.bakery.catalog.entity.ProductImage third = new com.bakery.catalog.entity.ProductImage();
+    third.setDisplayOrder(2);
+    when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(5L)))
+        .thenReturn(List.of(first, third));
+    when(fileStorage.store(any())).thenReturn("/uploads/new.png");
+    ProductUpdateRequest request = updateRequest(ProductStatus.SELLING);
+    request.setNewImages(List.of(validImage()));
+
+    service.update(5L, request);
+
+    verify(images).save(org.mockito.ArgumentMatchers.argThat(
+        (com.bakery.catalog.entity.ProductImage image) -> image.getDisplayOrder() == 3));
+  }
+
+  @Test
   void rejectsNonImageFile() {
     ProductCreateRequest request = createRequest();
     request.setImages(List.of(new MockMultipartFile("images", "notes.txt", "image/png",
@@ -264,13 +285,21 @@ class ProductAdminServiceImplTest {
   @Test
   void passesKeywordCategoryAndStatusToAdminFilter() {
     var pageable = org.springframework.data.domain.PageRequest.of(0, 10);
-    when(products.searchAdmin("cake", 1L, ProductStatus.SELLING, pageable))
+    when(products.searchAdmin("cake", 1L, ProductStatus.SELLING, "newest", pageable))
         .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of(), pageable, 0));
 
-    var result = service.search(" cake ", 1L, ProductStatus.SELLING, pageable);
+    var result = service.search(" cake ", 1L, ProductStatus.SELLING, "newest", pageable);
 
     assertEquals(0, result.getTotalElements());
-    verify(products).searchAdmin("cake", 1L, ProductStatus.SELLING, pageable);
+    verify(products).searchAdmin("cake", 1L, ProductStatus.SELLING, "newest", pageable);
+  }
+
+  @Test
+  void rejectsUnsupportedAdminSort() {
+    assertThrows(IllegalArgumentException.class,
+        () -> service.search("", null, null, "unsupported", org.springframework.data.domain.PageRequest.of(0, 10)));
+    verify(products, org.mockito.Mockito.never())
+        .searchAdmin(any(), any(), any(), any(), any());
   }
 
   private ProductUpdateRequest updateRequest(ProductStatus status) {

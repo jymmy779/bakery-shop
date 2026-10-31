@@ -1,6 +1,7 @@
 package com.bakery.catalog.controller.admin;
 
 import com.bakery.catalog.dto.CategoryRequest;
+import com.bakery.catalog.dto.CategoryResponse;
 import com.bakery.catalog.service.CategoryAdminService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +24,23 @@ public class CategoryAdminController {
   @GetMapping
   public String getAllCategories(Model model) {
     model.addAttribute("categories", categoryAdminService.findAll());
-    model.addAttribute("categoryRequest", new CategoryRequest());
     return "cms/category/list";
+  }
+
+  @GetMapping({"/add", "/new"})
+  public String newCategory(Model model) {
+    populateCategoryForm(model, false);
+    model.addAttribute("categoryRequest", new CategoryRequest());
+    return "cms/category/form";
+  }
+
+  @GetMapping("/{id}/edit")
+  public String editCategory(@PathVariable Long id, Model model) {
+    CategoryResponse category = categoryAdminService.getById(id);
+    model.addAttribute("category", category);
+    model.addAttribute("categoryRequest", toCategoryRequest(category));
+    populateCategoryForm(model, true);
+    return "cms/category/form";
   }
 
   @PostMapping("/toggle-status/{id}")
@@ -38,26 +55,40 @@ public class CategoryAdminController {
   }
 
   @PostMapping("/add")
-  public String createCategory(@Valid CategoryRequest request, BindingResult result, RedirectAttributes redirect) {
-    if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu danh mục không hợp lệ!");
+  public String createCategory(@ModelAttribute("categoryRequest") @Valid CategoryRequest request,
+      BindingResult result, Model model, RedirectAttributes redirect) {
+    if (result.hasErrors()) {
+      populateCategoryForm(model, false);
+      return "cms/category/form";
+    }
     try {
       categoryAdminService.create(request);
       redirect.addFlashAttribute("successMessage", "Thêm danh mục thành công!");
     } catch (RuntimeException exception) {
-      redirect.addFlashAttribute("errorMessage", exception.getMessage());
+      populateCategoryForm(model, false);
+      model.addAttribute("errorMessage", exception.getMessage());
+      return "cms/category/form";
     }
     return "redirect:/cms/categories";
   }
 
   @PostMapping("/update/{id}")
-  public String updateCategory(@PathVariable Long id, @Valid CategoryRequest request, BindingResult result,
-      RedirectAttributes redirect) {
-    if (result.hasErrors()) return errorRedirect(redirect, "Dữ liệu danh mục không hợp lệ!");
+  public String updateCategory(@PathVariable Long id,
+      @ModelAttribute("categoryRequest") @Valid CategoryRequest request, BindingResult result,
+      Model model, RedirectAttributes redirect) {
+    if (result.hasErrors()) {
+      model.addAttribute("category", categoryAdminService.getById(id));
+      populateCategoryForm(model, true);
+      return "cms/category/form";
+    }
     try {
       categoryAdminService.update(id, request);
       redirect.addFlashAttribute("successMessage", "Cập nhật danh mục thành công!");
     } catch (RuntimeException exception) {
-      redirect.addFlashAttribute("errorMessage", exception.getMessage());
+      model.addAttribute("category", categoryAdminService.getById(id));
+      populateCategoryForm(model, true);
+      model.addAttribute("errorMessage", exception.getMessage());
+      return "cms/category/form";
     }
     return "redirect:/cms/categories";
   }
@@ -73,8 +104,14 @@ public class CategoryAdminController {
     return "redirect:/cms/categories";
   }
 
-  private String errorRedirect(RedirectAttributes redirect, String message) {
-    redirect.addFlashAttribute("errorMessage", message);
-    return "redirect:/cms/categories";
+  private void populateCategoryForm(Model model, boolean editing) {
+    model.addAttribute("isEdit", editing);
+  }
+
+  private CategoryRequest toCategoryRequest(CategoryResponse category) {
+    CategoryRequest request = new CategoryRequest();
+    request.setName(category.getName());
+    request.setDescription(category.getDescription());
+    return request;
   }
 }

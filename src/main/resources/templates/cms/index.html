@@ -1,1 +1,97 @@
-<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><title>CMS</title><link rel="stylesheet" th:href="@{/css/app.css}"></head><body><main class="container"><h1>Bakery CMS</h1><nav><a th:href="@{/cms/products}">Sản phẩm</a><a th:href="@{/cms/categories}">Danh mục</a><a th:href="@{/cms/orders}">Đơn hàng</a><a th:href="@{/cms/accounts}">Tài khoản</a><a th:href="@{/cms/staff}">Nhân viên</a></nav></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/cms-layout :: head('Tổng quan')}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('dashboard')}"></th:block>
+<main class="cms-page cms-dashboard-page">
+  <div class="wrap cms-dashboard">
+    <header class="cms-dashboard-hero">
+      <svg class="cms-dashboard-hero__watermark" viewBox="0 0 240 220" aria-hidden="true" focusable="false">
+        <path d="M25 181h190a10 10 0 0 1 0 20H25a10 10 0 0 1 0-20Z"/>
+        <path d="M42 181v-62a17 17 0 0 1 17-17h122a17 17 0 0 1 17 17v62"/>
+        <path d="M42 123c0-11 8-20 18-20s18 9 18 20v8c0 8 6 14 14 14s14-6 14-14v-8c0-11 8-20 18-20s18 9 18 20v22c0 8 6 14 14 14s14-6 14-14v-10c0-11 8-20 18-20s18 9 18 20v6c0 8 6 14 14 14"/>
+        <path d="M77 102V55m0 0c-10-12-10-17 0-31 10 14 10 19 0 31Zm-8 12h16m-16 13h16"/>
+        <path d="M120 102V55m0 0c-10-12-10-17 0-31 10 14 10 19 0 31Zm-8 12h16m-16 13h16"/>
+        <path d="M163 102V55m0 0c-10-12-10-17 0-31 10 14 10 19 0 31Zm-8 12h16m-16 13h16"/>
+      </svg>
+      <div>
+        <span class="cms-dashboard-kicker">KHÔNG GIAN QUẢN TRỊ LUNE</span>
+        <h1>Tổng quan <em>cửa hàng</em></h1>
+        <p>“Mỗi chiếc bánh nướng tại Lune là một bản giao hưởng giữa thời gian ủ men và đôi tay người thợ bánh.”</p>
+      </div>
+      <a class="cms-dashboard-hero__action" th:href="@{/cms/products}">
+        <span>Quản lý<br> sản phẩm</span>
+        <span class="cms-dashboard-hero__arrow" aria-hidden="true">→</span>
+      </a>
+    </header>
+
+    <section class="cms-dashboard-section" aria-labelledby="dashboard-metrics-title">
+      <div class="cms-dashboard-section__heading">
+        <div>
+          <span class="eyebrow">SỨC KHỎE CỬA HÀNG</span>
+          <h2 id="dashboard-metrics-title">Các chỉ số chính</h2>
+        </div>
+        <small>Dữ liệu hiện tại</small>
+      </div>
+      <div class="cms-dashboard-columns">
+        <div class="cms-dashboard-chart-column">
+          <a class="cms-dashboard-card cms-dashboard-products" th:href="@{/cms/products}">
+          <div class="cms-dashboard-products__heading">
+            <span class="cms-dashboard-card__icon" aria-hidden="true">▧</span>
+            <span class="cms-dashboard-card__tag">SẢN PHẨM</span>
+            <span class="cms-dashboard-card__label">Tổng số sản phẩm</span>
+            <strong th:text="${#numbers.formatInteger(dashboard.totalProducts(), 0, 'POINT')}">0</strong>
+          </div>
+          <div class="cms-dashboard-products__details">
+            <span class="cms-dashboard-products__chart"
+                  role="img"
+                  aria-label="Biểu đồ tỷ lệ sản phẩm đang bán và ngừng bán"
+                  th:classappend="${dashboard.totalProducts() == 0} ? ' is-empty' : ''"
+                  th:style="|--selling-share: ${dashboard.totalProducts() == 0 ? 0 : dashboard.sellingProducts() * 100.0 / dashboard.totalProducts()}%|"></span>
+            <div class="cms-dashboard-products__legend">
+              <span><i class="cms-dashboard-products__dot is-selling" aria-hidden="true"></i>Đang bán</span>
+              <strong th:text="${#numbers.formatInteger(dashboard.sellingProducts(), 0, 'POINT')}">0</strong>
+              <span><i class="cms-dashboard-products__dot is-stopped" aria-hidden="true"></i>Ngừng bán</span>
+              <strong th:text="${#numbers.formatInteger(dashboard.stoppedProducts(), 0, 'POINT')}">0</strong>
+            </div>
+          </div>
+          </a>
+        </div>
+        <div class="cms-dashboard-metrics-column">
+          <a class="cms-dashboard-card category-total" th:href="@{/cms/categories}">
+            <span class="cms-dashboard-card__icon" aria-hidden="true">◇</span>
+            <span class="cms-dashboard-card__tag">DANH MỤC</span>
+            <span class="cms-dashboard-card__label">Tổng số danh mục</span>
+            <strong th:text="${#numbers.formatInteger(dashboard.totalCategories(), 0, 'POINT')}">0</strong>
+            <small>Danh mục đang hoạt động và ngừng hoạt động</small>
+          </a>
+          <a class="cms-dashboard-card user-total" sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}">
+            <span class="cms-dashboard-card__icon" aria-hidden="true">♙</span>
+            <span class="cms-dashboard-card__tag">NGƯỜI DÙNG</span>
+            <span class="cms-dashboard-card__label">Tổng số người dùng</span>
+            <strong th:text="${#numbers.formatInteger(dashboard.totalUsers(), 0, 'POINT')}">0</strong>
+            <small>Tài khoản trong cửa hàng</small>
+          </a>
+          <div class="cms-dashboard-card user-total" sec:authorize="!hasRole('ADMIN')">
+            <span class="cms-dashboard-card__icon" aria-hidden="true">♙</span>
+            <span class="cms-dashboard-card__tag">NGƯỜI DÙNG</span>
+            <span class="cms-dashboard-card__label">Tổng số người dùng</span>
+            <strong th:text="${#numbers.formatInteger(dashboard.totalUsers(), 0, 'POINT')}">0</strong>
+            <small>Tài khoản trong cửa hàng</small>
+          </div>
+          <div class="cms-dashboard-card revenue-total">
+            <span class="cms-dashboard-card__icon" aria-hidden="true">₫</span>
+            <span class="cms-dashboard-card__tag">DOANH THU</span>
+            <span class="cms-dashboard-card__label">Doanh thu đã giao</span>
+            <strong><span th:text="${#numbers.formatInteger(dashboard.deliveredRevenue(), 0, 'POINT')}">0</span> đ</strong>
+            <small>Đơn đã giao và thanh toán thành công</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+</body>
+</html>

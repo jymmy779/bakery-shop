@@ -20,6 +20,7 @@ public interface ProductAdminService {
       String keyword,
       Long categoryId,
       ProductStatus status,
+      String sort,
       Pageable pageable);
 
   ProductRemovalResult deleteOrStopSelling(Long productId);
