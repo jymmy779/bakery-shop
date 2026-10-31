@@ -76,6 +76,12 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 31/10/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Nguyễn Trần Thái Sơn | Catalog Admin — định dạng giá VND trong form sản phẩm | Bỏ gợi ý giá; tự chèn dấu chấm khi nhập; gửi số thuần khi lưu; render giá BigDecimal dạng nguyên có phân cách hàng nghìn khi mở form sửa để không hiểu nhầm `.00` là chữ số giá trị | Chờ review | Branch `review-pr-20`; PR #20; commit: Chưa có | `git diff --check` đạt; Maven Wrapper không khởi chạy được (`Cannot start maven from wrapper`); chưa demo trình duyệt | Kiểm tra nhập/lưu trực tiếp trên trình duyệt |
+
 ### 30/10/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
