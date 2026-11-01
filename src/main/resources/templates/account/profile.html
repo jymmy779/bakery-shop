@@ -1,1 +1,351 @@
-<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><title>Tài khoản</title><link rel="stylesheet" th:href="@{/css/app.css}"></head><body><header th:replace="~{fragments/layout :: header}"></header><main class="container"><h1>Thông tin tài khoản</h1></main></body></html>
+<!DOCTYPE html>
+
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"/>
+<meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Tài khoản của tôi — LUNE Bakery</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}button{cursor:pointer;}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-background":"#261814","on-primary":"#ffffff","secondary":"#536443","surface-dim":"#eed5cc","on-error-container":"#93000a","inverse-primary":"#ffb2bc","on-primary-container":"#ffa3b0","on-tertiary-fixed-variant":"#4f453c","primary-container":"#8b263e","tertiary":"#3c342b","on-error":"#ffffff","surface-container":"#ffe9e3","inverse-on-surface":"#ffede7","inverse-surface":"#3c2d28","surface-bright":"#fff8f6","on-primary-fixed":"#400013","primary-fixed-dim":"#ffb2bc","tertiary-fixed-dim":"#d2c4b7","on-secondary-container":"#586a48","surface-container-lowest":"#ffffff","surface-tint":"#a3394f","error":"#ba1a1a","surface-container-highest":"#f7ddd5","background":"#fff8f6","surface-variant":"#f7ddd5","on-secondary-fixed-variant":"#3b4c2d","surface":"#fff8f6","secondary-fixed":"#d5e9bf","outline":"#897174","on-tertiary":"#ffffff","on-tertiary-container":"#c8baae","tertiary-fixed":"#efe0d3","primary-fixed":"#ffd9dd","outline-variant":"#dcc0c2","on-secondary":"#ffffff","secondary-fixed-dim":"#bacda5","primary":"#6c0c28","tertiary-container":"#544a40","secondary-container":"#d5e9bf","error-container":"#ffdad6","surface-container-high":"#fde3da","on-surface":"#261814","on-secondary-fixed":"#111f06","surface-container-low":"#fff1ec","on-tertiary-fixed":"#221a12","on-surface-variant":"#564244","on-primary-fixed-variant":"#842039"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-xs":"0.25rem","gutter":"1.5rem","gutter-mobile":"1rem","space-lg":"1.5rem","space-md":"1rem","margin-mobile":"1.25rem","margin":"3rem","space-xl":"2.5rem","space-sm":"0.5rem"},fontFamily:{"display":["Playfair Display"],"label-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"headline-md":["Playfair Display"],"headline-sm":["Playfair Display"],"body-md":["Plus Jakarta Sans"],"headline-lg-mobile":["Playfair Display"],"headline-md-mobile":["Playfair Display"],"display-mobile":["Playfair Display"],"headline-lg":["Playfair Display"],"body-sm":["Plus Jakarta Sans"],"label-lg":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"]},fontSize:{"display":["3.5rem",{lineHeight:"4rem",letterSpacing:"-0.02em",fontWeight:"600"}],"label-sm":["0.6875rem",{lineHeight:"0.875rem",letterSpacing:"0.08em",fontWeight:"700"}],"body-lg":["1.125rem",{lineHeight:"1.875rem",fontWeight:"400"}],"headline-md":["2rem",{lineHeight:"2.5rem",fontWeight:"500"}],"headline-sm":["1.25rem",{lineHeight:"1.75rem",fontWeight:"600"}],"body-md":["1rem",{lineHeight:"1.625rem",fontWeight:"400"}],"headline-lg-mobile":["1.875rem",{lineHeight:"2.375rem",fontWeight:"600"}],"headline-md-mobile":["1.5rem",{lineHeight:"2rem",fontWeight:"500"}],"display-mobile":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.01em",fontWeight:"600"}],"headline-lg":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["0.875rem",{lineHeight:"1.375rem",fontWeight:"400"}],"label-lg":["0.875rem",{lineHeight:"1.25rem",letterSpacing:"0.04em",fontWeight:"600"}],"label-md":["0.75rem",{lineHeight:"1rem",letterSpacing:"0.06em",fontWeight:"600"}]}}}};</script></head><body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header th:replace="~{fragments/layout :: storefrontHeader('auth')}"></header><main class="w-full pt-20 bg-surface"><div class="flex flex-col w-full">
+<div class="relative w-full overflow-hidden">
+<!-- Main Container -->
+<div class="max-w-[1280px] w-full mx-auto px-gutter py-space-lg">
+<div th:replace="~{fragments/layout :: storefrontBreadcrumb('Tài khoản của tôi', null, null)}"></div>
+<!-- 2. Header: Greeting & Quick Summary Bento -->
+<section class="mb-space-xl bg-surface-container-low rounded-xl p-space-lg shadow-sm relative overflow-hidden">
+<div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative z-10">
+<!-- Personalized Greeting -->
+<div class="space-y-space-xs">
+<div class="flex flex-wrap items-center gap-space-sm">
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight" th:text="${user?.fullName} ?: 'Xin chào, Nguyễn Hoàng Lan'">
+                Xin chào, Nguyễn Hoàng Lan
+              </h1>
+<span class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-label-sm font-label-sm">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">star</span>
+<span>Khách hàng thân thiết</span>
+</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">
+              Cảm ơn bạn đã đồng hành cùng hương vị bơ mộc và bánh nướng tươi thủ công mỗi sớm mai tại Lune Bakery.
+            </p>
+</div>
+<!-- Quick Metrics Ribbon -->
+<div class="grid grid-cols-3 gap-space-md w-full lg:w-auto bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl p-space-md shadow-sm">
+<div class="text-center px-space-sm">
+<span class="block font-headline-sm text-headline-sm text-primary" th:text="${orderCount} ?: '04'">04</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Đã đặt</span>
+</div>
+<div class="text-center px-space-sm">
+<span class="block font-headline-sm text-headline-sm text-secondary" th:text="${activeOrders} ?: '01'">01</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Đang giao</span>
+</div>
+<div class="text-center px-space-sm">
+<span class="block font-label-lg text-label-lg text-tertiary pt-1" th:text="${memberSince} ?: '10/2023'">10/2023</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Gia nhập</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Layout: Two Columns (280px Sidebar + Content Canvas) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- ================= LEFT COLUMN: Sidebar Navigation ================= -->
+<aside class="lg:col-span-4 xl:col-span-3 space-y-space-md">
+<!-- Navigation Menu Card -->
+<div class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm">
+<div class="p-space-xs mb-space-xs font-label-sm text-label-sm tracking-wider uppercase text-on-surface-variant px-space-sm">
+              Quản trị tài khoản
+            </div>
+<nav class="flex flex-col space-y-1">
+<!-- Active: Hồ sơ cá nhân -->
+<a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg bg-primary-container text-on-primary transition-all shadow-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md flex-1">Thông tin cá nhân</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+<!-- Lịch sử đặt bánh tươi -->
+<a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+<span class="font-label-md text-label-md flex-1">Lịch sử đặt bánh</span>
+<span class="min-w-[20px] h-5 px-1.5 rounded-full bg-surface-container-high text-on-surface text-label-sm font-label-sm flex items-center justify-center">4</span>
+</a>
+<!-- Sổ địa chỉ giao hàng -->
+<a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">local_shipping</span>
+<span class="font-label-md text-label-md flex-1">Địa chỉ</span>
+</a>
+<!-- Mật khẩu & Bảo mật -->
+<a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">shield</span>
+<span class="font-label-md text-label-md flex-1">Bảo mật &amp; Mật khẩu</span>
+</a>
+</nav>
+<div class="pt-space-md mt-space-sm px-space-xs">
+<form th:action="@{/logout}" method="post">
+<button class="cursor-pointer w-full flex items-center justify-center gap-space-xs py-space-xs px-space-md text-error hover:bg-error-container/40 rounded-lg transition-colors font-label-md text-label-md" type="submit">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+<span>Đăng xuất tài khoản</span>
+</button>
+</form>
+</div>
+</div>
+<!-- Bakery Special Assistance Widget -->
+<div class="bg-surface-container-high/60 rounded-xl p-space-md relative overflow-hidden">
+<div class="flex items-start gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px]">cake</span>
+</div>
+<div class="space-y-1">
+<h4 class="font-headline-sm text-[1rem] leading-snug text-tertiary">Bánh tiệc &amp; Đặt gấp</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                  Cần bánh nướng số lượng lớn cho sự kiện, tiệc trà hoặc chuẩn bị hộp quà sang trọng?
+                </p>
+<a class="inline-flex items-center gap-1 pt-1 font-label-md text-label-md text-primary hover:text-primary-container" href="tel:02838241955">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>(028) 3824 1955</span>
+</a>
+</div>
+</div>
+</div>
+</aside>
+<!-- ================= RIGHT COLUMN: Content Workspaces ================= -->
+<div class="lg:col-span-8 xl:col-span-9 space-y-space-xl">
+<!-- KHỐI 1: FORM THÔNG TIN CÁ NHÂN -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm pb-space-md">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Hồ Sơ Cá Nhân</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cập nhật thông tin nhận bánh và lời chúc đặc quyền từ Lune Bakery</p>
+</div>
+<span class="font-label-sm text-label-sm text-secondary bg-secondary-container px-space-sm py-1 rounded-full uppercase tracking-wider">
+                Thành viên chính thức
+              </span>
+</div>
+<!-- Thymeleaf Form Container -->
+<form action="#" class="space-y-space-lg pt-space-md" id="profile-form" method="post">
+<!-- Avatar Section -->
+<div class="flex flex-wrap items-center gap-space-lg p-space-md bg-surface-container-low rounded-xl">
+<div class="relative w-20 h-20 rounded-full overflow-hidden shadow-sm bg-surface-container-highest flex-shrink-0">
+<img alt="Ảnh đại diện Nguyễn Hoàng Lan" class="w-full h-full object-cover" data-alt="Close up warm lifestyle portrait of a gentle Vietnamese woman named Nguyen Hoang Lan with soft natural daylight, cozy linen clothing, warm bakery tones and calm expression, high aesthetic editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUKkjOgj7Loq7yRpPfrcbxM_ZN_qK62TCx0kzyRneNudvKoajWHGpVe-Uu1YHKfnwPjtB55Ry9TrZ6J3aZ8v3e6Zd-NNPqifumFM5t0XPUEaGO4tU1K3bu8Yj6VxmlOM4GHqWxIzyDXCp6Ak2XeQ-ShXPRJRNdb5lfecq4ZRWSbnwqMBU4NIRG02nIT6WBrlY16Ix4Caa0fV_K2J20wTSDioSHCeVzwokK1OLralyDBTaOwcio9sUSuQ"/>
+</div>
+<div class="space-y-1.5">
+<h4 class="font-label-lg text-label-lg text-on-surface">Ảnh đại diện tài khoản</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Hỗ trợ định dạng JPG, PNG dung lượng dưới 5MB</p>
+<div class="flex items-center gap-space-sm pt-1">
+<label class="cursor-pointer inline-flex items-center gap-1.5 px-space-md py-1.5 bg-surface-container-highest text-on-surface hover:bg-surface-dim rounded-full font-label-md text-label-md transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]">photo_camera</span>
+<span>Thay đổi ảnh</span>
+<input accept="image/*" class="sr-only" type="file"/>
+</label>
+<button class="text-on-surface-variant hover:text-error text-label-sm font-label-sm px-space-xs transition-colors" type="button">
+                      Gỡ ảnh
+                    </button>
+</div>
+</div>
+</div>
+<!-- Form Input Fields Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<!-- Họ và tên -->
+<div class="space-y-1">
+<label class="block font-label-md text-label-md text-on-surface" for="fullName">
+                    Họ và tên <span class="text-primary">*</span>
+</label>
+<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="fullName" name="fullName" required="" th:value="${user?.fullName} ?: 'Nguyễn Hoàng Lan'" type="text" value="Nguyễn Hoàng Lan"/>
+</div>
+<!-- Số điện thoại -->
+<div class="space-y-1">
+<label class="block font-label-md text-label-md text-on-surface" for="phone">
+                    Số điện thoại nhận bánh <span class="text-primary">*</span>
+</label>
+<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="phone" name="phone" required="" th:value="${user?.phone} ?: '0912 345 678'" type="tel" value="0912 345 678"/>
+</div>
+<!-- Email + Badge -->
+<div class="space-y-1">
+<div class="flex items-center justify-between">
+<label class="block font-label-md text-label-md text-on-surface" for="email">
+                      Địa chỉ Email <span class="text-primary">*</span>
+</label>
+<span class="inline-flex items-center gap-1 text-[11px] font-label-sm text-secondary">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Đã xác thực</span>
+</span>
+</div>
+<input class="w-full h-12 px-space-md bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm rounded-lg border border-outline-variant shadow-sm cursor-not-allowed" id="email" name="email" readonly th:value="${user?.email} ?: 'hoanglan.nguyen@gmail.com'" type="email" value="hoanglan.nguyen@gmail.com"/>
+</div>
+<!-- Ngày sinh nhật -->
+<div class="space-y-1">
+<label class="block font-label-md text-label-md text-on-surface" for="birthday">
+                    Ngày sinh của bạn
+                  </label>
+<div class="relative">
+<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="birthday" name="birthday" type="date" value="1994-08-22"/>
+</div>
+<p class="font-body-sm text-[12px] text-primary flex items-center gap-1 pt-0.5">
+<span class="material-symbols-outlined text-[14px]">redeem</span>
+<span>Tặng 01 hộp Croissant Bơ Hạnh Nhân thơm lừng vào tuần sinh nhật</span>
+</p>
+</div>
+</div>
+<!-- Giới tính Radio Buttons -->
+<div class="space-y-2 pt-space-xs">
+<span class="block font-label-md text-label-md text-on-surface">Giới tính</span>
+<div class="flex flex-wrap items-center gap-space-lg">
+<label class="flex items-center gap-space-xs cursor-pointer text-body-sm font-body-sm text-on-surface">
+<input checked="" class="w-4 h-4 text-primary focus:ring-primary" name="gender" type="radio" value="FEMALE"/>
+<span>Nữ</span>
+</label>
+<label class="flex items-center gap-space-xs cursor-pointer text-body-sm font-body-sm text-on-surface">
+<input class="w-4 h-4 text-primary focus:ring-primary" name="gender" type="radio" value="MALE"/>
+<span>Nam</span>
+</label>
+<label class="flex items-center gap-space-xs cursor-pointer text-body-sm font-body-sm text-on-surface">
+<input class="w-4 h-4 text-primary focus:ring-primary" name="gender" type="radio" value="OTHER"/>
+<span>Khác</span>
+</label>
+</div>
+</div>
+<!-- Form Action Buttons -->
+<div class="flex items-center justify-end gap-space-md pt-space-md">
+<button class="px-space-lg py-2.5 rounded-full text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md" type="reset">
+                  Hủy thay đổi
+                </button>
+<button class="cursor-pointer px-space-xl py-2.5 rounded-full bg-primary hover:bg-primary-container text-on-primary transition-all shadow-sm font-label-md text-label-md flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px]">done</span>
+<span>Lưu Thay Đổi</span>
+</button>
+</div>
+</form>
+</div>
+<!-- KHỐI 2: ĐƠN HÀNG GẦN NHẤT (RECENT ORDERS PREVIEW) -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-xs">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-6 bg-primary rounded-full"></span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Đơn Hàng Bánh Tươi Gần Nhất</h3>
+</div>
+<a class="font-label-md text-label-md text-primary hover:underline flex items-center gap-0.5" href="#">
+<span>Xem tất cả 04 đơn</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+<!-- Single Featured Order Card -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm hover:shadow-md transition-shadow">
+<!-- Order Header Meta -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-sm">
+<div class="space-y-0.5">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-lg text-label-lg text-primary tracking-wide">#LUNE-8921</span>
+<span class="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-label-sm font-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+<span>Đang nướng &amp; chuẩn bị giao</span>
+</span>
+</div>
+<p class="font-body-sm text-[13px] text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">schedule</span>
+<span>Đặt lúc 07:15 sáng nay — 14/04/2025</span>
+</p>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant block">Tổng thanh toán</span>
+<span class="font-headline-sm text-headline-sm text-primary">322.000 đ</span>
+</div>
+</div>
+<!-- Product Items Preview Thumbnails -->
+<div class="py-space-md grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<!-- Item 1 -->
+<div class="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm rounded-lg shadow-sm">
+<div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img alt="Croissant Bơ Pháp Normandie" class="w-full h-full object-cover" data-alt="Golden crisp freshly baked French butter croissant with glossy laminated layers resting on unbleached bakery parchment paper, artisan pastry photography, warm bakery aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSHwNpgt0I8PcHd5uh13uxl2jpCiocbTeVtwTIGNmcKAv9_1tEizVXpJpkDSNb8j7mQR-4v6-xmISVtRi86ZW29uXEGPyCby90a8TUuBMlSoo6KaTry31mFZ_h24hOOoaThJxuaGPmq5GNDvb4DvjC05eepeaYCT06EHKEDEAk5z8PMVs2tDNqaKfMQ194VoFEx5y4dfuybAaZxqsIUAV3e2SeJs3EiHzOlzurkeHOyFoPS5Twb_Tqsg"/>
+</div>
+<div class="min-w-0 flex-1">
+<h5 class="font-label-md text-label-md text-on-surface truncate">Croissant Bơ Pháp</h5>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Bơ Normandie × 2</p>
+<span class="font-label-sm text-label-sm text-primary">110.000 đ</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm rounded-lg shadow-sm">
+<div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img alt="Pain au Chocolat Đen" class="w-full h-full object-cover" data-alt="Glossy dark chocolate pain au chocolat pastry showing rich molten single-origin dark chocolate center and golden flaky layers, artisan French bakery shot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOzN9E-fTvdRZgvzrPLQPqOowZ86kLJwqrV4eb2MEoiw9-gvDANJ1AeEm_cNDeE7ObllcwhbbEt4x6Yn-SnXKUV3gKdj2rB68uTJnwLQ6Y_9j0VAQZQTcmEouCZ27H5UIlBcpmzDVS_4YaYx9g53pOBO8T4WdEZWeX9Hqt-jUtlv2i17kbigMTnZctwm0_6W75vwE1U30CgqZ_xvC4oI6vmVOYKoOKvjASK5wf3qx_VcjJBaOGqHYK-A"/>
+</div>
+<div class="min-w-0 flex-1">
+<h5 class="font-label-md text-label-md text-on-surface truncate">Pain au Chocolat Đen</h5>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Socola Valrhona 64% × 1</p>
+<span class="font-label-sm text-label-sm text-primary">68.000 đ</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm rounded-lg shadow-sm">
+<div class="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img alt="Mini Croissant Hộp 5 Chiếc" class="w-full h-full object-cover" data-alt="Kraft artisan gift box packed with 5 golden miniature french butter croissants tied with rustic baker twine on a rustic stone counter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZJsivpRqrOC69LXCMRMBmefJk3GGsT0F9eICze3X_L8IiNvxu6MiggWRCjrmad9jlEcE8VliL-p1HjiivWLJ3RqQh1h4SR0oqtcPup4itlR5tUDwHWc37_APz8DC443Cxp0OvxqwYBckbFNjxIQyMXVkzur0sqzsvWry8WTs4S7yfEMZZB0mYxDmhBGqkH2V8l2Ol7xbX_7o_aPnGHlD1NxCUWF_oYQhyTiAAw9CBUWO_QSsI4MQGUA"/>
+</div>
+<div class="min-w-0 flex-1">
+<h5 class="font-label-md text-label-md text-on-surface truncate">Hộp Mini Croissant (5)</h5>
+<p class="font-body-sm text-[12px] text-on-surface-variant">Hộp kraft quà tặng × 1</p>
+<span class="font-label-sm text-label-sm text-primary">144.000 đ</span>
+</div>
+</div>
+</div>
+<!-- Order Action Bar & Timeline status -->
+<div class="pt-space-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-sm">
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-secondary">moped</span>
+<span>Dự kiến giao: <strong>08:45 - 09:15 hôm nay</strong> (Quận 1)</span>
+</div>
+<div class="flex items-center gap-space-sm w-full sm:w-auto">
+<button class="flex-1 sm:flex-initial px-space-md py-2 rounded-full bg-surface-container-highest hover:bg-surface-dim text-on-surface transition-colors font-label-md text-label-md" type="button">
+                    Xem chi tiết đơn
+                  </button>
+<button class="flex-1 sm:flex-initial px-space-md py-2 rounded-full bg-secondary text-on-secondary hover:bg-opacity-90 transition-colors font-label-md text-label-md flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">location_searching</span>
+<span>Theo dõi đơn hàng</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- KHỐI 3: SỔ ĐỊA CHỈ MẶC ĐỊNH -->
+<div class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md">
+<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-xs">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Địa Chỉ Nhận Bánh Mặc Định</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Bác tài giao bánh nóng tận cửa theo địa chỉ này</p>
+</div>
+<button class="inline-flex items-center gap-1.5 px-space-md py-2 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors font-label-md text-label-md" type="button">
+<span class="material-symbols-outlined text-[16px]">add_location_alt</span>
+<span>Thêm địa chỉ mới</span>
+</button>
+</div>
+<!-- Address Card -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm relative flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="space-y-space-xs max-w-xl">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-lg text-label-lg text-on-surface">Văn phòng làm việc / Nhà riêng</span>
+<span class="px-space-xs py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed text-label-sm font-label-sm">
+                    Mặc định
+                  </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary flex-shrink-0 mt-1">pin_drop</span>
+<span>158/4 Pasteur, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+</p>
+<!-- Delivery Note / Artisan Instruction -->
+<div class="flex items-start gap-space-xs text-body-sm font-body-sm text-on-surface-variant bg-surface-container-lowest p-space-sm rounded-lg">
+<span class="material-symbols-outlined text-[16px] text-tertiary flex-shrink-0 mt-0.5">sticky_note_2</span>
+<span><strong>Ghi chú giao bánh:</strong> "Giao trong giờ hành chính, gửi quầy lễ tân hoặc gọi trước 10 phút để nhận bánh nóng giòn từ lò."</span>
+</div>
+</div>
+<!-- Edit Action -->
+<div class="flex md:flex-col items-center gap-space-sm flex-shrink-0 w-full md:w-auto justify-end">
+<button class="px-space-md py-2 rounded-full bg-surface-container-highest hover:bg-surface-dim text-on-surface font-label-md text-label-md flex items-center gap-1.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+<span>Chỉnh sửa địa chỉ</span>
+</button>
+</div>
+</div>
+<!-- Artisan Delivery Commitment Footnote -->
+<div class="pt-space-xs flex items-center gap-space-sm text-on-surface-variant font-body-sm text-[13px]">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified_user</span>
+<span>Lune Bakery cam kết bảo quản bánh trong túi giấy giữ nhiệt chuyên dụng khi giao hàng nội thành.</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main><footer th:replace="~{fragments/layout :: storefrontFooter}"></footer></body></html>

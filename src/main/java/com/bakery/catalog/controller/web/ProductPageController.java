@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequiredArgsConstructor
 public class ProductPageController {
-  private final ProductQueryService products;
+
+  private final ProductQueryService productQueryService;
 
   @GetMapping("/products")
   public String list() {
@@ -26,7 +27,7 @@ public class ProductPageController {
 
   @GetMapping("/products/{productId}")
   public String detail(@PathVariable Long productId, Model model) {
-    model.addAttribute("product", products.getById(productId));
+    model.addAttribute("product", productQueryService.getById(productId));
     return "product/detail";
   }
 }

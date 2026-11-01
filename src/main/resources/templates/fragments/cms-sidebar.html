@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<th:block th:fragment="nav(active)">
+  <aside class="cms-sidebar-nav" aria-label="Điều hướng quản trị">
+    <a class="cms-sidebar-brand" th:href="@{/cms}">LUNE<span>.</span> CMS</a>
+    <div class="cms-sidebar-user">
+      <span class="cms-sidebar-avatar" th:text="${#strings.isEmpty(cmsDisplayName) ? #strings.toUpperCase(#strings.substring(#authentication.name, 0, 1)) : #strings.toUpperCase(#strings.substring(cmsDisplayName, 0, 1))}">A</span>
+      <div>
+        <strong th:text="${#strings.isEmpty(cmsDisplayName) ? #authentication.name : cmsDisplayName}">Tên tài khoản</strong>
+        <small sec:authorize="hasRole('ADMIN')">Quản trị viên</small>
+        <small sec:authorize="!hasRole('ADMIN')">Nhân viên</small>
+      </div>
+    </div>
+    <nav>
+      <a th:href="@{/cms}" th:classappend="${active == 'dashboard'} ? ' active'">Tổng quan</a>
+      <a th:href="@{/cms/products}" th:classappend="${active == 'products'} ? ' active'">Quản lý sản phẩm</a>
+      <a th:href="@{/cms/categories}" th:classappend="${active == 'categories'} ? ' active'">Quản lý danh mục</a>
+      <a th:href="@{/cms/orders}" th:classappend="${active == 'orders'} ? ' active'">Quản lý đơn hàng</a>
+      <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/staff}" th:classappend="${active == 'staff'} ? ' active'">Quản lý nhân viên</a>
+      <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}" th:classappend="${active == 'accounts'} ? ' active'">Quản lý tài khoản</a>
+    </nav>
+    <form class="cms-sidebar-logout-form"     th:action="@{/logout(loginType='cms')}" method="post">
+      <button class="cms-sidebar-logout" type="submit">Đăng xuất</button>
+    </form>
+  </aside>
+</th:block>
+<div th:fragment="image-preview" class="cms-image-modal" id="cms-image-modal" hidden>
+  <button type="button" class="cms-image-modal__close" aria-label="Đóng" data-preview-close>&times;</button>
+  <button type="button" class="cms-image-modal__arrow previous" aria-label="Ảnh trước" data-preview-move="-1">&#8249;</button>
+  <figure>
+    <img id="cms-image-modal-img" alt="Xem trước ảnh">
+    <figcaption id="cms-image-modal-count"></figcaption>
+  </figure>
+  <button type="button" class="cms-image-modal__arrow next" aria-label="Ảnh sau" data-preview-move="1">&#8250;</button>
+</div>
+<th:block th:fragment="image-preview-script">
+  <script>
+    (function () {
+      const modal = document.getElementById('cms-image-modal');
+      if (!modal) return;
+      const img = document.getElementById('cms-image-modal-img');
+      const count = document.getElementById('cms-image-modal-count');
+      let paths = [];
+      let index = 0;
+      function render() {
+        img.src = paths[index];
+        count.textContent = (index + 1) + ' / ' + paths.length;
+        modal.classList.toggle('single', paths.length < 2);
+      }
+      function move(step) {
+        if (paths.length < 2) return;
+        index = (index + step + paths.length) % paths.length;
+        render();
+      }
+      window.openImagePreview = function (list, start) {
+        paths = list.filter(Boolean);
+        if (!paths.length) return;
+        index = Math.min(Math.max(start || 0, 0), paths.length - 1);
+        render();
+        modal.hidden = false;
+      };
+      function close() { modal.hidden = true; }
+      modal.addEventListener('click', function (event) {
+        if (event.target === modal || event.target.hasAttribute('data-preview-close')) close();
+        const step = event.target.getAttribute('data-preview-move');
+        if (step) move(Number(step));
+      });
+      document.addEventListener('keydown', function (event) {
+        if (modal.hidden) return;
+        if (event.key === 'Escape') close();
+        if (event.key === 'ArrowLeft') move(-1);
+        if (event.key === 'ArrowRight') move(1);
+      });
+      document.addEventListener('click', function (event) {
+        const thumb = event.target.closest('img.cms-product-thumb');
+        if (!thumb || thumb.src.indexOf('product-placeholder') >= 0) return;
+        const carousel = thumb.closest('.cms-image-carousel');
+        const list = carousel ? (carousel.dataset.images || '').split('|') : [];
+        openImagePreview(list.length ? list : [thumb.getAttribute('src')],
+            carousel ? Number(carousel.dataset.index || 0) : 0);
+      });
+    })();
+  </script>
+</th:block>
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.bakery.catalog.service;
 
 import com.bakery.catalog.entity.Category;
 import com.bakery.catalog.entity.Product;
+import com.bakery.catalog.entity.ProductBadge;
 import com.bakery.catalog.entity.ProductImage;
 import com.bakery.catalog.repository.ProductImageRepository;
 import com.bakery.catalog.repository.ProductRepository;
@@ -110,6 +111,10 @@ class ProductQueryServiceTest {
     product.setId(10L);
     product.setName("Tiramisu");
     product.setDescription("Coffee and mascarpone");
+    product.setBadge(ProductBadge.BEST_SELLER);
+    product.setIngredients("Coffee, mascarpone");
+    product.setStorageInstructions("Keep chilled");
+    product.setAllergenInfo("Contains milk");
     product.setPrice(new BigDecimal("65000"));
     product.setStockQuantity(15);
     product.setPreparationDays(1);
@@ -124,6 +129,10 @@ class ProductQueryServiceTest {
 
     assertEquals("Tiramisu", result.getName());
     assertEquals("Coffee and mascarpone", result.getDescription());
+    assertEquals(ProductBadge.BEST_SELLER, result.getBadge());
+    assertEquals("Coffee, mascarpone", result.getIngredients());
+    assertEquals("Keep chilled", result.getStorageInstructions());
+    assertEquals("Contains milk", result.getAllergenInfo());
     assertEquals(product.getPrice(), result.getPrice());
     assertEquals(15, result.getStockQuantity());
     assertEquals(1, result.getPreparationDays());

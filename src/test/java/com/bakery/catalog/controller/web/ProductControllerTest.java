@@ -58,8 +58,8 @@ class ProductControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.totalElements").value(3))
         .andExpect(jsonPath("$.filters.categoryId").value(1))
-        .andExpect(jsonPath("$.next").value("/products?keyword=d%C3%A2u&sort=price_desc&page=2&size=1&categoryId=1&minPrice=25000&maxPrice=300000"))
-        .andExpect(jsonPath("$.previous").value("/products?keyword=d%C3%A2u&sort=price_desc&page=0&size=1&categoryId=1&minPrice=25000&maxPrice=300000"));
+        .andExpect(jsonPath("$.next").value("/api/products?keyword=d%C3%A2u&sort=price_desc&page=2&size=1&categoryId=1&minPrice=25000&maxPrice=300000"))
+        .andExpect(jsonPath("$.previous").value("/api/products?keyword=d%C3%A2u&sort=price_desc&page=0&size=1&categoryId=1&minPrice=25000&maxPrice=300000"));
   }
 
   @Test

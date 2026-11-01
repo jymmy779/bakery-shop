@@ -14,6 +14,7 @@ com.bakery
 ├── order         Checkout, đơn hàng, chi tiết đơn và thanh toán
 ├── notification  Gửi email và các thông báo hệ thống
 ├── storage       Lưu trữ và phục vụ file upload
+├── dashboard     Tổng hợp chỉ số CMS từ service công khai của các phân hệ
 ├── common        Exception, validation và tiện ích dùng chung
 └── config        Cấu hình Spring dùng chung
 ```
@@ -60,6 +61,7 @@ Controller -> Service -> Repository -> Database
 - Repository chỉ truy vấn dữ liệu, không điều phối use case.
 - Transaction bắt đầu ở service.
 - Phân hệ khác chỉ gọi service công khai; không gọi repository của nhau.
+- `dashboard` chỉ điều phối các service công khai để tạo số liệu tổng quan; không truy cập repository của phân hệ khác.
 - `common` không được phụ thuộc ngược vào một phân hệ nghiệp vụ.
 - `cart` lưu trong HTTP Session, không tạo bảng Cart hoặc CartItem.
 

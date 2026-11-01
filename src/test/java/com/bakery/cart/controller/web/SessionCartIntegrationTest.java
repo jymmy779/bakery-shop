@@ -106,7 +106,7 @@ class SessionCartIntegrationTest {
     String oldId = session.getId();
     mvc.perform(post("/login").session(session).with(csrf())
         .param("email", "customer@example.test").param("password", "test-password"))
-        .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/"));
+        .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/profile"));
     assertNotEquals(oldId, session.getId());
     mvc.perform(get("/cart/items").session(session)).andExpect(jsonPath("$.totalQuantity").value(2));
   }

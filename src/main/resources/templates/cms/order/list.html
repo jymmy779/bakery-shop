@@ -1,1 +1,51 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>CMS - Đơn hàng</title></head><body><main><h1>Quản lý đơn hàng</h1></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/cms-layout :: head('Quản lý đơn hàng')}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('orders')}"></th:block>
+<main class="cms-page">
+  <div class="wrap cms-management-page">
+    <header class="cms-management-hero">
+      <div>
+        <span class="eyebrow">CMS / VẬN HÀNH</span>
+        <h1 class="section-title">Quản lý <em>đơn hàng</em></h1>
+        <p>Theo dõi đơn đặt bánh, thanh toán và trạng thái giao hàng.</p>
+      </div>
+    </header>
+
+    <section class="cms-panel">
+      <div class="cms-management-panel-heading">
+        <div>
+          <span class="cms-management-eyebrow">ĐƠN HÀNG</span>
+          <h2>Danh sách đơn hàng</h2>
+        </div>
+      </div>
+      <div class="cms-table-wrap">
+        <table class="cms-table cms-management-table">
+          <thead>
+          <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Ngày đặt</th>
+            <th>Tổng tiền</th>
+            <th>Thanh toán</th>
+            <th>Trạng thái đơn</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td colspan="6" class="cms-management-empty-cell">
+              <span class="cms-management-empty__icon" aria-hidden="true">▤</span>
+              <strong>Danh sách đơn hàng đang được tích hợp</strong>
+              <span>Đơn hàng sẽ hiển thị tại đây khi trang CMS được kết nối với nghiệp vụ Order.</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+</body>
+</html>

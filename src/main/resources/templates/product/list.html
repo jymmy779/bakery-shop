@@ -562,7 +562,7 @@
   <link rel="stylesheet" href="/css/app.css"></head>
   <body>
     <header
-      th:replace="~{fragments/layout :: header}"
+      th:replace="~{fragments/layout :: storefrontHeader('products')}"
     ></header>
     <main>
       <nav class="max-w-[1280px] mx-auto px-gutter py-space-md"><a href="/products">Sản phẩm</a></nav>
@@ -608,7 +608,7 @@
         </div>
       </section>
     </main>
-    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
     <script src="/js/shop-api.js"></script><script src="/js/catalog-api.js"></script>
 
   </body>

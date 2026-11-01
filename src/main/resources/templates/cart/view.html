@@ -224,7 +224,7 @@
     class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"
   >
     <header
-      th:replace="~{fragments/layout :: header}"
+      th:replace="~{fragments/layout :: storefrontHeader('products')}"
     ></header>
     <main class="w-full pt-20 bg-surface">
       <div class="flex flex-col w-full">
@@ -415,6 +415,6 @@
         </div>
       </div>
     </main>
-    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
   <script src="/js/shop-api.js"></script><script src="/js/cart-page.js"></script></body>
 </html>

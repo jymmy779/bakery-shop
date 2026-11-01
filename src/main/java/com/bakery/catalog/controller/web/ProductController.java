@@ -48,7 +48,7 @@ public class ProductController {
   }
 
   private String pageLink(ProductFilters filters, int page, int size) {
-    var uri = UriComponentsBuilder.fromPath("/products")
+    var uri = UriComponentsBuilder.fromPath("/api/products")
         .queryParam("keyword", filters.keyword()).queryParam("sort", filters.sort())
         .queryParam("page", page).queryParam("size", size);
     if (filters.categoryId() != null) uri.queryParam("categoryId", filters.categoryId());

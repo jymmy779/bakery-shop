@@ -1,6 +1,7 @@
 package com.bakery.catalog.dto;
 
 import com.bakery.catalog.entity.ProductStatus;
+import com.bakery.catalog.entity.ProductBadge;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,10 @@ public class ProductDetailResponse {
   private Long id;
   private String name;
   private String description;
+  private ProductBadge badge;
+  private String ingredients;
+  private String storageInstructions;
+  private String allergenInfo;
   private BigDecimal price;
   private int stockQuantity;
   private int preparationDays;

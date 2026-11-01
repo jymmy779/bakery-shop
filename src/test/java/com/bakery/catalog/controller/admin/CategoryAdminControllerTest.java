@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.bakery.catalog.service.CategoryAdminService;
+import com.bakery.catalog.dto.CategoryResponse;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,30 @@ class CategoryAdminControllerTest {
     mvc.perform(get("/cms/categories"))
         .andExpect(status().isOk())
         .andExpect(view().name("cms/category/list"))
-        .andExpect(model().attributeExists("categories", "categoryRequest"));
+        .andExpect(model().attributeExists("categories"));
+  }
+
+  @Test
+  void rendersCategoryCreateForm() throws Exception {
+    mvc.perform(get("/cms/categories/add"))
+        .andExpect(status().isOk())
+        .andExpect(view().name("cms/category/form"))
+        .andExpect(model().attributeExists("categoryRequest"))
+        .andExpect(model().attribute("isEdit", false));
+  }
+
+  @Test
+  void rendersCategoryUpdateFormWithExistingValues() throws Exception {
+    CategoryResponse category = new CategoryResponse();
+    category.setId(5L);
+    category.setName("Bánh kem");
+    category.setDescription("Bánh cho dịp đặc biệt");
+    when(categoryAdminService.getById(5L)).thenReturn(category);
+
+    mvc.perform(get("/cms/categories/5/edit"))
+        .andExpect(status().isOk())
+        .andExpect(view().name("cms/category/form"))
+        .andExpect(model().attributeExists("category", "categoryRequest"))
+        .andExpect(model().attribute("isEdit", true));
   }
 }

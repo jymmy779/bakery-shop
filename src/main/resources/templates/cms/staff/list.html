@@ -1,1 +1,26 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>CMS - Nhân viên</title></head><body><main><h1>Quản lý nhân viên</h1></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/cms-layout :: head('Quản lý nhân viên')}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('staff')}"></th:block>
+<main class="cms-page">
+  <div class="wrap cms-management-page">
+    <header class="cms-management-hero">
+      <div>
+        <span class="eyebrow">CMS / NHÂN SỰ</span>
+        <h1 class="section-title">Quản lý <em>nhân viên</em></h1>
+        <p>Không gian dành cho quản lý tài khoản nhân viên của LUNE Bakery.</p>
+      </div>
+    </header>
+
+    <section class="cms-panel cms-management-empty">
+      <span class="cms-management-empty__icon" aria-hidden="true">♙</span>
+      <span class="cms-management-eyebrow">QUẢN LÝ NHÂN SỰ</span>
+      <h2>Chức năng đang được hoàn thiện</h2>
+      <p>Danh sách và thao tác quản lý nhân viên sẽ hiển thị tại đây khi use case được tích hợp.</p>
+    </section>
+  </div>
+</main>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+</body>
+</html>
