@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"><head>
+    <meta name="_csrf" th:content="${_csrf.token}"><meta name="_csrf_header" th:content="${_csrf.headerName}"><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Tìm kiếm sản phẩm — LUNE Bakery</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}button,select{cursor:pointer;}input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none;}input[type="search"]::-ms-clear{display:none;}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-background":"#261814","on-primary":"#ffffff","secondary":"#536443","surface-dim":"#eed5cc","on-error-container":"#93000a","inverse-primary":"#ffb2bc","on-primary-container":"#ffa3b0","on-tertiary-fixed-variant":"#4f453c","primary-container":"#8b263e","tertiary":"#3c342b","on-error":"#ffffff","surface-container":"#ffe9e3","inverse-on-surface":"#ffede7","inverse-surface":"#3c2d28","surface-bright":"#fff8f6","on-primary-fixed":"#400013","primary-fixed-dim":"#ffb2bc","tertiary-fixed-dim":"#d2c4b7","on-secondary-container":"#586a48","surface-container-lowest":"#ffffff","surface-tint":"#a3394f","error":"#ba1a1a","surface-container-highest":"#f7ddd5","background":"#fff8f6","surface-variant":"#f7ddd5","on-secondary-fixed-variant":"#3b4c2d","surface":"#fff8f6","secondary-fixed":"#d5e9bf","outline":"#897174","on-tertiary":"#ffffff","on-tertiary-container":"#c8baae","tertiary-fixed":"#efe0d3","primary-fixed":"#ffd9dd","outline-variant":"#dcc0c2","on-secondary":"#ffffff","secondary-fixed-dim":"#bacda5","primary":"#6c0c28","tertiary-container":"#544a40","secondary-container":"#d5e9bf","error-container":"#ffdad6","surface-container-high":"#fde3da","on-surface":"#261814","on-secondary-fixed":"#111f06","surface-container-low":"#fff1ec","on-tertiary-fixed":"#221a12","on-surface-variant":"#564244","on-primary-fixed-variant":"#842039"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-xs":"0.25rem","gutter":"1.5rem","gutter-mobile":"1rem","space-lg":"1.5rem","space-md":"1rem","margin-mobile":"1.25rem","margin":"3rem","space-xl":"2.5rem","space-sm":"0.5rem"},fontFamily:{"display":["Playfair Display"],"label-sm":["Plus Jakarta Sans"],"body-lg":["Plus Jakarta Sans"],"headline-md":["Playfair Display"],"headline-sm":["Playfair Display"],"body-md":["Plus Jakarta Sans"],"headline-lg-mobile":["Playfair Display"],"headline-md-mobile":["Playfair Display"],"display-mobile":["Playfair Display"],"headline-lg":["Playfair Display"],"body-sm":["Plus Jakarta Sans"],"label-lg":["Plus Jakarta Sans"],"label-md":["Plus Jakarta Sans"]},fontSize:{"display":["3.5rem",{lineHeight:"4rem",letterSpacing:"-0.02em",fontWeight:"600"}],"label-sm":["0.6875rem",{lineHeight:"0.875rem",letterSpacing:"0.08em",fontWeight:"700"}],"body-lg":["1.125rem",{lineHeight:"1.875rem",fontWeight:"400"}],"headline-md":["2rem",{lineHeight:"2.5rem",fontWeight:"500"}],"headline-sm":["1.25rem",{lineHeight:"1.75rem",fontWeight:"600"}],"body-md":["1rem",{lineHeight:"1.625rem",fontWeight:"400"}],"headline-lg-mobile":["1.875rem",{lineHeight:"2.375rem",fontWeight:"600"}],"headline-md-mobile":["1.5rem",{lineHeight:"2rem",fontWeight:"500"}],"display-mobile":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.01em",fontWeight:"600"}],"headline-lg":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["0.875rem",{lineHeight:"1.375rem",fontWeight:"400"}],"label-lg":["0.875rem",{lineHeight:"1.25rem",letterSpacing:"0.04em",fontWeight:"600"}],"label-md":["0.75rem",{lineHeight:"1rem",letterSpacing:"0.06em",fontWeight:"600"}]}}}};</script><link rel="stylesheet" href="/css/app.css"></head><body class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header th:replace="~{fragments/layout :: header}"></header><main class="w-full pt-20 bg-surface"><div class="flex flex-col w-full">
+<nav class="max-w-[1280px] mx-auto px-gutter py-space-md"><a href="/products">Sản phẩm</a></nav>
+<!-- SEARCH HEADER HERO SECTION -->
+<section class="relative w-full bg-surface-container-lowest overflow-hidden">
+<!-- Subtle Ambient Flour & Glow Accent -->
+
+
+<div class="max-w-[1040px] mx-auto px-gutter pt-space-xl pb-space-xl text-center relative z-10 flex flex-col items-center">
+<div class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-low text-primary text-label-sm font-label-sm uppercase tracking-wider mb-space-sm">
+<span class="material-symbols-outlined text-[15px]">qr_code_2</span>
+<span>Tra cứu danh mục bánh tươi Lune Bakery</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight max-w-2xl text-balance">
+        Tìm Món Bánh Yêu Thích Của Bạn
+      </h1>
+<p class="mt-space-xs font-body-md text-body-md text-on-surface-variant max-w-xl">
+        Thưởng thức hương vị bánh nướng mới ra lò với nguyên liệu bột hữu cơ tuyển chọn và bơ Pháp chuẩn AOP thơm ngậy đậm vị mộc mạc.
+      </p>
+<!-- Search Input Container Form (Ready for Spring Boot th:action="@{/tim-kiem}") -->
+<form id="catalog-search" th:action="@{/products/search}" action="/products/search" class="w-full mt-space-lg relative flex flex-col sm:flex-row items-center gap-space-xs bg-surface-container-low p-2 rounded-full shadow-[0_8px_30px_rgba(45,31,26,0.06)]" method="GET">
+<div class="relative flex-1 flex items-center w-full pl-space-md pr-space-sm">
+<span class="material-symbols-outlined text-primary text-[24px] pointer-events-none mr-space-xs">search</span>
+<input aria-label="Nhập từ khóa tìm kiếm bánh" class="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none py-3" id="searchInputField" name="keyword" placeholder="Tìm croissant bơ Pháp, sourdough, pain au chocolat..." type="search" th:value="${keyword}"/>
+<button aria-label="Xóa nội dung tìm kiếm" class="p-1 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors flex items-center justify-center" id="clearSearchBtn" onclick="document.getElementById('searchInputField').value=''; document.getElementById('searchInputField').focus();" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<button class="w-full sm:w-auto px-space-xl py-3.5 bg-primary-container text-on-primary font-label-lg text-label-lg rounded-full hover:bg-primary shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-space-xs flex-shrink-0" type="submit">
+<span class="material-symbols-outlined text-[18px]">manage_search</span>
+<span>Tìm Kiếm</span>
+</button>
+</form>
+<!-- Popular Search Tags / Chips -->
+<div class="mt-space-md flex flex-wrap items-center justify-center gap-2">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mr-1">Gợi ý nhanh:</span>
+<button class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-primary-fixed hover:text-on-primary-fixed text-label-sm font-label-sm transition-colors" onclick="document.getElementById('searchInputField').value='Croissant AOP'; document.getElementById('searchInputField').focus();" type="button">
+          Croissant AOP
+        </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-secondary-container hover:text-on-secondary-container text-label-sm font-label-sm transition-colors" onclick="document.getElementById('searchInputField').value='Sourdough men tự nhiên'; document.getElementById('searchInputField').focus();" type="button">
+          Sourdough men tự nhiên
+        </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-primary-fixed hover:text-on-primary-fixed text-label-sm font-label-sm transition-colors" onclick="document.getElementById('searchInputField').value='Tart dâu rừng'; document.getElementById('searchInputField').focus();" type="button">
+          Tart dâu rừng
+        </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-primary-fixed hover:text-on-primary-fixed text-label-sm font-label-sm transition-colors" onclick="document.getElementById('searchInputField').value='Pain au Chocolat'; document.getElementById('searchInputField').focus();" type="button">
+          Pain au Chocolat
+        </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-primary-fixed hover:text-on-primary-fixed text-label-sm font-label-sm transition-colors" onclick="document.getElementById('searchInputField').value='Bánh sinh nhật'; document.getElementById('searchInputField').focus();" type="button">
+          Bánh sinh nhật
+        </button>
+<button class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface hover:bg-primary-fixed hover:text-on-primary-fixed text-label-sm font-label-sm transition-colors" onclick="document.getElementById('searchInputField').value='Hộp thiếc Sablé'; document.getElementById('searchInputField').focus();" type="button">
+          Hộp thiếc Sablé
+        </button>
+</div>
+</div>
+</section><section class="max-w-[1280px] mx-auto px-gutter py-space-xl"><div class="categories flex flex-wrap gap-2 my-4" id="category-filters" aria-label="Danh mục bánh"></div><div class="toolbar flex flex-wrap gap-4 justify-between my-4"><div>Đang hiển thị <strong id="result-count">0</strong> sản phẩm</div><form id="price-filter" class="filters flex flex-wrap gap-2"><input name="minPrice" type="number" min="0" step="any" placeholder="Giá từ" aria-label="Giá thấp nhất" class="rounded-lg p-2 w-36"><input name="maxPrice" type="number" min="0" step="any" placeholder="Giá đến" aria-label="Giá cao nhất" class="rounded-lg p-2 w-36"><button type="submit" class="chip">Lọc giá</button></form><select id="sort-filter" aria-label="Sắp xếp" class="rounded-lg p-2"><option value="price_asc">Giá thấp đến cao</option><option value="price_desc">Giá cao đến thấp</option><option value="name">Tên A – Z</option><option value="best_selling">Bán chạy</option></select></div><div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-live="polite"></div><div class="pagination flex gap-4 items-center justify-center my-6" aria-label="Phân trang"></div></section></div></main><footer th:replace="~{fragments/layout :: footer}"></footer><script src="/js/shop-api.js"></script><script src="/js/catalog-api.js"></script></body></html>
