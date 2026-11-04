@@ -18,4 +18,6 @@ public class CartItemResponse {
   private BigDecimal lineTotal;
   private int availableStock;
   private int preparationDays;
+  private boolean available = true;
+  private String availabilityMessage;
 }

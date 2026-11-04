@@ -1,125 +1,123 @@
-(() => {
-  const pageSize = 12;
-  const form = document.getElementById('catalog-filter-form');
-  const grid = document.getElementById('catalog-grid');
-  const empty = document.getElementById('catalog-empty');
-  const count = document.getElementById('catalog-count');
-  const category = document.getElementById('category');
+﻿(() => {
+  const grid = document.getElementById('product-grid');
+  if (!grid) return;
+  const count = document.getElementById('result-count');
+  const categories = document.getElementById('category-filters');
+  const price = document.getElementById('price-filter');
+  const sort = document.getElementById('sort-filter');
+  const search = document.getElementById('search-input');
   const pagination = document.getElementById('catalog-pagination');
-  const urlParams = new URLSearchParams(location.search);
-  let products = [];
-  let currentPage = Math.max(Number(urlParams.get('page') || 0), 0);
+  const initial = new URLSearchParams(location.search);
+  const sorts = {latest: 'newest', priceAsc: 'price_asc', priceDesc: 'price_desc', nameAsc: 'name'};
+  const labels = {NEW: 'Mới', BEST_SELLER: 'Bán chạy', LIMITED: 'Giới hạn', SEASONAL: 'Theo mùa'};
+  const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g,
+    char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[char]));
+  const money = value => new Intl.NumberFormat('vi-VN').format(value) + 'đ';
+  let categoryId = initial.get('categoryId') || '';
+  let page = Math.max(0, Number.parseInt(initial.get('page'), 10) || 0);
+  let pending;
+  search.value = initial.get('keyword') || '';
+  sort.value = Object.keys(sorts).find(key => sorts[key] === initial.get('sort')) || 'latest';
+  price.value = ['all', 'under100', '100to300', 'above300'].includes(initial.get('price'))
+    ? initial.get('price') : 'all';
 
-  form.elements.keyword.value = urlParams.get('keyword') || '';
-  form.elements.sort.value = urlParams.get('sort') || 'name';
-
-  const escapeHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-  })[char]);
-  const money = value => new Intl.NumberFormat('vi-VN').format(value || 0) + ' ₫';
-  const imageUrl = path => !path ? '/assets/product-placeholder.svg'
-    : (/^(https?:)?\//.test(path) ? path : '/' + path.replace(/^\/+/, ''));
-
-  function createCard(product) {
-    const soldOut = product.stockQuantity < 1;
-    return `<article class="catalog-card">
-      <a class="catalog-media" href="/products/${product.id}">
-        <img src="${escapeHtml(imageUrl(product.primaryImagePath))}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'">
-        <span>${soldOut ? 'Tạm hết' : escapeHtml(product.categoryName)}</span>
-      </a>
-      <div class="catalog-card-body">
-        <small>${escapeHtml(product.categoryName || 'LUNE SIGNATURE')}</small>
-        <h2><a href="/products/${product.id}">${escapeHtml(product.name)}</a></h2>
-        <p>${escapeHtml(product.description || 'Bánh tươi thủ công, làm mới mỗi ngày.')}</p>
-        <div><strong>${money(product.price)}</strong><a href="/products/${product.id}" aria-label="Xem ${escapeHtml(product.name)}">→</a></div>
-      </div>
-    </article>`;
+  function card(product) {
+    const name = escapeHtml(product.name);
+    const image = product.primaryImagePath;
+    const safeImage = image && (/^\/(?!\/)/.test(image) || /^https?:\/\//i.test(image))
+      ? image : '/assets/product-placeholder.svg';
+    return `<article class="card"><div class="image-wrap"><a href="/products/${product.id}">
+      <img src="${escapeHtml(safeImage)}" alt="${name}" loading="lazy"
+        onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'"></a>
+      ${labels[product.badge] ? `<span class="badge ${product.badge}">${labels[product.badge]}</span>` : ''}
+      </div><div class="card-body"><span class="category">${escapeHtml(product.categoryName)}</span>
+      <h2><a href="/products/${product.id}">${name}</a></h2>
+      <p class="description">${escapeHtml(product.description)}</p>
+      <div class="card-bottom"><span class="price">${money(product.price)}</span>
+      <a class="add" href="/products/${product.id}" aria-label="Xem ${name}"><span class="material-symbols-outlined">arrow_forward</span></a>
+      </div></div></article>`;
   }
 
-  function syncUrl() {
-    const params = new URLSearchParams();
-    const keyword = form.elements.keyword.value.trim();
-    if (keyword) params.set('keyword', keyword);
-    if (category.value) params.set('categoryId', category.value);
-    if (form.elements.sort.value !== 'name') params.set('sort', form.elements.sort.value);
-    if (currentPage > 0) params.set('page', currentPage);
-    history.replaceState(null, '', location.pathname + (params.size ? '?' + params : ''));
-  }
-
-  function filteredProducts() {
-    const keyword = form.elements.keyword.value.trim().toLocaleLowerCase('vi');
-    const categoryId = category.value;
-    const sort = form.elements.sort.value;
-    const result = products.filter(product => {
-      const text = `${product.name} ${product.description}`.toLocaleLowerCase('vi');
-      return (!keyword || text.includes(keyword))
-        && (!categoryId || String(product.categoryId) === categoryId);
-    });
-    result.sort((a, b) => sort === 'price_asc' ? a.price - b.price
-      : sort === 'price_desc' ? b.price - a.price
-      : a.name.localeCompare(b.name, 'vi'));
-    return result;
-  }
-
-  function pageButton(label, page, disabled, active = false) {
-    return `<button type="button" data-page="${page}" ${disabled ? 'disabled' : ''} class="${active ? 'active' : ''}">${label}</button>`;
-  }
-
-  function render() {
-    const result = filteredProducts();
-    const totalPages = Math.ceil(result.length / pageSize);
-    if (currentPage >= totalPages) currentPage = Math.max(totalPages - 1, 0);
-    const visible = result.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
-    grid.innerHTML = visible.map(createCard).join('');
-    grid.hidden = visible.length === 0;
-    empty.hidden = visible.length !== 0;
-    count.textContent = `${result.length} món bánh`;
-    pagination.innerHTML = totalPages > 1
-      ? `${pageButton('←', currentPage - 1, currentPage === 0)}${Array.from({length: totalPages}, (_, page) => pageButton(page + 1, page, false, page === currentPage)).join('')}${pageButton('→', currentPage + 1, currentPage + 1 >= totalPages)}`
-      : '';
-    syncUrl();
+  function message(text) {
+    grid.innerHTML = `<div class="empty" style="display:block" role="status">${escapeHtml(text)}</div>`;
   }
 
   async function loadProducts() {
+    pending?.abort();
+    const controller = new AbortController();
+    pending = controller;
+    const params = new URLSearchParams({page, size: 12, sort: sorts[sort.value] || 'newest'});
+    if (search.value.trim()) params.set('keyword', search.value.trim());
+    if (categoryId) params.set('categoryId', categoryId);
+    if (price.value === 'under100') params.set('maxPrice', '99999.99');
+    if (price.value === '100to300') { params.set('minPrice', '100000'); params.set('maxPrice', '300000'); }
+    if (price.value === 'above300') params.set('minPrice', '300000.01');
+    const url = new URLSearchParams(params);
+    url.delete('size'); url.delete('minPrice'); url.delete('maxPrice');
+    if (price.value !== 'all') url.set('price', price.value);
+    history.replaceState(null, '', location.pathname + '?' + url);
+    grid.setAttribute('aria-busy', 'true');
+    message('Đang tải sản phẩm...');
+    count.textContent = '…';
+    pagination.innerHTML = '';
     try {
-      const response = await fetch('/api/products?size=100&sort=name', {
-        headers: {Accept: 'application/json'}
+      const response = await fetch('/api/products?' + params, {
+        headers: {Accept: 'application/json'}, signal: controller.signal
       });
-      if (!response.ok) throw new Error('Không thể tải danh sách sản phẩm');
+      if (!response.ok) throw new Error('Không thể tải sản phẩm');
       const data = await response.json();
-      products = data.products.filter(product => product.status === 'SELLING');
-      const categories = [...new Map(products.map(product => [product.categoryId, product.categoryName])).entries()]
-        .sort((a, b) => a[1].localeCompare(b[1], 'vi'));
-      category.insertAdjacentHTML('beforeend', categories
-        .map(([id, name]) => `<option value="${id}">${escapeHtml(name)}</option>`).join(''));
-      category.value = urlParams.get('categoryId') || '';
-      render();
+      if (controller.signal.aborted) return;
+      if (page > 0 && page >= data.totalPages) {
+        page = Math.max(0, data.totalPages - 1);
+        return loadProducts();
+      }
+      count.textContent = data.totalElements;
+      grid.innerHTML = data.products.map(card).join('');
+      if (!data.products.length) message('Không tìm thấy sản phẩm phù hợp.');
+      const button = (label, target, disabled) => `<button type="button" class="page" data-page="${target}" ${disabled ? 'disabled' : ''}>${label}</button>`;
+      if (data.totalPages > 1) pagination.innerHTML =
+        button('←', page - 1, page === 0) + `<span aria-live="polite">Trang ${page + 1} / ${data.totalPages}</span>`
+        + button('→', page + 1, page + 1 >= data.totalPages);
     } catch (error) {
-      grid.innerHTML = '<div class="catalog-loading">Không thể tải sản phẩm. Vui lòng thử lại sau.</div>';
-      count.textContent = 'Không thể tải sản phẩm';
+      if (error.name === 'AbortError') return;
+      count.textContent = '0';
+      message('Không thể tải sản phẩm. Vui lòng tải lại trang để thử lại.');
+    } finally {
+      if (pending === controller) grid.setAttribute('aria-busy', 'false');
     }
   }
 
-  form.addEventListener('submit', event => {
-    event.preventDefault();
-    currentPage = 0;
-    render();
+  async function loadCategories() {
+    try {
+      const response = await fetch('/api/categories', {headers: {Accept: 'application/json'}});
+      if (!response.ok) throw new Error('Không thể tải danh mục');
+      const data = await response.json();
+      categories.insertAdjacentHTML('beforeend', data.map(item =>
+        `<button type="button" class="chip" data-category="${item.id}">${escapeHtml(item.name)}</button>`).join(''));
+      categories.querySelectorAll('[data-category]').forEach(button =>
+        button.classList.toggle('active', button.dataset.category === categoryId));
+    } catch (error) {
+      categories.insertAdjacentHTML('beforeend', '<span role="status">Không thể tải danh mục. Vui lòng tải lại trang.</span>');
+    }
+  }
+  const reset = () => { page = 0; loadProducts(); };
+  price.addEventListener('change', reset);
+  sort.addEventListener('change', reset);
+  document.getElementById('header-search')?.addEventListener('submit', event => {
+    event.preventDefault(); reset();
   });
-  form.elements.sort.addEventListener('change', () => {
-    currentPage = 0;
-    render();
-  });
-  category.addEventListener('change', () => {
-    currentPage = 0;
-    render();
+  categories.addEventListener('click', event => {
+    const button = event.target.closest('[data-category]');
+    if (!button) return;
+    categoryId = button.dataset.category;
+    categories.querySelectorAll('[data-category]').forEach(item => item.classList.toggle('active', item === button));
+    reset();
   });
   pagination.addEventListener('click', event => {
     const button = event.target.closest('[data-page]');
     if (!button || button.disabled) return;
-    currentPage = Number(button.dataset.page);
-    render();
-    window.scrollTo({top: 180, behavior: 'smooth'});
+    page = Number(button.dataset.page); loadProducts();
   });
-
+  loadCategories();
   loadProducts();
 })();

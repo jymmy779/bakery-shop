@@ -82,7 +82,38 @@ public class CartQuantityServiceImpl {
       return toResponse(new Cart());
     }
     synchronized (cart) {
-      return toResponse(cart);
+      CartResponse response = toResponse(cart);
+      BigDecimal total = BigDecimal.ZERO;
+      int preparationDays = 0;
+      for (CartItemResponse line : response.getItems()) {
+        try {
+          var product = products.getById(line.getProductId());
+          line.setProductName(product.getName());
+          line.setUnitPrice(product.getPrice());
+          line.setAvailableStock(product.getStockQuantity());
+          line.setPreparationDays(product.getPreparationDays());
+          line.setImagePath(product.getImages().isEmpty() ? null : product.getImages().get(0).getImagePath());
+          line.setLineTotal(product.getPrice().multiply(BigDecimal.valueOf(line.getQuantity())));
+          if (product.getStatus() != ProductStatus.SELLING) {
+            line.setAvailabilityMessage("Sản phẩm đã ngừng bán. Vui lòng xóa khỏi giỏ hàng");
+          } else if (product.getStockQuantity() < 1) {
+            line.setAvailabilityMessage("Sản phẩm tạm hết hàng. Vui lòng xóa khỏi giỏ hàng");
+          } else if (line.getQuantity() > product.getStockQuantity()) {
+            line.setAvailabilityMessage("Chỉ còn " + product.getStockQuantity() + " sản phẩm. Vui lòng giảm số lượng");
+          }
+        } catch (ResourceNotFoundException exception) {
+          line.setAvailabilityMessage("Sản phẩm không còn tồn tại. Vui lòng xóa khỏi giỏ hàng");
+          line.setAvailableStock(0);
+        }
+        line.setAvailable(line.getAvailabilityMessage() == null);
+        total = total.add(line.getLineTotal());
+        preparationDays = Math.max(preparationDays, line.getPreparationDays());
+      }
+      response.setTotalAmount(total);
+      response.setMaximumPreparationDays(preparationDays);
+      response.setCheckoutAllowed(!response.getItems().isEmpty()
+          && response.getItems().stream().allMatch(CartItemResponse::isAvailable));
+      return response;
     }
   }
 }

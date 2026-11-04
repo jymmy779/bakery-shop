@@ -43,6 +43,8 @@ class ProductFilterIntegrationTest {
     em.persist(account);
     Product unsold = product(marker + " A", category, "100000");
     Product sold = product(marker + " Z", category, "200000");
+    Product stopped = product(marker + " stopped", category, "150000");
+    stopped.setStatus(ProductStatus.STOPPED);
     order(account, sold, OrderStatus.DELIVERED, 3);
     order(account, sold, OrderStatus.DELIVERED, 4);
     order(account, unsold, OrderStatus.CANCELLED, 100);

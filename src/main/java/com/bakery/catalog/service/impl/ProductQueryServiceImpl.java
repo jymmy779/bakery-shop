@@ -103,7 +103,9 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     List<Product> productList = keyword == null || keyword.isBlank()
         ? products.findAll(sort)
         : products.searchByNameOrDescription(searchPattern(keyword));
-    return summaries(productList);
+    return summaries(productList.stream()
+        .filter(product -> product.getStatus() == com.bakery.catalog.entity.ProductStatus.SELLING)
+        .toList());
   }
 
   private List<ProductSummaryResponse> summaries(List<Product> productList) {

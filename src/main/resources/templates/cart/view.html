@@ -4,9 +4,11 @@
   <head>
     <meta name="_csrf" th:content="${_csrf.token}"><meta name="_csrf_header" th:content="${_csrf.headerName}">
     <meta charset="utf-8" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="web_standard" name="shell-type" />
-    <title>Atelier Du Four — Boulangerie &amp; Pâtisserie Artisanale</title>
+    <title>Giỏ hàng — LUNE Bakery</title>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
@@ -227,194 +229,56 @@
       th:replace="~{fragments/layout :: storefrontHeader('products')}"
     ></header>
     <main class="w-full pt-20 bg-surface">
-      <div class="flex flex-col w-full">
-        <nav class="max-w-[1280px] mx-auto px-gutter py-space-md"><a href="/products">Sản phẩm</a> / Giỏ hàng</nav>
-        <div class="max-w-[1280px] w-full mx-auto px-gutter py-space-lg">
-          <!-- Page Title & Micro Context -->
-          <div
-            class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-lg"
-          >
-            <div class="space-y-space-xs">
-              <div class="flex items-center gap-space-sm">
-                <h1
-                  class="font-headline-lg text-headline-lg text-primary tracking-tight"
-                >
-                  Giỏ Hàng Của Bạn
-                </h1>
-                <span
-                  class="inline-flex items-center px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm"
-                >
-                  <span id="cart-page-count">0 món bánh</span>
-                </span>
-              </div>
-              <p
-                class="font-body-md text-body-md text-on-surface-variant max-w-2xl"
-              >
-                Giỏ hàng lưu lựa chọn trong phiên truy cập. Bánh sẽ được
-                đóng gói cẩn thận ngay khi bạn hoàn tất đặt đơn.
-              </p>
-            </div>
-          </div>
-          <!-- Main Two-Column Layout (7:5 desktop proportion) -->
-          <div
-            class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start mb-space-xl"
-          >
-            <!-- Left Column: Cart Items (7 Cols) -->
-            <section
-              aria-label="Danh sách món bánh trong giỏ"
-              class="lg:col-span-7 flex flex-col gap-space-md"
-            >
-              <!-- Table Header (Visual layout without harsh borders) -->
-              <div
-                class="hidden sm:grid grid-cols-12 gap-space-sm px-space-md py-space-xs bg-surface-container-low rounded-xl text-label-sm font-label-sm text-on-surface-variant uppercase tracking-wider"
-              >
-                <div class="col-span-6">Sản phẩm</div>
-                <div class="col-span-2 text-right">Đơn giá</div>
-                <div class="col-span-2 text-center">Số lượng</div>
-                <div class="col-span-2 text-right">Tạm tính</div>
-              </div>
-              <div id="cart-items" class="flex flex-col gap-space-md" aria-live="polite">Đang tải giỏ hàng...</div><button id="clear-cart" type="button" disabled>Xóa tất cả món</button><!-- Packaging & Artisan Care Card -->
-              <div
-                class="mt-space-sm p-space-md rounded-xl bg-surface-container-low text-on-surface flex items-start gap-space-md"
-              >
-                <div
-                  class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center flex-shrink-0"
-                >
-                  <span class="material-symbols-outlined text-[20px]"
-                    >inventory_2</span
-                  >
-                </div>
-                <div class="space-y-0.5">
-                  <h4 class="font-headline-sm text-headline-sm text-on-surface">
-                    Đóng gói chuẩn tiệm thủ công
-                  </h4>
-                  <p
-                    class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed"
-                  >
-                    Tất cả bánh đều được gói trong túi giấy kraft chuyên dụng
-                    thoáng khí và hộp carton giữ form, giúp lớp vỏ pastry luôn
-                    duy trì độ giòn xốp tối đa cho đến khi chạm tay bạn.
-                  </p>
-                </div>
-              </div>
-            </section>
-            <!-- Right Column: Order Summary Card (5 Cols) -->
-            <aside
-              aria-label="Tóm tắt đơn hàng"
-              class="lg:col-span-5 sticky top-32"
-            >
-              <div
-                class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm space-y-space-md"
-              >
-                <div class="flex items-center justify-between pb-space-xs">
-                  <h2
-                    class="font-headline-md text-headline-md text-on-surface tracking-tight"
-                  >
-                    Tóm tắt đơn hàng
-                  </h2>
-                  <span
-                    class="material-symbols-outlined text-primary text-[24px]"
-                    >receipt_long</span
-                  >
-                </div>
-                <!-- Cost Calculations Breakdown -->
-                <div class="space-y-space-sm pt-space-xs">
-                  <div
-                    class="flex items-center justify-between text-body-md font-body-md"
-                  >
-                    <span class="text-on-surface-variant"
-                      ><span id="cart-subtotal-label">Tạm tính</span></span
-                    >
-                    <span class="text-on-surface font-medium"><span id="cart-subtotal">0 ₫</span></span>
-                  </div>
-                  <div
-                    class="flex items-start justify-between text-body-md font-body-md"
-                  >
-                    <div class="flex flex-col">
-                      <span class="text-on-surface-variant"
-                        >Phí vận chuyển</span
-                      >
-                      <span
-                        class="font-label-sm text-label-sm text-on-surface-variant opacity-80"
-                        >Giao hỏa tốc giữ ấm giòn</span
-                      >
-                    </div>
-                    <span class="text-on-surface font-medium">Tính khi thanh toán</span>
-                  </div>
-                  <!-- Soft visual separator without borders -->
-                  <div
-                    class="h-px w-full bg-surface-container-high my-space-xs"
-                  ></div>
-                  <div class="flex items-baseline justify-between pt-space-xs">
-                    <div class="flex flex-col">
-                      <span
-                        class="font-headline-sm text-headline-sm text-on-surface"
-                        >Tổng tiền bánh</span
-                      >
-                    </div>
-                    <div class="text-right">
-                      <span
-                        class="font-display-mobile text-display-mobile text-primary font-bold"
-                        ><span id="cart-total">0 ₫</span></span
-                      >
-                    </div>
-                  </div>
-                </div>
-                <!-- Primary CTA Button -->
-                <button id="checkout-button" disabled class="w-full py-3.5 px-space-md rounded-xl bg-primary-container text-on-primary hover:bg-primary transition-all duration-200 font-label-lg text-label-lg flex items-center justify-center gap-space-xs shadow-md hover:shadow-lg active:scale-[0.99]"
-                  type="button"
-                >
-                  <span>Tiến hành thanh toán</span>
-                  <span class="material-symbols-outlined text-[20px]"
-                    >arrow_forward</span
-                  >
-                </button>
-                <!-- Safe Baker Guarantees -->
-                <div class="pt-space-sm space-y-space-sm">
-                  <div
-                    class="flex items-start gap-space-sm text-body-sm font-body-sm text-on-surface-variant"
-                  >
-                    <span
-                      class="material-symbols-outlined text-secondary text-[20px] flex-shrink-0 mt-0.5"
-                      >verified_user</span
-                    >
-                    <span
-                      >100% Bơ Pháp Normandie AOP &amp; Bột mì hữu cơ chứng
-                      nhận</span
-                    >
-                  </div>
-                  <div
-                    class="flex items-start gap-space-sm text-body-sm font-body-sm text-on-surface-variant"
-                  >
-                    <span
-                      class="material-symbols-outlined text-secondary text-[20px] flex-shrink-0 mt-0.5"
-                      >outdoor_garden</span
-                    >
-                    <span
-                      >Bánh ra lò 2 khung giờ chuẩn: Sáng 06:30 &amp; Chiều
-                      14:00</span
-                    >
-                  </div>
-                  <div
-                    class="flex items-start gap-space-sm text-body-sm font-body-sm text-on-surface-variant"
-                  >
-                    <span
-                      class="material-symbols-outlined text-secondary text-[20px] flex-shrink-0 mt-0.5"
-                      >sync_saved_locally</span
-                    >
-                    <span
-                      >Hỗ trợ đổi bánh tức thì nếu sản phẩm bị xô lệch khi vận
-                      chuyển</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </aside>
-          </div>
-
+      <div th:replace="~{fragments/layout :: storefrontBreadcrumb('Giỏ hàng', null, null)}"></div>
+      <section class="max-w-[1280px] mx-auto px-gutter py-space-xl">
+        <h1 class="font-headline-lg text-headline-lg mb-space-md">Giỏ hàng của bạn</h1>
+        <p id="cart-feedback" role="status" aria-live="polite" class="mb-space-md text-primary"></p>
+        <div id="cart-empty" th:style="${cart.items.isEmpty() ? '' : 'display:none'}" class="rounded-xl bg-white p-space-xl text-center">
+          <p class="font-headline-sm text-headline-sm mb-space-md">Giỏ hàng đang trống.</p>
+          <a href="/products" class="inline-block px-space-lg py-space-md rounded-xl bg-primary-container text-on-primary">Chọn bánh</a>
         </div>
-      </div>
+        <div id="cart-content" th:style="${cart.items.isEmpty() ? 'display:none' : ''}" class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+          <div id="cart-items" class="lg:col-span-8 space-y-space-md">
+            <article th:each="item : ${cart.items}" th:attr="data-product-id=${item.productId}"
+                     class="cart-item bg-white rounded-xl p-space-md flex flex-wrap gap-space-md items-center shadow-sm">
+              <a th:href="@{/products/{id}(id=${item.productId})}" class="w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-surface-container">
+                <img class="w-full h-full object-cover" th:alt="${item.productName}"
+                     th:src="${item.imagePath != null ? item.imagePath : '/assets/product-placeholder.svg'}"
+                     onerror="this.onerror=null;this.src='/assets/product-placeholder.svg'"/>
+              </a>
+              <div class="flex-1 min-w-[180px]">
+                <h2 class="font-headline-sm text-headline-sm"><a th:href="@{/products/{id}(id=${item.productId})}" th:text="${item.productName}"></a></h2>
+                <p class="text-body-sm"><span data-unit-price th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')}"></span> ₫ / sản phẩm</p>
+                <p class="text-body-sm">Tồn kho: <span data-stock th:text="${item.availableStock}"></span></p>
+                <p data-availability th:text="${item.availabilityMessage}" class="text-primary text-body-sm" role="alert"></p>
+                <div class="flex gap-space-sm items-center mt-space-sm">
+                  <button type="button" data-action="decrease" aria-label="Giảm số lượng" class="px-3 py-1 rounded-lg bg-surface-container"
+                          th:disabled="${item.quantity <= 1 or item.availableStock < 1}">−</button>
+                  <input type="number" min="1" th:max="${item.availableStock}" th:value="${item.quantity}"
+                         th:attr="data-current-quantity=${item.quantity}" th:disabled="${item.availableStock < 1}"
+                         aria-label="Số lượng" class="cart-quantity w-16 text-center rounded-lg bg-surface-container-low py-1"/>
+                  <button type="button" data-action="increase" aria-label="Tăng số lượng" class="px-3 py-1 rounded-lg bg-surface-container"
+                          th:disabled="${!item.available or item.quantity >= item.availableStock}">+</button>
+                  <button type="button" data-action="remove" class="ml-auto text-primary underline px-2 py-1">Xóa</button>
+                </div>
+              </div>
+              <strong data-line-total class="text-primary" th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA') + ' ₫'}"></strong>
+            </article>
+            <a href="/products" class="inline-block py-space-md text-primary">← Tiếp tục chọn bánh</a>
+          </div>
+          <aside class="lg:col-span-4 bg-white rounded-xl p-space-lg shadow-sm space-y-space-md">
+            <h2 class="font-headline-md text-headline-md">Tóm tắt giỏ hàng</h2>
+            <p>Tổng số bánh: <strong id="cart-total-quantity" th:text="${cart.totalQuantity}"></strong></p>
+            <p class="flex justify-between">Tạm tính: <strong id="cart-total-amount" th:text="${#numbers.formatDecimal(cart.totalAmount, 0, 'POINT', 0, 'COMMA') + ' ₫'}"></strong></p>
+            <p class="text-body-sm">Thời gian chuẩn bị tối thiểu: <span id="cart-preparation-days" th:text="${cart.maximumPreparationDays}"></span> ngày</p>
+            <p id="cart-checkout-warning" th:style="${cart.checkoutAllowed ? 'display:none' : ''}" role="alert" class="text-primary text-body-sm">Vui lòng giảm số lượng hoặc xóa sản phẩm không còn bán trước khi thanh toán.</p>
+            <a id="cart-checkout" th:style="${cart.checkoutAllowed ? '' : 'display:none'}" th:href="${cart.checkoutAllowed ? '/checkout' : null}" class="block text-center rounded-xl py-space-md bg-primary-container text-on-primary">Tiến hành thanh toán</a>
+            <button id="cart-checkout-disabled" th:style="${cart.checkoutAllowed ? 'display:none' : ''}" type="button" disabled class="w-full rounded-xl py-space-md bg-primary-container text-on-primary opacity-50">Tiến hành thanh toán</button>
+          </aside>
+        </div>
+      </section>
     </main>
+    <script th:src="@{/js/cart.js}" src="/js/cart.js" defer></script>
     <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
-  <script src="/js/shop-api.js"></script><script src="/js/cart-page.js"></script></body>
+  </body>
 </html>

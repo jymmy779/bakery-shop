@@ -49,7 +49,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   List<Product> searchByNameOrDescription(@Param("pattern") String pattern);
 
   String FILTER_WHERE = """
-      FROM products p WHERE (:categoryId IS NULL OR p.category_id = :categoryId)
+      FROM products p WHERE p.status = 'SELLING'
+        AND (:categoryId IS NULL OR p.category_id = :categoryId)
         AND (:minPrice IS NULL OR p.price >= :minPrice)
         AND (:maxPrice IS NULL OR p.price <= :maxPrice)
         AND (:pattern IS NULL OR

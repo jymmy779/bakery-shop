@@ -44,7 +44,10 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 class StorefrontCsrfRenderingTest {
   @Configuration
   @EnableWebMvc
-  @Import({SecurityConfig.class, ProductPageController.class, CartController.class})
+  @Import({SecurityConfig.class, ProductPageController.class, CartController.class,
+      com.bakery.cart.service.impl.SessionCartServiceImpl.class,
+      com.bakery.cart.service.impl.CartServiceImpl.class,
+      com.bakery.cart.service.impl.CartQuantityServiceImpl.class})
   static class Config {
     @Bean ProductQueryService products() { return mock(ProductQueryService.class); }
     @Bean UserDetailsService users() { return mock(UserDetailsService.class); }
@@ -79,6 +82,11 @@ class StorefrontCsrfRenderingTest {
     category.setName("Bánh kem");
     product.setCategory(category);
     when(products.getById(1L)).thenReturn(product);
+    when(products.filter(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+        org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+        org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyInt(),
+        org.mockito.ArgumentMatchers.anyInt()))
+        .thenReturn(org.springframework.data.domain.Page.empty());
     mvc = MockMvcBuilders.webAppContextSetup(context)
         // Model a servlet response that starts streaming before a large template finishes.
         .addFilter((request, response, chain) -> {

@@ -598,18 +598,41 @@
       </section>
       <section>
         <div class="container">
-          <form id="catalog-search" class="filters" role="search"><input name="keyword" type="search" placeholder="Tìm bánh..." aria-label="Tìm kiếm bánh"><button type="submit" class="chip">Tìm kiếm</button></form><div class="categories flex flex-wrap gap-2 my-4" id="category-filters" aria-label="Danh mục bánh"></div><div class="toolbar flex flex-wrap gap-4 justify-between my-4"><div>Đang hiển thị <strong id="result-count">0</strong> sản phẩm</div><form id="price-filter" class="filters flex flex-wrap gap-2"><input name="minPrice" type="number" min="0" step="any" placeholder="Giá từ" aria-label="Giá thấp nhất" class="rounded-lg p-2 w-36"><input name="maxPrice" type="number" min="0" step="any" placeholder="Giá đến" aria-label="Giá cao nhất" class="rounded-lg p-2 w-36"><button type="submit" class="chip">Lọc giá</button></form><select id="sort-filter" aria-label="Sắp xếp" class="rounded-lg p-2"><option value="price_asc">Giá thấp đến cao</option><option value="price_desc">Giá cao đến thấp</option><option value="name">Tên A – Z</option><option value="best_selling">Bán chạy</option></select></div>
+          <div
+            class="categories"
+            id="category-filters"
+            role="tablist"
+            aria-label="Danh mục sản phẩm"
+          ><button type="button" class="chip active" data-category="">Tất cả</button></div>
+          <div class="toolbar">
+            <div class="result-count">
+              Đang hiển thị <strong id="result-count">0</strong> sản phẩm
+            </div>
+            <div class="filters">
+              <select id="price-filter" aria-label="Lọc theo giá">
+                <option value="all">Tất cả mức giá</option>
+                <option value="under100">Dưới 100.000đ</option>
+                <option value="100to300">100.000đ – 300.000đ</option>
+                <option value="above300">Trên 300.000đ</option></select
+              ><select id="sort-filter" aria-label="Sắp xếp">
+                <option value="latest">Mới nhất</option>
+                <option value="priceAsc">Giá thấp đến cao</option>
+                <option value="priceDesc">Giá cao đến thấp</option>
+                <option value="nameAsc">Tên A – Z</option>
+              </select>
+            </div>
+          </div>
         </div>
       </section>
       <section class="catalog">
         <div class="container">
-          <div class="grid" id="product-grid" aria-live="polite"></div>
-          <div class="pagination" aria-label="Phân trang"></div>
+          <div class="grid" id="product-grid"></div>
+          <div class="pagination" id="catalog-pagination" aria-label="Phân trang"></div>
         </div>
       </section>
     </main>
     <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
-    <script src="/js/shop-api.js"></script><script src="/js/catalog-api.js"></script>
-
+    <script th:src="@{/js/product-list.js}" src="/js/product-list.js" defer></script>
+    <th:block th:replace="~{fragments/layout :: storefrontScrollReveal}"></th:block>
   </body>
 </html>
