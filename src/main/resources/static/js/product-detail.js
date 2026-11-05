@@ -11,19 +11,30 @@ function decrementQty() {
 function updateMainImage(button) {
   const source = button.querySelector('img');
   const main = document.getElementById('main-product-image');
+  if (!source || !main) return;
+
+  const previousSrc = main.getAttribute('src');
+  const previousAlt = main.alt;
   main.src = source.src;
   main.alt = source.alt;
+  source.src = previousSrc;
+  source.alt = previousAlt;
+
+  document.querySelectorAll('.gallery-thumb').forEach(thumbnail => {
+    thumbnail.setAttribute('aria-pressed', thumbnail === button ? 'true' : 'false');
+  });
 }
 
 async function handleAddToCart() {
   const form = document.getElementById('product-purchase-form');
   const input = document.getElementById('quantity-input');
   const button = document.getElementById('add-to-cart-btn');
-  const feedback = document.getElementById('cart-feedback');
   if (button.disabled || !form.reportValidity()) return;
   const token = document.getElementById('cart-csrf-token');
+  const buttonText = document.getElementById('add-to-cart-text');
+  const idleLabel = buttonText.textContent;
   button.disabled = true;
-  feedback.textContent = 'Đang thêm vào giỏ...';
+  buttonText.textContent = 'Đang thêm…';
   try {
     const response = await fetch('/cart/items', {
       method: 'POST',
@@ -32,10 +43,12 @@ async function handleAddToCart() {
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || 'Không thể thêm sản phẩm vào giỏ');
-    feedback.textContent = `Đã thêm ${input.value} ${document.getElementById('product-name').textContent} vào giỏ hàng`;
+    window.updateCartBadge?.(result.totalQuantity);
+    window.AppToast?.show(`Đã thêm ${input.value} ${document.getElementById('product-name').textContent} vào giỏ hàng`);
   } catch (error) {
-    feedback.textContent = error.message || 'Không thể thêm sản phẩm vào giỏ. Vui lòng thử lại.';
+    window.AppToast?.show(error.message || 'Không thể thêm sản phẩm vào giỏ. Vui lòng thử lại.', 'error');
   } finally {
     button.disabled = false;
+    buttonText.textContent = idleLabel;
   }
 }

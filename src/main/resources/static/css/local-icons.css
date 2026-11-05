@@ -1,0 +1,35 @@
+.container {
+  width: min(1280px, calc(100% - 40px));
+  max-width: none;
+  margin-inline: auto;
+}
+
+@media (max-width: 720px) {
+  .container {
+    width: calc(100% - 28px);
+  }
+}
+
+.material-symbols-outlined {
+  visibility: hidden;
+  display: inline-flex;
+  width: 1em;
+  height: 1em;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.material-symbols-outlined[data-icon-ready] {
+  visibility: visible;
+}
+
+.material-symbols-outlined[data-icon-ready] svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+  flex: none;
+  color: currentColor;
+}

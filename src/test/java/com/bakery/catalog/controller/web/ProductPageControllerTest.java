@@ -5,38 +5,27 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.bakery.catalog.dto.ProductDetailResponse;
-import com.bakery.catalog.dto.ProductSummaryResponse;
 import com.bakery.catalog.service.ProductQueryService;
-import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 class ProductPageControllerTest {
   private final ProductQueryService products = mock(ProductQueryService.class);
 
-  @Test void searchPassesKeywordToDatabaseServiceAndDisplaysItsResults() throws Exception {
-    var cake = new ProductSummaryResponse();
-    cake.setId(1L);
-    cake.setName("Bánh kem dâu");
-    var results = new PageImpl<>(List.of(cake), PageRequest.of(0, 12), 1);
-    when(products.filter("bánh kem dâu", null, null, null, "newest", 0, 12)).thenReturn(results);
+  @Test void legacySearchRouteRedirectsToCanonicalCatalog() throws Exception {
     MockMvcBuilders.standaloneSetup(new ProductPageController(products)).build()
         .perform(get("/products/search").param("keyword", " bánh kem dâu "))
-        .andExpect(status().isOk()).andExpect(view().name("product/search"))
-        .andExpect(model().attribute("keyword", "bánh kem dâu"))
-        .andExpect(model().attribute("results", results));
-    verify(products).filter("bánh kem dâu", null, null, null, "newest", 0, 12);
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/products?keyword=b%C3%A1nh%20kem%20d%C3%A2u&sort=newest&page=0"));
+    verifyNoInteractions(products);
   }
 
-  @Test void searchPreservesSortAndPaginationWithNoMatches() throws Exception {
-    var results = new PageImpl<ProductSummaryResponse>(List.of(), PageRequest.of(1, 12), 0);
-    when(products.filter("missing", null, null, null, "price_asc", 1, 12)).thenReturn(results);
+  @Test void legacySearchRoutePreservesSortAndPagination() throws Exception {
     MockMvcBuilders.standaloneSetup(new ProductPageController(products)).build()
         .perform(get("/products/search").param("keyword", "missing").param("sort", "price_asc").param("page", "1"))
-        .andExpect(status().isOk()).andExpect(model().attribute("results", results))
-        .andExpect(model().attribute("sort", "price_asc"));
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/products?keyword=missing&sort=price_asc&page=1"));
+    verifyNoInteractions(products);
   }
 
   @Test void detailPassesSelectedProductToTemplate() throws Exception {
