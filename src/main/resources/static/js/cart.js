@@ -33,8 +33,7 @@
     document.getElementById('cart-total-quantity').textContent = cart.totalQuantity;
     document.getElementById('cart-total-amount').textContent = money.format(cart.totalAmount) + ' ₫';
     document.getElementById('cart-preparation-days').textContent = cart.maximumPreparationDays;
-    const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = cart.totalQuantity;
+    window.updateCartBadge?.(cart.totalQuantity);
     show('cart-content', cart.items.length > 0);
     show('cart-empty', cart.items.length === 0);
     show('cart-checkout', cart.checkoutAllowed);
@@ -46,13 +45,13 @@
   }
 
   async function change(row, method, quantity) {
-    if (pending) return;
+    if (pending) return false;
     const input = row.querySelector('.cart-quantity');
     if (method !== 'DELETE' && (!Number.isInteger(quantity) || quantity < 1
         || quantity > Number(input.max))) {
       feedback.textContent = `Số lượng phải từ 1 đến ${input.max}.`;
       input.value = input.dataset.currentQuantity;
-      return;
+      return false;
     }
     pending = true;
     const controls = [...container.querySelectorAll('button, input')];
@@ -74,12 +73,14 @@
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || 'Không thể cập nhật giỏ hàng');
       render(result);
+      return true;
     } catch (error) {
-      feedback.textContent = error.message || 'Không thể cập nhật giỏ hàng. Vui lòng thử lại.';
+      if (method !== 'DELETE') feedback.textContent = error.message || 'Không thể cập nhật giỏ hàng. Vui lòng thử lại.';
       input.value = input.dataset.currentQuantity;
       controls.forEach((control, index) => { control.disabled = disabled[index]; });
       show('cart-checkout', checkoutVisible);
       show('cart-checkout-disabled', !checkoutVisible);
+      return false;
     } finally {
       pending = false;
     }
@@ -93,7 +94,21 @@
     const action = button.dataset.action;
     const quantity = action === 'increase' ? Number(input.value) + 1
       : Math.min(Number(input.max), Number(input.value) - 1);
-    change(row, action === 'remove' ? 'DELETE' : 'PATCH', quantity);
+    if (action === 'remove') {
+      const productName = row.querySelector('h2 a').textContent;
+      window.AppConfirm?.open({
+        heading: 'Xóa sản phẩm khỏi giỏ?',
+        text: `Bạn có chắc muốn xóa “${productName}” khỏi giỏ hàng không?`,
+        confirmLabel: 'Xóa sản phẩm'
+      }).then(async confirmed => {
+        if (!confirmed) return;
+        const removed = await change(row, 'DELETE');
+        if (removed) window.AppToast?.show(`Đã xóa ${productName} khỏi giỏ hàng.`);
+        else window.AppToast?.show('Không thể xóa sản phẩm. Vui lòng thử lại.', 'error');
+      });
+      return;
+    }
+    change(row, 'PATCH', quantity);
   });
   container.addEventListener('change', event => {
     if (!event.target.matches('.cart-quantity')) return;

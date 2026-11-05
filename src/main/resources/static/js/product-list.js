@@ -2,6 +2,7 @@
   const grid = document.getElementById('product-grid');
   if (!grid) return;
   const count = document.getElementById('result-count');
+  const resultContext = document.getElementById('result-context');
   const categories = document.getElementById('category-filters');
   const price = document.getElementById('price-filter');
   const sort = document.getElementById('sort-filter');
@@ -17,6 +18,9 @@
   let page = Math.max(0, Number.parseInt(initial.get('page'), 10) || 0);
   let pending;
   search.value = initial.get('keyword') || '';
+  if (resultContext && search.value.trim()) {
+    resultContext.textContent = `Kết quả cho “${search.value.trim()}” ·`;
+  }
   sort.value = Object.keys(sorts).find(key => sorts[key] === initial.get('sort')) || 'latest';
   price.value = ['all', 'under100', '100to300', 'above300'].includes(initial.get('price'))
     ? initial.get('price') : 'all';
@@ -55,7 +59,8 @@
     const url = new URLSearchParams(params);
     url.delete('size'); url.delete('minPrice'); url.delete('maxPrice');
     if (price.value !== 'all') url.set('price', price.value);
-    history.replaceState(null, '', location.pathname + '?' + url);
+    const query = url.toString();
+    history.replaceState(null, '', location.pathname + (query ? '?' + query : ''));
     grid.setAttribute('aria-busy', 'true');
     message('Đang tải sản phẩm...');
     count.textContent = '…';
@@ -72,6 +77,11 @@
         return loadProducts();
       }
       count.textContent = data.totalElements;
+      if (resultContext) {
+        resultContext.textContent = search.value.trim()
+          ? `Kết quả cho “${search.value.trim()}” ·`
+          : 'Đang hiển thị';
+      }
       grid.innerHTML = data.products.map(card).join('');
       if (!data.products.length) message('Không tìm thấy sản phẩm phù hợp.');
       const button = (label, target, disabled) => `<button type="button" class="page" data-page="${target}" ${disabled ? 'disabled' : ''}>${label}</button>`;
@@ -104,7 +114,9 @@
   price.addEventListener('change', reset);
   sort.addEventListener('change', reset);
   document.getElementById('header-search')?.addEventListener('submit', event => {
-    event.preventDefault(); reset();
+    event.preventDefault();
+    search.value = search.value.trim();
+    reset();
   });
   categories.addEventListener('click', event => {
     const button = event.target.closest('[data-category]');

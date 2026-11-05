@@ -15,26 +15,11 @@
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap"
       rel="stylesheet"
     />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
+
+
+
+
+
     <style>
       @layer base {
         html,
@@ -221,7 +206,7 @@
         },
       };
     </script>
-  <link rel="stylesheet" href="/css/app.css"></head>
+  <link rel="stylesheet" href="/css/app.css"><link rel="stylesheet" href="/css/local-icons.css"><script th:src="@{/js/local-icons.js}" src="/js/local-icons.js" defer></script></head>
   <body
     class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"
   >
@@ -230,7 +215,7 @@
     ></header>
     <main class="w-full pt-20 bg-surface">
       <div th:replace="~{fragments/layout :: storefrontBreadcrumb('Giỏ hàng', null, null)}"></div>
-      <section class="max-w-[1280px] mx-auto px-gutter py-space-xl">
+      <section class="container py-space-xl">
         <h1 class="font-headline-lg text-headline-lg mb-space-md">Giỏ hàng của bạn</h1>
         <p id="cart-feedback" role="status" aria-live="polite" class="mb-space-md text-primary"></p>
         <div id="cart-empty" th:style="${cart.items.isEmpty() ? '' : 'display:none'}" class="rounded-xl bg-white p-space-xl text-center">
@@ -279,6 +264,7 @@
       </section>
     </main>
     <script th:src="@{/js/cart.js}" src="/js/cart.js" defer></script>
+    <th:block th:replace="~{fragments/layout :: storefrontUiComponents}"></th:block>
     <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
   </body>
 </html>

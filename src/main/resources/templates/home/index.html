@@ -11,14 +11,8 @@
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap"
       rel="stylesheet"
     />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
+
+
     <style>
       @layer base {
         html,
@@ -339,7 +333,7 @@
         },
       };
     </script>
-  </head>
+  <link rel="stylesheet" href="/css/local-icons.css"><script th:src="@{/js/local-icons.js}" src="/js/local-icons.js" defer></script></head>
   <body
     class="bg-surface font-body-md text-on-surface antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"
   >
@@ -350,7 +344,7 @@
       <div class="flex flex-col w-full">
         <!-- 1. HERO SECTION -->
         <section
-          class="w-full max-w-[1280px] mx-auto px-gutter py-space-lg lg:py-space-xl"
+          class="container py-space-lg lg:py-space-xl"
         >
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-center">
             <!-- Col Left (7 cols): Editorial Typography & CTA -->
@@ -515,7 +509,7 @@
           </div>
         </section>
         <!-- 2. CATEGORIES SECTION (Artisanal Line-Art SVG Icons) -->
-        <section class="w-full max-w-[1280px] mx-auto px-gutter py-space-md">
+        <section class="container py-space-md">
           <div
             class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-space-sm"
             data-category-grid
@@ -684,7 +678,7 @@
           </div>
         </section>
         <!-- 3. KHU VỰC 1: BÁNH MỚI RA LÒ (EDITORIAL BALANCED 4-COLUMN GRID) -->
-        <section class="w-full max-w-[1280px] mx-auto px-gutter py-space-xl">
+        <section class="container py-space-xl">
           <div
             class="flex flex-col md:flex-row md:items-end justify-between mb-space-lg gap-space-sm"
           >
@@ -716,345 +710,13 @@
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter"
             data-new-arrivals-grid
           >
-            <!-- Item 1 -->
-            <div
-              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div
-                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Classic French golden butter croissant from Normandy on white marble counter, deep layered lamination, flaky surface, warm studio lighting"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqZirpJu706xXeqlzmspDay6t6o9Rt11vSqUO4McPVSNqXR5pgzHryfBX4GyIDKpfOJDuThy6OH7yq8znKSXg-5SK_DMf7kjVA6TyeDBlD31opmVC6lZUX8kX-uhujnx2_za6ybYEecuDFXJUS3_tAN21u_mByez6s1j2YhpUvRExJDsGiP92BHrnilqIZz8ryQbyJO-rNGz-4hKDZJlxbvjwSLfOeAtU6bcjymZN7HxN1dtmo7igkJQ"
-                />
-                <span
-                  class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm shadow"
-                  >Mới</span
-                >
-              </div>
-              <span
-                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
-                >Viennoiserie</span
-              >
-              <h3
-                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
-              >
-                Croissant Bơ Pháp Normandie
-              </h3>
-              <div
-                class="mt-auto pt-space-sm flex items-center justify-between"
-              >
-                <span
-                  class="font-headline-sm text-headline-sm text-primary font-bold"
-                  >45.000₫</span
-                >
-                <button
-                  aria-label="Thêm Croissant vào giỏ"
-                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
-                  type="button"
-                >
-                  <span class="material-symbols-outlined text-[18px]"
-                    >shopping_bag</span
-                  >
-                </button>
-              </div>
-            </div>
-            <!-- Item 2 -->
-            <div
-              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div
-                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="French pain au chocolat with dark Valrhona chocolate bars melting inside, glossy brown flaky pastry surface, flour dusting on dark slate"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuANsLaMMhTUHJ1_OCRZHUVQf7ZTSxCSNslNnJbY6zWYaIr-cydl_rZdL6PkPBl6oBqZ6u8tIefucUAW0gvP0W8i2f2d0R69D_4k9BUKwH5ZqhV8Tw5Vxqk-Lt4jc_WFZXGV2w1IhcK9s_N7HHPKT3QsJETD7Esh6yp5neOFYSGjOJUqG49wGh6jREZsvTBi95kWmh5642nHhgWC0Nssfx1wKch21gshdUvLRaMIJ29N4gsOogvk_benPw"
-                />
-              </div>
-              <span
-                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
-                >Viennoiserie</span
-              >
-              <h3
-                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
-              >
-                Pain au Chocolat Đen Valrhona
-              </h3>
-              <div
-                class="mt-auto pt-space-sm flex items-center justify-between"
-              >
-                <span
-                  class="font-headline-sm text-headline-sm text-primary font-bold"
-                  >52.000₫</span
-                >
-                <button
-                  aria-label="Thêm Pain au Chocolat vào giỏ"
-                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
-                  type="button"
-                >
-                  <span class="material-symbols-outlined text-[18px]"
-                    >shopping_bag</span
-                  >
-                </button>
-              </div>
-            </div>
-            <!-- Item 3 -->
-            <div
-              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div
-                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Exquisite French wild strawberry tart with almond frangipane cream, glistening red berries, mint garnish on linen tablecloth"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuChQzIeKWWtpKyY6cGz4D1SJa9T85q-BCuNncfTH7wjdFQCXo9Tuc8cQRimlRvieyG5SrF72G5BeYYJ0MGrEd5rJ-LqVD0vNdKDYv8MYcKX75yxWUgQt9jr6SzxHIGTyxvcBxT3Tos7KNRfSJDXvYH8Qb6ojt1r0b-LEbcbDwlgfhjZO5928P9d5B5Ln_biEVjBLETOd6mppWsdpm2IbYvcuY62QjydQQ_Zqwk1VNsTah9RMNsisrhFXw"
-                />
-                <span
-                  class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm shadow"
-                  >Mới</span
-                >
-              </div>
-              <span
-                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
-                >Bánh Tart</span
-              >
-              <h3
-                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
-              >
-                Tart Dâu Tây Rừng &amp; Kem Hạnh Nhân
-              </h3>
-              <div
-                class="mt-auto pt-space-sm flex items-center justify-between"
-              >
-                <span
-                  class="font-headline-sm text-headline-sm text-primary font-bold"
-                  >75.000₫</span
-                >
-                <button
-                  aria-label="Thêm Tart dâu vào giỏ"
-                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
-                  type="button"
-                >
-                  <span class="material-symbols-outlined text-[18px]"
-                    >shopping_bag</span
-                  >
-                </button>
-              </div>
-            </div>
-            <!-- Item 4 -->
-            <div
-              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div
-                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Individual raspberry pistachio mousse entremet with shiny red mirror glaze and crushed pistachio nuts, served on porcelain dish"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA6xeIqly-lH0BIAqPqqXDlvXDKW0N8izdImlGJO5oPe-IR28Ux8YojkzkADEv_SGUYdUlZrmw2TGNoWcPcZVI-vzEp7RzEOzDZkLphCamKJHU243ZBU27DNQFsJiNlJloe7ErjL1hounxwd41bnEqpvUBoDoxKCq-Yju5dfFh2f8sVZbTEnrUMkJLMYRAv0nZtgNldowsm-E_ZOWi_MbqyAmUwjy-cVs_OsdOa6dl70QKuvIFAvvgwg"
-                />
-              </div>
-              <span
-                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
-                >Bánh Lạnh</span
-              >
-              <h3
-                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
-              >
-                Mousse Phúc Bồn Tử Pistachio
-              </h3>
-              <div
-                class="mt-auto pt-space-sm flex items-center justify-between"
-              >
-                <span
-                  class="font-headline-sm text-headline-sm text-primary font-bold"
-                  >85.000₫</span
-                >
-                <button
-                  aria-label="Thêm Mousse vào giỏ"
-                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
-                  type="button"
-                >
-                  <span class="material-symbols-outlined text-[18px]"
-                    >shopping_bag</span
-                  >
-                </button>
-              </div>
-            </div>
-            <!-- Item 5 -->
-            <div
-              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div
-                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Artisanal 36 hour sourdough bread boule with scored wheat pattern, blistered dark golden crust, dusted with flour on wooden board"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDr952XiUGIoy6O1IcdwCMr9_XgD1EGGs1GaiZMy-15zBvooyfxy1C28KX2xEMFXh_NHV-671RrM4mnEvjrIgMNvTOfZSiwKJLPPZ3dcx4-ncO6B3oDxlv_ope5oVyB516-qIfVJxXSNIXveR3iOAoCSX3XJbmwtGuQl2yGgqyp3_nUzbYlkgDH1q2YpR6IOPCO91edr1mQC4DZt43mPuNwnI59qL6n7gUmt6uw77wCEGuU0OHXYsaQ6g"
-                />
-              </div>
-              <span
-                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
-                >Bánh Mì Mộc</span
-              >
-              <h3
-                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
-              >
-                Sourdough Men Tự Nhiên 36 Giờ
-              </h3>
-              <div
-                class="mt-auto pt-space-sm flex items-center justify-between"
-              >
-                <span
-                  class="font-headline-sm text-headline-sm text-primary font-bold"
-                  >68.000₫</span
-                >
-                <button
-                  aria-label="Thêm Sourdough vào giỏ"
-                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
-                  type="button"
-                >
-                  <span class="material-symbols-outlined text-[18px]"
-                    >shopping_bag</span
-                  >
-                </button>
-              </div>
-            </div>
-            <!-- Item 6 -->
-            <div
-              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div
-                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Kyoto matcha green tea eclair topped with fine green icing and gold leaf, delicate French pastry presentation"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoFm4D0pMaCQHty2TYeIBwhZ8hj4IKTbKRXlCPyZbJLNnHJkGyBBWJYe04BgzTYfDUSHc6bT41O_UvCYAdDd90M2d-FMmECaZ7-P85htMMqoxVKel9qCOmvjj_3Tl7ZekHUPlj-c0IGkIqDHblBwOPm6CW8he8LjZo-Z4QTIgNpTfREQiVgogGeyyzedzNnqajhPivULZqpQSM28QFZXoe9Q8tIzL78BmV-ZpEsbFoBDbpBmWVDL6i2g"
-                />
-              </div>
-              <span
-                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
-                >Choux &amp; Éclair</span
-              >
-              <h3
-                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
-              >
-                Éclair Trà Xanh Kyoto &amp; Kem Sữa
-              </h3>
-              <div
-                class="mt-auto pt-space-sm flex items-center justify-between"
-              >
-                <span
-                  class="font-headline-sm text-headline-sm text-primary font-bold"
-                  >58.000₫</span
-                >
-                <button
-                  aria-label="Thêm Eclair vào giỏ"
-                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
-                  type="button"
-                >
-                  <span class="material-symbols-outlined text-[18px]"
-                    >shopping_bag</span
-                  >
-                </button>
-              </div>
-            </div>
-            <!-- Item 7 -->
-            <div
-              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div
-                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Golden enriched brioche loaf studded with rum soaked raisins and pearl sugar crystals, fluffy textured crumb"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKrzrx9bNlvPwE9Si_9k0pD1VY4vzQL52jiyZc2wl5ofcrOqVzQqZkjFtMrTDsUP__vP2l-fe9f6KyoLeSDO-lzgn20esJyZn3gdAtB3ETM45Y07HUNejjz1lvzlWz6D7oLCTL4V0Fnpep_4VllI-BClJWwzHST8gd0oD8artBmY7IE7VRGQDOPscNkoV578Oe52mRiNC8GSeCROVBG9DX1eUlMLH2Jind5oWYkU6tIeaEKU33F4E0nA"
-                />
-                <span
-                  class="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm shadow"
-                  >Mới</span
-                >
-              </div>
-              <span
-                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
-                >Brioche</span
-              >
-              <h3
-                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
-              >
-                Brioche Hoàng Gia Nho Khô Rum
-              </h3>
-              <div
-                class="mt-auto pt-space-sm flex items-center justify-between"
-              >
-                <span
-                  class="font-headline-sm text-headline-sm text-primary font-bold"
-                  >65.000₫</span
-                >
-                <button
-                  aria-label="Thêm Brioche vào giỏ"
-                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
-                  type="button"
-                >
-                  <span class="material-symbols-outlined text-[18px]"
-                    >shopping_bag</span
-                  >
-                </button>
-              </div>
-            </div>
-            <!-- Item 8 -->
-            <div
-              class="flex flex-col rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm hover:shadow-md transition-all duration-300 group"
-            >
-              <div
-                class="relative w-full aspect-square rounded-xl overflow-hidden bg-surface-container-low mb-space-sm"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Classic French lemon meringue tart with torched golden peaks of Italian meringue and zesty yellow curd on crisp butter crust"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbZ0Cr_LuvWLab3kqg4fljZDWgY38Y2mdU0FCfGtCQkK7RhFY3EmxcYOwjHtOX0Bl14syNdaRyp_rYOtym8Z5DCcTIZHYF_xCWzDGU_uFuLE9P0YQF47yHr1mZ6a5m-mNL3q6ykA2PirKKCbcgdO4SMY8icVa1CnAeXEYZ0STmqz__3BuMX4FNo3O4MlBIGBvIksPKwFTzQsTp_IMEMt399WfMR94zBiBRyyq3v-0mHyogutLdvvGvdQ"
-                />
-              </div>
-              <span
-                class="font-label-sm text-label-sm text-secondary font-semibold uppercase"
-                >Bánh Tart</span
-              >
-              <h3
-                class="font-headline-sm text-headline-sm text-tertiary font-medium line-clamp-1 mt-0.5"
-              >
-                Tart Chanh Vàng Meringue Cháy
-              </h3>
-              <div
-                class="mt-auto pt-space-sm flex items-center justify-between"
-              >
-                <span
-                  class="font-headline-sm text-headline-sm text-primary font-bold"
-                  >72.000₫</span
-                >
-                <button
-                  aria-label="Thêm Tart Chanh vào giỏ"
-                  class="cursor-pointer w-9 h-9 rounded-full bg-surface-container hover:bg-primary-container hover:text-on-primary text-tertiary flex items-center justify-center transition-colors"
-                  type="button"
-                >
-                  <span class="material-symbols-outlined text-[18px]"
-                    >shopping_bag</span
-                  >
-                </button>
-              </div>
-            </div>
           </div>
         </section>
         <!-- 4. KHU VỰC 2: BÁNH SINH NHẬT & BÁNH TIỆC (SPLIT SHOWCASE / HORIZONTAL SPOTLIGHT) -->
         <section
           class="w-full bg-surface-container-low py-space-xl my-space-md"
         >
-          <div class="max-w-[1280px] mx-auto px-gutter">
+          <div class="container ">
             <div
               class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch"
             >
@@ -1110,186 +772,12 @@
                 class="lg:col-span-7 flex flex-col justify-between gap-space-md"
                 data-birthday-products
               >
-                <!-- Celebration Cake 1 -->
-                <div
-                  class="flex flex-col sm:flex-row items-center bg-surface-container-lowest rounded-2xl p-space-sm gap-space-md shadow-sm hover:shadow-md transition-all"
-                >
-                  <div
-                    class="w-full sm:w-44 h-40 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-low"
-                  >
-                    <img
-                      class="w-full h-full object-cover"
-                      data-alt="Luxury French rose and raspberry entremet cake decorated with organic rose petals, glossy pink glaze, diameter 16cm on ceramic cake stand"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDudRTclAFmgFqlz9GGLfgAdUitAWU8cskAYnSAtbW8N3-EHEJdLLYpX6KNLdjgTitkPvdAgYuHBU4aNKBsmVffmc6n_yPrOvDQAgpakyT1iT4GIAJRaRcW8z0Yoe1f1z6Xknk5zoj2cEDmi2lhtM8F9Ns6rzkxuYR9oGy9M8WGRHxj7GbUXXZLSfhLQHZjIXv-IWPkuf4f5kJjwqMUTLyGdkLjM7ckZ9d-1I3XhP8VjK_eYJQSx8q3Tg"
-                    />
-                  </div>
-                  <div
-                    class="flex flex-col flex-grow w-full justify-between py-1"
-                  >
-                    <div>
-                      <div class="flex items-center justify-between">
-                        <span
-                          class="font-label-sm text-label-sm text-secondary font-bold uppercase"
-                          >Entremet Glacé</span
-                        >
-                        <span
-                          class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full"
-                          >Ø 16cm</span
-                        >
-                      </div>
-                      <h3
-                        class="font-headline-sm text-headline-sm text-tertiary font-medium mt-1"
-                      >
-                        Bánh Entremet Hoa Hồng Dâu Rừng
-                      </h3>
-                      <p
-                        class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 mt-0.5"
-                      >
-                        Mousse hoa hồng Bungary, thạch dâu rừng dại và cốt
-                        dacquoise hạnh nhân giòn.
-                      </p>
-                    </div>
-                    <div
-                      class="flex items-center justify-between pt-space-xs mt-2"
-                    >
-                      <span
-                        class="font-headline-sm text-headline-sm text-primary font-bold"
-                        >520.000₫</span
-                      >
-                      <button
-                        class="cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[16px]"
-                          >add_shopping_cart</span
-                        >
-                        <span class="">Thêm giỏ</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <!-- Celebration Cake 2 -->
-                <div
-                  class="flex flex-col sm:flex-row items-center bg-surface-container-lowest rounded-2xl p-space-sm gap-space-md shadow-sm hover:shadow-md transition-all"
-                >
-                  <div
-                    class="w-full sm:w-44 h-40 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-low"
-                  >
-                    <img
-                      class="w-full h-full object-cover"
-                      data-alt="High end dark Valrhona chocolate gateau cake with bourbon vanilla cream layers, chocolate curls, diameter 18cm luxury celebration cake"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-l_U0eslwOtgrwCvl57Ly3zUb3FXvyZxHKxhaCf619lvVeJQvzeMr4hsXQdDvbdvHCVrVlj3Aovm9x9yE9rebGQDo548pM5elNO57js7WdIi-hiaWjHiqxb6goygaN9Y2aohKRaU-RkEu738o3hGzHYgqd1_M_4U3-6HS9pSAtM2EpOUGkcNHdqWRH2ODXduLFVifFDIFZYZGI2SoDyokA12lJe2qN0AHTvoWuWXRcPn3Ok-lFgxz9A"
-                    />
-                  </div>
-                  <div
-                    class="flex flex-col flex-grow w-full justify-between py-1"
-                  >
-                    <div>
-                      <div class="flex items-center justify-between">
-                        <span
-                          class="font-label-sm text-label-sm text-secondary font-bold uppercase"
-                          >Gâteau Classique</span
-                        >
-                        <span
-                          class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full"
-                          >Ø 18cm</span
-                        >
-                      </div>
-                      <h3
-                        class="font-headline-sm text-headline-sm text-tertiary font-medium mt-1"
-                      >
-                        Gâteau Chocolate Đen &amp; Vani Bourbon
-                      </h3>
-                      <p
-                        class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 mt-0.5"
-                      >
-                        Ganache Valrhona 70%, hạt ca cao rang giòn và kem béo
-                        ngậy ủ hạt vani Madagascar.
-                      </p>
-                    </div>
-                    <div
-                      class="flex items-center justify-between pt-space-xs mt-2"
-                    >
-                      <span
-                        class="font-headline-sm text-headline-sm text-primary font-bold"
-                        >580.000₫</span
-                      >
-                      <button
-                        class="cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[16px]"
-                          >add_shopping_cart</span
-                        >
-                        <span class="">Thêm giỏ</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <!-- Celebration Cake 3 -->
-                <div
-                  class="flex flex-col sm:flex-row items-center bg-surface-container-lowest rounded-2xl p-space-sm gap-space-md shadow-sm hover:shadow-md transition-all"
-                >
-                  <div
-                    class="w-full sm:w-44 h-40 sm:h-36 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container-low"
-                  >
-                    <img
-                      class="w-full h-full object-cover"
-                      data-alt="Modern artisanal sweet corn cream cake with roasted pistachio and cream cheese mascarpone, pastel yellow and green pastel palette, diameter 16cm"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPVx4t2RSWsPjx6Uub4JXaGAbZB0cJ_OXGw2TvQ4XdAU_eb-KOWIxuPSe2dZQGEDylIoy37xPk2PoAPrIhY6qQgMhrzBOXwXxxro5zxi2QYKW99KFPjhYaeZ7u7Qpg1TOCKav6PBSnTgeZSHJTdOWAiXfEAjwIKZoFSlvUE9iMpA3VOdoLPmrfhEKNsR0xzQOEaJk64WcjD3SXpvkI8_uRqkCUdPm2oZCiY2ZWyAg744oNgDop1Q6-_A"
-                    />
-                  </div>
-                  <div
-                    class="flex flex-col flex-grow w-full justify-between py-1"
-                  >
-                    <div>
-                      <div class="flex items-center justify-between">
-                        <span
-                          class="font-label-sm text-label-sm text-secondary font-bold uppercase"
-                          >Signature Atelier</span
-                        >
-                        <span
-                          class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full"
-                          >Ø 16cm</span
-                        >
-                      </div>
-                      <h3
-                        class="font-headline-sm text-headline-sm text-tertiary font-medium mt-1"
-                      >
-                        Bánh Kem Bắp Non &amp; Hạt Dẻ Cười Phô Mai
-                      </h3>
-                      <p
-                        class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1 mt-0.5"
-                      >
-                        Sữa bắp tươi ninh nhuyễn cùng mascarpone Ý, sốt praline
-                        dẻ cười thơm lừng.
-                      </p>
-                    </div>
-                    <div
-                      class="flex items-center justify-between pt-space-xs mt-2"
-                    >
-                      <span
-                        class="font-headline-sm text-headline-sm text-primary font-bold"
-                        >490.000₫</span
-                      >
-                      <button
-                        class="cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm"
-                        type="button"
-                      >
-                        <span class="material-symbols-outlined text-[16px]"
-                          >add_shopping_cart</span
-                        >
-                        <span class="">Thêm giỏ</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
         </section>
         <!-- 5. KHU VỰC 3: BÁNH HỘP THIẾC (VINTAGE ARTISANAL STRIP / MAGAZINE SPREAD) -->
-        <section class="w-full max-w-[1280px] mx-auto px-gutter py-space-xl">
+        <section class="container py-space-xl">
           <div class="text-center max-w-2xl mx-auto mb-space-xl">
             <div
               class="inline-flex items-center gap-space-xs px-space-md py-1 rounded-full bg-secondary-container text-on-secondary-container mb-space-xs"
@@ -1314,169 +802,6 @@
             class="grid grid-cols-1 md:grid-cols-3 gap-gutter"
             data-tinbox-products
           >
-            <!-- Tin Box 1 -->
-            <div
-              class="flex flex-col bg-surface-container-low rounded-3xl p-space-md shadow-sm hover:shadow-md transition-all duration-300 relative group"
-            >
-              <div
-                class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container-lowest my-space-xs"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Embossed vintage French tin box filled with golden Breton salted butter cookies, antique botanical illustration on the tin lid, warm morning light on wooden baking surface"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTrxsPfa05tH887BZzpMhjtRbSSC6LLGGFhSQ5os2RZhHtjhczjauJbEGjPyqlLi3w-kMVibQO9TyCOB6vzasjWKkUwyb90SraBeTw2d7Ihbj2aJhliTpWPLPAvCnRw7jNTznn8ll158wmHBq5kU2vAvWBFLby8Stl47hhUWbTGuSVUOfUXNgXMU7t8uxATBCNWNDR3LPMu0GOlqicBdV0XAlreg5yElZUwyN0GDpUcCGQnJ6JF_HsCA"
-                />
-              </div>
-              <!-- Content styled like Parisian patisserie label -->
-              <div class="flex flex-col flex-grow pt-space-xs">
-                <span
-                  class="font-label-sm text-label-sm text-primary font-semibold uppercase"
-                  >Sablé au Beurre Salé</span
-                >
-                <h3
-                  class="font-headline-sm text-headline-sm text-tertiary font-semibold mt-1"
-                >
-                  Hộp Thiếc Sablé Breton Bơ Mặn
-                </h3>
-                <p
-                  class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed"
-                >
-                  Công thức truyền thống vùng Brittany với muối biển Guérande
-                  kết tinh tạo vị đậm đà giòn xốp.
-                </p>
-                <div
-                  class="mt-auto pt-space-md flex items-center justify-between"
-                >
-                  <div>
-                    <span
-                      class="font-label-sm text-label-sm text-on-surface-variant block"
-                      >Giá niêm yết</span
-                    >
-                    <span
-                      class="font-headline-sm text-headline-sm text-primary font-bold"
-                      >240.000₫</span
-                    >
-                  </div>
-                  <button
-                    class="home-buy-button cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-highest text-tertiary font-label-md text-label-md"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[18px]"
-                      >shopping_bag</span
-                    >
-                    <span class="">Chọn mua</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <!-- Tin Box 2 -->
-            <div
-              class="flex flex-col bg-surface-container-low rounded-3xl p-space-md shadow-sm hover:shadow-md transition-all duration-300 relative group"
-            >
-              <div
-                class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container-lowest my-space-xs"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Artisanal French embossed tin box with delicate crispy almond hazelnut tuiles, thin golden wafers, elegant floral motifs on tin container, culinary photography"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDy5oNZvVmN4-ZKP4Q_F6cHYM7tFDbgV93uJzxljKidWw2a-8nSWaznSmm3prHNwKeuRA_1m8J2Ap_QoGGatx9q65uJOY6Uz8Me2BbWZVyqaEMLK90V_6etp3K4HDn-Q25kp4Btokr4IxqOr-HddKaGyLsm8bF3B6JQY3jNUgcuCAmtRABPpB6QobJMdE3llfuVD3Kz9Zyjlq7HP8EGPIAsUFTRNpN-tN3SJqdIj34nzj9-6AwFj7t_kA"
-                />
-              </div>
-              <div class="flex flex-col flex-grow pt-space-xs">
-                <span
-                  class="font-label-sm text-label-sm text-primary font-semibold uppercase"
-                  >Tuiles aux Amandes</span
-                >
-                <h3
-                  class="font-headline-sm text-headline-sm text-tertiary font-semibold mt-1"
-                >
-                  Hộp Thiếc Hạnh Nhân Hạt Phỉ Tuile Giòn
-                </h3>
-                <p
-                  class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed"
-                >
-                  Lát hạnh nhân nướng mỏng tang uốn cong nhẹ nhàng, quyện cùng
-                  hạt phỉ Piedmont bùi thơm ngậy.
-                </p>
-                <div
-                  class="mt-auto pt-space-md flex items-center justify-between"
-                >
-                  <div>
-                    <span
-                      class="font-label-sm text-label-sm text-on-surface-variant block"
-                      >Giá niêm yết</span
-                    >
-                    <span
-                      class="font-headline-sm text-headline-sm text-primary font-bold"
-                      >260.000₫</span
-                    >
-                  </div>
-                  <button
-                    class="home-buy-button cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-highest text-tertiary font-label-md text-label-md"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[18px]"
-                      >shopping_bag</span
-                    >
-                    <span class="">Chọn mua</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <!-- Tin Box 3 -->
-            <div
-              class="flex flex-col bg-surface-container-low rounded-3xl p-space-md shadow-sm hover:shadow-md transition-all duration-300 relative group"
-            >
-              <div
-                class="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container-lowest my-space-xs"
-              >
-                <img
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-alt="Retro tin box packaging for Earl Grey tea and orange peel shortbread cookies, vintage olive and warm cream branding, tea leaves garnish, high quality food packaging"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCchgSI9CGiXKM8jvMMbyAznNATq7BNQtTusigxAXZp8fL_-ELqUHi15HFGJd6bYXnmYGdA9pXuriVRLtCVDOq1Ih_8eaRyoB2c3YjyHxMR3LCRaNhQuO-TMb3FNHkuW62nMlCK9qUiEzHFU_o_L790XPCOUjE8OSEkxntxubYO2M2fdYYHFcZ69ZhX5KOBO5u335L5av3YgRLs8bTke1VyVcppGI6AfFXa-0Au0uAregqH-RwNoSELYA"
-                />
-              </div>
-              <div class="flex flex-col flex-grow pt-space-xs">
-                <span
-                  class="font-label-sm text-label-sm text-primary font-semibold uppercase"
-                  >Shortbread Infusé</span
-                >
-                <h3
-                  class="font-headline-sm text-headline-sm text-tertiary font-semibold mt-1"
-                >
-                  Hộp Thiếc Cookie Trà Earl Grey &amp; Vỏ Cam
-                </h3>
-                <p
-                  class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed"
-                >
-                  Hương thơm bergamot quý phái từ trà bá tước ủ men cùng mứt vỏ
-                  cam vàng thơm the thanh mát.
-                </p>
-                <div
-                  class="mt-auto pt-space-md flex items-center justify-between"
-                >
-                  <div>
-                    <span
-                      class="font-label-sm text-label-sm text-on-surface-variant block"
-                      >Giá niêm yết</span
-                    >
-                    <span
-                      class="font-headline-sm text-headline-sm text-primary font-bold"
-                      >250.000₫</span
-                    >
-                  </div>
-                  <button
-                    class="home-buy-button cursor-pointer inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-xl bg-surface-container-highest text-tertiary font-label-md text-label-md"
-                    type="button"
-                  >
-                    <span class="material-symbols-outlined text-[18px]"
-                      >shopping_bag</span
-                    >
-                    <span class="">Chọn mua</span>
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </section>
         <!-- 6. WHY LUNE / BRAND PROMISES -->
@@ -1707,7 +1032,7 @@
         </section>
 
         <section
-          class="w-full max-w-[1280px] mx-auto px-gutter pb-space-xl"
+          class="container pb-space-xl"
           aria-labelledby="lune-promises-title"
         >
           <div
@@ -1816,7 +1141,7 @@
           class="w-full bg-secondary text-on-secondary py-space-xl my-space-lg"
           id="oven-schedule"
         >
-          <div class="max-w-[1280px] mx-auto px-gutter">
+          <div class="container ">
             <div
               class="flex flex-col md:flex-row md:items-center justify-between gap-space-md pb-space-lg"
             >
@@ -1933,7 +1258,7 @@
           </div>
         </section>
         <section
-          class="w-full max-w-[1280px] mx-auto px-gutter py-space-xl"
+          class="container py-space-xl"
           id="faq-section"
         >
           <div class="text-center max-w-2xl mx-auto mb-space-xl">
