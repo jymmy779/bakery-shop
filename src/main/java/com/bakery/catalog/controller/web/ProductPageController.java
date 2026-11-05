@@ -20,8 +20,14 @@ public class ProductPageController {
   }
 
   @GetMapping("/products/search")
-  public String search(@RequestParam(defaultValue = "") String keyword, Model model) {
-    model.addAttribute("keyword", keyword.strip());
+  public String search(@RequestParam(defaultValue = "") String keyword,
+      @RequestParam(defaultValue = "newest") String sort,
+      @RequestParam(defaultValue = "0") int page, Model model) {
+    keyword = keyword.strip();
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("sort", sort);
+    model.addAttribute("results", productQueryService.filter(keyword, null, null, null,
+        sort, Math.max(0, page), 12));
     return "product/search";
   }
 

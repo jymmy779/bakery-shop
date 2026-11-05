@@ -53,13 +53,16 @@ public class SessionCartServiceImpl {
   public <T> T checkout(HttpSession session, Function<Cart, T> placeOrder) {
     synchronized (WebUtils.getSessionMutex(session)) {
       Cart checkedOut = current(session);
+      // Revalidate sale status, stock and price before invoking order creation.
+      checkedOut = carts.refresh(checkedOut);
+      final Cart purchasedCart = checkedOut;
       T result = placeOrder.apply(checkedOut);
       if (TransactionSynchronizationManager.isActualTransactionActive()
           && TransactionSynchronizationManager.isSynchronizationActive()) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
           @Override
           public void afterCommit() {
-            clearPurchasedCart(session, checkedOut);
+            clearPurchasedCart(session, purchasedCart);
           }
         });
       } else {

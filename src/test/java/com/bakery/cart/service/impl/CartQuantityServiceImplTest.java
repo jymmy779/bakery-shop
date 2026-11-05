@@ -68,6 +68,39 @@ class CartQuantityServiceImplTest {
   }
 
   @Test
+  void readingExistingCartKeepsStoppedProductVisibleButBlocksCheckout() {
+    cart.getItems().remove(2L);
+    product(5, ProductStatus.STOPPED);
+    var response = service.getCart(cart);
+    assertFalse(response.isCheckoutAllowed());
+    assertFalse(response.getItems().get(0).isAvailable());
+    assertTrue(response.getItems().get(0).getAvailabilityMessage().contains("ngừng bán"));
+    assertEquals(1, cart.getItems().size());
+  }
+
+  @Test
+  void readingCartRefreshesPriceAndStockAndBlocksExcessQuantity() {
+    cart.getItems().remove(2L);
+    product(1, ProductStatus.SELLING);
+    var response = service.getCart(cart);
+    assertEquals(new BigDecimal("24000"), response.getTotalAmount());
+    assertEquals(1, response.getItems().get(0).getAvailableStock());
+    assertFalse(response.isCheckoutAllowed());
+    assertTrue(response.getItems().get(0).getAvailabilityMessage().contains("Chỉ còn 1"));
+    assertEquals(2, cart.getItems().get(1L).getQuantity());
+  }
+
+  @Test
+  void readingCartKeepsDeletedProductRemovable() {
+    cart.getItems().remove(2L);
+    when(products.getById(1L)).thenThrow(new ResourceNotFoundException("Deleted"));
+    var response = service.getCart(cart);
+    assertFalse(response.isCheckoutAllowed());
+    assertFalse(response.getItems().get(0).isAvailable());
+    assertEquals(1, response.getItems().size());
+  }
+
+  @Test
   void rejectsAbsentSessionOrItem() {
     assertThrows(ResourceNotFoundException.class, () -> service.updateItem(null, 1L, request(1)));
     assertThrows(ResourceNotFoundException.class, () -> service.updateItem(cart, 99L, request(1)));

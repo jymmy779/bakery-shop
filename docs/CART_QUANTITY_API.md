@@ -21,11 +21,14 @@ Response HTTP 200 (ví dụ):
     "quantity": 2,
     "lineTotal": 240000,
     "availableStock": 5,
-    "preparationDays": 1
+    "preparationDays": 1,
+    "available": true,
+    "availabilityMessage": null
   }],
   "totalQuantity": 2,
   "totalAmount": 240000,
-  "maximumPreparationDays": 1
+  "maximumPreparationDays": 1,
+  "checkoutAllowed": true
 }
 ```
 
@@ -60,10 +63,19 @@ Không tạo bảng giỏ hàng và không ghi giỏ xuống database. `CartServ
 khai contract CartService hiện có; `SessionCartServiceImpl` quản lý Session và
 khóa các thao tác trong cùng Session để tránh mất cập nhật.
 
-Reload/chuyển trang không xóa giỏ. Tổng tạm tính được tính từ các mặt hàng trong
-Session khi trả JSON. GET giữ giá snapshot; thao tác thêm/cập nhật đọc giá và kho
-mới của mặt hàng được thay đổi. `CartService.refresh` kiểm tra lại toàn giỏ để
-tích hợp checkout.
+Reload/chuyển trang không xóa giỏ. GET đọc lại giá, ảnh, tên, kho và trạng thái
+hiện tại để trả dữ liệu giỏ; không tự đổi số lượng khách đã chọn. Bánh ngừng bán,
+hết hàng, vượt kho hoặc bị xóa vẫn hiện trong response với `available=false` và
+`availabilityMessage`, để khách giảm số lượng hoặc xóa. `checkoutAllowed=false`
+khi giỏ rỗng hoặc còn dòng không hợp lệ. GET vẫn trả HTTP 200 cho giỏ có dòng lỗi;
+thao tác thêm/sửa không hợp lệ tiếp tục trả 409. `CartService.refresh` kiểm tra
+lại toàn giỏ trước callback tạo đơn; checkout thực tế vẫn cần kiểm tra/trừ kho
+trong transaction.
+
+Trang `/cart` render giỏ Session thật bằng Thymeleaf. `cart.js` gọi PATCH/DELETE
+kèm CSRF để tăng, giảm, nhập số lượng hoặc xóa dòng, rồi reload giỏ và tổng tiền.
+Không hiển thị dữ liệu mẫu khi giỏ trống. Restart app có thể làm mất Session;
+sau restart cần thêm bánh lại để demo.
 
 Timeout hiện có là `server.servlet.session.timeout=${SESSION_TIMEOUT:30m}`.
 Servlet container tự hủy Session khi không tương tác quá thời hạn; không cần bộ
@@ -95,4 +107,5 @@ Không có API cho client tự báo đặt hàng thành công hoặc tự xóa g
 Đây mới là điểm tích hợp đã kiểm thử bằng callback và transaction synchronization,
 chưa nối luồng đặt đơn thực tế. Phân hệ Order vẫn phải kiểm tra giỏ rỗng, xác thực
 Customer, kiểm tra/trừ kho và chống gửi đơn trùng trong transaction. Xóa Session
-không thay thế cơ chế chống trùng của Order. JavaScript/giao diện giỏ chưa nối API.
+không thay thế cơ chế chống trùng của Order. Giao diện giỏ đã nối API;
+luồng tạo đơn thực tế vẫn cần thành viên phụ trách Order triển khai.

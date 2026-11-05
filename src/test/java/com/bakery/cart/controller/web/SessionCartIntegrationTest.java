@@ -79,6 +79,19 @@ class SessionCartIntegrationTest {
     mvc.perform(get("/cart/items").session(session)).andExpect(jsonPath("$.totalQuantity").value(2));
   }
 
+  @Test void stoppedProductIsReportedAndCannotReachOrderCreation() throws Exception {
+    var session = add();
+    products.getById(1L).setStatus(ProductStatus.STOPPED);
+    mvc.perform(get("/cart/items").session(session)).andExpect(status().isOk())
+        .andExpect(jsonPath("$.checkoutAllowed").value(false))
+        .andExpect(jsonPath("$.items[0].available").value(false));
+    assertThrows(com.bakery.common.exception.ConflictException.class,
+        () -> sessions.checkout(session, cart -> { fail("Must not create order"); return null; }));
+    assertNotNull(session.getAttribute("cart"));
+    mvc.perform(delete("/cart/items/1").session(session).with(csrf()))
+        .andExpect(status().isOk()).andExpect(jsonPath("$.items").isEmpty());
+  }
+
   @Test void addsSameItemUpdatesAndRemovesWithinSession() throws Exception {
     var session = add();
     mvc.perform(post("/cart/items").session(session).with(csrf()).contentType(MediaType.APPLICATION_JSON)
@@ -106,7 +119,7 @@ class SessionCartIntegrationTest {
     String oldId = session.getId();
     mvc.perform(post("/login").session(session).with(csrf())
         .param("email", "customer@example.test").param("password", "test-password"))
-        .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/"));
+        .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/profile"));
     assertNotEquals(oldId, session.getId());
     mvc.perform(get("/cart/items").session(session)).andExpect(jsonPath("$.totalQuantity").value(2));
   }
