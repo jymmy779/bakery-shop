@@ -80,7 +80,7 @@ Mẫu một dòng cập nhật:
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
 | --- | --- | --- | --- | --- | --- | --- |
-| Nguyễn Trần Thái Sơn | Catalog Admin — cập nhật test sản phẩm và danh mục | Sửa mock lọc badge và kỳ vọng giao diện theo thiết kế hiện tại; kiểm tra render giá BigDecimal, cấu hình định dạng giá và binding giá thuần khi thêm/sửa | Đang làm | Branch `feature/admin-son`; PR/commit: Chưa có | `mvnw.cmd '-Dtest=ProductAdminPageIntegrationTest,ProductAdminControllerTest,ProductAdminServiceImplTest,CategoryAdminControllerTest,CategoryAdminServiceImplTest' test`: 41/41 đạt | Chưa demo trình duyệt; cần kiểm tra trực tiếp định dạng giá khi nhập và gửi form |
+| Nguyễn Trần Thái Sơn | Catalog Admin — cập nhật test sản phẩm và danh mục | Sửa mock lọc badge và kỳ vọng giao diện theo thiết kế hiện tại; kiểm tra render giá BigDecimal, cấu hình định dạng giá và binding giá thuần khi thêm/sửa | Chờ review | Branch `feature/admin-son`; PR #26; commit `fc5cde8` | `mvnw.cmd '-Dtest=ProductAdminPageIntegrationTest,ProductAdminControllerTest,ProductAdminServiceImplTest,CategoryAdminControllerTest,CategoryAdminServiceImplTest' test`: 41/41 đạt | Chưa demo trình duyệt; cần kiểm tra trực tiếp định dạng giá khi nhập và gửi form |
 
 ### 05/11/2026
 
