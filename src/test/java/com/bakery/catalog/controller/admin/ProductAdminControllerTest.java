@@ -1,5 +1,6 @@
 package com.bakery.catalog.controller.admin;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,15 +12,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.bakery.catalog.dto.CategoryResponse;
+import com.bakery.catalog.dto.ProductCreateRequest;
 import com.bakery.catalog.dto.ProductDetailResponse;
+import com.bakery.catalog.dto.ProductUpdateRequest;
+import com.bakery.catalog.entity.ProductBadge;
 import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.service.CategoryAdminService;
 import com.bakery.catalog.service.ProductAdminService;
 import com.bakery.catalog.service.ProductRemovalResult;
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.data.domain.PageImpl;
@@ -58,17 +64,16 @@ class ProductAdminControllerTest {
   @Test
   void passesSelectedProductSortToService() throws Exception {
     var pageable = org.springframework.data.domain.PageRequest.of(0, 10);
-    when(productAdminService.search("", null, null, null, "price_desc", pageable))
+    when(productAdminService.search("", null, ProductBadge.NEW, null, "price_desc", pageable))
         .thenReturn(new PageImpl<>(List.of()));
     when(categoryAdminService.findAllActive()).thenReturn(List.of());
 
     mvc.perform(get("/cms/products").param("sort", "price_desc").param("badge", "NEW"))
         .andExpect(status().isOk())
         .andExpect(model().attribute("sort", "price_desc"))
-        .andExpect(model().attribute("badge", com.bakery.catalog.entity.ProductBadge.NEW));
+        .andExpect(model().attribute("badge", ProductBadge.NEW));
 
-    verify(productAdminService).search("", null, com.bakery.catalog.entity.ProductBadge.NEW,
-        null, "price_desc", pageable);
+    verify(productAdminService).search("", null, ProductBadge.NEW, null, "price_desc", pageable);
   }
 
   @Test
@@ -120,6 +125,42 @@ class ProductAdminControllerTest {
         .andExpect(view().name("cms/product/form"))
         .andExpect(model().attribute("isEdit", false))
         .andExpect(model().attributeHasFieldErrors("productRequest", "name", "price", "categoryId"));
+  }
+
+  @Test
+  void bindsPlainPriceWhenCreatingProduct() throws Exception {
+    mvc.perform(multipart("/cms/products/add")
+            .file(new MockMultipartFile("images", "cake.png", "image/png", new byte[] {1}))
+            .param("name", "Bánh kem")
+            .param("description", "Bánh mới")
+            .param("price", "125000")
+            .param("stockQuantity", "5")
+            .param("preparationDays", "1")
+            .param("categoryId", "3"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms/products"));
+
+    ArgumentCaptor<ProductCreateRequest> request = ArgumentCaptor.forClass(ProductCreateRequest.class);
+    verify(productAdminService).create(request.capture());
+    assertEquals(new BigDecimal("125000"), request.getValue().getPrice());
+  }
+
+  @Test
+  void bindsPlainPriceWhenUpdatingProduct() throws Exception {
+    mvc.perform(multipart("/cms/products/update/42")
+            .param("name", "Bánh kem")
+            .param("description", "Bánh mới")
+            .param("price", "125000")
+            .param("stockQuantity", "5")
+            .param("preparationDays", "1")
+            .param("categoryId", "3")
+            .param("status", "SELLING"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms/products"));
+
+    ArgumentCaptor<ProductUpdateRequest> request = ArgumentCaptor.forClass(ProductUpdateRequest.class);
+    verify(productAdminService).update(org.mockito.ArgumentMatchers.eq(42L), request.capture());
+    assertEquals(new BigDecimal("125000"), request.getValue().getPrice());
   }
 
   @Test

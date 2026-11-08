@@ -70,8 +70,12 @@ class ProductAdminPageIntegrationTest {
         .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"product-saving\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"product-upload-progress\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("Đang tải ảnh lên...")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"price-suggestions\"")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("[100, 1000, 10000]")));
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("id=\"product-price\" name=\"price\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("inputmode=\"numeric\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("id=\"price-suggestions\""))))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("function formatVndInput(value)")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("formData.set('price', priceInput.value.replace(/\\D/g, ''))")));
   }
 
   @Test
@@ -91,11 +95,11 @@ class ProductAdminPageIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/products/add\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("CMS Test Admin")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("placeholder=\"Tra cứu tên sản phẩm...\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("placeholder=\"Tìm theo tên sản phẩm...\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("aria-label=\"Sắp xếp sản phẩm\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"newest\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("Mới nhất")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("aria-label=\"Tra cứu theo tên sản phẩm\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("aria-label=\"Tìm sản phẩm theo tên\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("viewBox=\"0 0 24 24\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("href=\"/cms/products/42/edit\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/products/toggle-status/42\"")))
@@ -118,7 +122,8 @@ class ProductAdminPageIntegrationTest {
     mvc.perform(get("/cms/categories"))
         .andExpect(status().isOk())
         .andExpect(content().string(org.hamcrest.Matchers.containsString("CMS Test Admin")))
-        .andExpect(content().string(org.hamcrest.Matchers.containsString("placeholder=\"Tra cứu tên danh mục...\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("placeholder=\"Tìm danh mục...\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("aria-label=\"Tìm danh mục theo tên\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("data-category-row")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("data-category-no-results")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("viewBox=\"0 0 24 24\"")))
@@ -161,6 +166,7 @@ class ProductAdminPageIntegrationTest {
   @Test
   void rendersProductEditPageWithExistingImages() throws Exception {
     ProductDetailResponse product = product();
+    product.setPrice(new BigDecimal("125000.00"));
     ProductImageResponse firstImage = new ProductImageResponse();
     firstImage.setId(11L);
     firstImage.setImagePath("/uploads/cake-front.jpg");
@@ -176,6 +182,9 @@ class ProductAdminPageIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(content().string(org.hamcrest.Matchers.containsString("Cập nhật sản phẩm")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("/uploads/cake-front.jpg")))
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"125.000\"")))
+        .andExpect(content().string(org.hamcrest.Matchers.not(
+            org.hamcrest.Matchers.containsString("value=\"125000.00\""))))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("action=\"/cms/products/update/42\"")))
         .andExpect(content().string(org.hamcrest.Matchers.containsString("data-is-edit=\"true\"")));
   }
