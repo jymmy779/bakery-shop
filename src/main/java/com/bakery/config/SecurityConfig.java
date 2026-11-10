@@ -1,8 +1,12 @@
 package com.bakery.config;
 
+import com.bakery.account.security.CustomUserDetails;
+import com.bakery.cart.service.impl.SessionCartServiceImpl;
+import jakarta.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +21,9 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+  @Autowired(required = false)
+  private SessionCartServiceImpl carts;
 
   @Bean
   public PasswordEncoder passwordEncoder() {
@@ -82,6 +89,14 @@ public class SecurityConfig {
             }
             response.sendRedirect(cmsLogin ? "/cms/login?roleError" : "/login?roleError");
             return;
+          }
+
+          if (customer && carts != null
+              && authentication.getPrincipal() instanceof CustomUserDetails user) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+              carts.mergeGuestCartAfterLogin(session, user.getAccountId());
+            }
           }
 
           HttpSessionRequestCache requestCache = new HttpSessionRequestCache();

@@ -76,6 +76,12 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 10/11/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Lương Việt Thái | Cart — lưu giỏ theo tài khoản đăng nhập | Thêm entity/repository cho giỏ tài khoản; giữ API cart hiện tại, guest dùng Session, Customer dùng giỏ theo accountId và merge guest cart khi đăng nhập; bổ sung hook Security và test routing | Đang làm | Branch `Thai`; PR/commit: Chưa có | Chưa chạy test; Maven không chạy được trong môi trường hiện tại do quyền đọc file cấu hình bảo mật JDK | Chạy test cart/auth trên IntelliJ; cập nhật tài liệu kiến trúc và hoàn thiện tích hợp checkout |
+
 ### 05/11/2026
 
 | Lương Việt Thái | Cart — xác nhận xóa sản phẩm và component toast dùng chung | Thêm dialog xác nhận trước khi xóa từng sản phẩm; tách modal xác nhận và toast thành fragment/JavaScript storefront dùng lại trên cart và product detail; không thêm endpoint hoặc thay đổi API | Đang làm | Branch `master`; PR/commit: Chưa có | Chưa chạy test hoặc demo trình duyệt; `node --check` và `git diff --check` đạt | Kiểm tra thao tác xóa/hủy xác nhận và toast trên runtime |

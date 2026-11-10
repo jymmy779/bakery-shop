@@ -25,11 +25,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({CartController.class, CartQuantityController.class})
-@Import({SecurityConfig.class, CartQuantityServiceImpl.class, CartServiceImpl.class, SessionCartServiceImpl.class})
+@Import({SecurityConfig.class, CartQuantityServiceImpl.class, CartServiceImpl.class,
+    SessionCartServiceImpl.class, com.bakery.cart.service.impl.AccountCartServiceImpl.class})
 class CartPageIntegrationTest {
   @Autowired MockMvc mvc;
   @MockitoBean ProductQueryService products;
   @MockitoBean com.bakery.account.repository.AccountRepository accounts;
+  @MockitoBean com.bakery.cart.repository.AccountCartRepository accountCarts;
+  @MockitoBean com.bakery.catalog.repository.ProductRepository productRepository;
   ProductDetailResponse cake;
 
   @BeforeEach void setup() {
