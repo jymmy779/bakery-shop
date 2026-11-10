@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,6 +46,9 @@ public class Account extends BaseEntity {
 
   @Column(length = 500)
   private String address;
+
+  @Column(name = "date_of_birth")
+  private LocalDate dateOfBirth;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false, length = 30)

@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
@@ -55,41 +56,56 @@ public class SecurityConfig {
       )
       .exceptionHandling(exceptions -> exceptions
         .authenticationEntryPoint((request, response, exception) -> {
-          response.sendRedirect(request.getContextPath() + "/login");
+          String requestPath = request.getRequestURI().substring(request.getContextPath().length());
+          String loginPage = requestPath.equals("/cms") || requestPath.startsWith("/cms/")
+              ? "/cms/login"
+              : "/login";
+          response.sendRedirect(request.getContextPath() + loginPage);
         })
       )
       .formLogin(form -> form
-        .loginPage("/login")
+        .loginPage("/cms/login")
         .loginProcessingUrl("/login")
         .usernameParameter("email")
         .successHandler((request, response, authentication) -> {
+          boolean cmsLogin = "cms".equals(request.getParameter("loginType"));
           boolean customer = authentication.getAuthorities().stream()
               .anyMatch(authority -> authority.getAuthority().equals("ROLE_CUSTOMER"));
           boolean cmsUser = authentication.getAuthorities().stream()
               .anyMatch(authority -> authority.getAuthority().equals("ROLE_STAFF")
                   || authority.getAuthority().equals("ROLE_ADMIN"));
 
-          if (!customer && !cmsUser) {
-            response.sendRedirect("/login?roleError");
+          if ((cmsLogin && !cmsUser) || (!cmsLogin && !customer)) {
+            SecurityContextHolder.clearContext();
+            if (request.getSession(false) != null) {
+              request.getSession(false).invalidate();
+            }
+            response.sendRedirect(cmsLogin ? "/cms/login?roleError" : "/login?roleError");
             return;
           }
 
           HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
           SavedRequest savedRequest = requestCache.getRequest(request, response);
-          String fallbackUrl = customer ? "/profile" : "/cms";
-          String targetUrl = customer ? savedCustomerTarget(savedRequest) : null;
+          String fallbackUrl = cmsLogin ? "/cms" : "/";
+          String targetUrl = cmsLogin ? null : savedCustomerTarget(savedRequest);
           requestCache.removeRequest(request, response);
           response.sendRedirect(targetUrl != null ? targetUrl : fallbackUrl);
         })
         .failureHandler((request, response, exception) -> {
-          response.sendRedirect("/login?error");
+          String failureUrl = "cms".equals(request.getParameter("loginType"))
+              ? "/cms/login?error"
+              : "/login?error";
+          response.sendRedirect(failureUrl);
         })
         .permitAll()
       )
       .logout(logout -> logout
         .logoutUrl("/logout")
         .logoutSuccessHandler((request, response, authentication) -> {
-          response.sendRedirect(request.getContextPath() + "/login?logout");
+          String loginPage = "cms".equals(request.getParameter("loginType"))
+              ? "/cms/login?logout"
+              : "/login?logout";
+          response.sendRedirect(request.getContextPath() + loginPage);
         })
         .invalidateHttpSession(true)
         .clearAuthentication(true)

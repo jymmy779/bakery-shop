@@ -76,6 +76,12 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 10/11/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Phạm Tấn Đạt | Đăng nhập, hồ sơ và bảo mật theo role | Hoàn thiện đăng nhập và điều hướng theo role; Customer cập nhật họ tên, số điện thoại, ngày sinh; CMS cập nhật hồ sơ; tách quản lý địa chỉ khỏi profile; thêm đổi mật khẩu cho Customer/Admin/Staff với xác thực mật khẩu hiện tại, xác nhận mật khẩu mới và lưu BCrypt; đồng bộ giao diện Customer/CMS | Đang làm | Branch `Dat`; PR/commit: Chưa có | `git diff --check` đạt; unit/controller tests đã bổ sung nhưng chưa chạy được vì Maven Wrapper dừng với `Cannot start maven from wrapper`; chưa demo luồng đổi mật khẩu | Kiểm tra đổi mật khẩu Customer và CMS trong IntelliJ; triển khai trang Địa chỉ riêng |
+
 ### 31/10/2026
 
 | Thành viên           | Use case/phần việc                                    | Kết quả cụ thể                                                                                                                                                                             | Trạng thái | Branch/PR/commit                               | Test hoặc demo                                                                                                                                                                               | Việc tiếp theo/vướng mắc                                                           |

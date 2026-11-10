@@ -337,7 +337,7 @@
                     <p
                       class="font-body-md text-body-md text-on-surface-variant leading-relaxed"
                     >
-                      Khách hàng, nhân viên và quản trị viên đều đăng nhập tại đây.
+                      Chào mừng bạn trở lại với hương bánh nướng mới mỗi ngày tại Lune.
                     </p>
                   </div>
                   <!-- Thymeleaf Form Container -->
@@ -347,6 +347,7 @@
                     method="post"
                     th:action="@{/login}"
                   >
+                    <input type="hidden" name="loginType" value="customer" />
                     <div
                       class="rounded-xl border border-error/20 bg-error/10 px-space-md py-space-sm text-body-sm text-error"
                       role="alert"
@@ -359,7 +360,7 @@
                       role="alert"
                       th:if="${param.roleError}"
                     >
-                      Tài khoản này chưa được cấp quyền truy cập vào hệ thống.
+                      Trang này chỉ dành cho khách hàng. Staff/Admin vui lòng đăng nhập tại CMS.
                     </div>
                     <div
                       class="rounded-xl border border-secondary/20 bg-secondary-container/60 px-space-md py-space-sm text-body-sm text-secondary"
@@ -471,9 +472,6 @@
                         >
                       </button>
                     </div>
-                    <p class="text-center text-label-sm font-label-sm text-on-surface-variant select-all">
-                      Admin: <code class="font-semibold text-primary-container">admin@bakery.local</code> / <code class="font-semibold text-primary-container">admin123</code>
-                    </p>
                     <div class="flex justify-center pt-2">
                       <button
                         type="button"
@@ -486,6 +484,10 @@
                         ><span class="">Tài khoản demo Customer</span>
                       </button>
                     </div>
+                    <p class="text-center text-body-sm text-on-surface-variant">
+                      Nhân viên hoặc quản trị viên?
+                      <a class="font-semibold text-primary-container hover:underline" th:href="@{/cms/login}">Đăng nhập CMS</a>
+                    </p>
                     <!-- Secondary Navigation: Register Callout -->
                     <div class="text-center pt-space-sm pb-space-xs">
                       <p

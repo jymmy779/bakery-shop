@@ -3,6 +3,7 @@ package com.bakery.account.service;
 import com.bakery.account.dto.AccountStatusUpdateRequest;
 import com.bakery.account.dto.AccountProfileResponse;
 import com.bakery.account.dto.AccountSummaryResponse;
+import com.bakery.account.dto.ChangePasswordRequest;
 import com.bakery.account.dto.ProfileUpdateRequest;
 import com.bakery.account.dto.RegisterRequest;
 import com.bakery.account.dto.StaffCreateRequest;
@@ -18,6 +19,8 @@ public interface AccountService {
   AccountProfileResponse getById(Long accountId);
 
   AccountProfileResponse updateProfile(Long accountId, ProfileUpdateRequest request);
+
+  void changePassword(Long accountId, ChangePasswordRequest request);
 
   AccountSummaryResponse updateStatus(Long accountId, AccountStatusUpdateRequest request);
 

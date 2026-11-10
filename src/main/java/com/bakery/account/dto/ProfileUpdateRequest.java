@@ -7,6 +7,8 @@ import com.bakery.common.validation.ValidationPatterns;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.PastOrPresent;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,7 +26,9 @@ public class ProfileUpdateRequest {
   @Pattern(regexp = ValidationPatterns.PHONE, message = INVALID_PHONE)
   private String phone;
 
-  @NotBlank(message = REQUIRED)
   @Size(max = 500)
   private String address;
+
+  @PastOrPresent(message = "Ngày sinh không được ở tương lai")
+  private LocalDate dateOfBirth;
 }

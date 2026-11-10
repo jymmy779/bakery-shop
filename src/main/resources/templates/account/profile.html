@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 
 <html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"/>
 <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><title>Tài khoản của tôi — LUNE Bakery</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
@@ -13,7 +13,7 @@
 <!-- Personalized Greeting -->
 <div class="space-y-space-xs">
 <div class="flex flex-wrap items-center gap-space-sm">
-<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight" th:text="${user?.fullName} ?: 'Xin chào, Nguyễn Hoàng Lan'">
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight" th:text="|Xin chào, ${profile.fullName}|">
                 Xin chào, Nguyễn Hoàng Lan
               </h1>
 <span class="inline-flex items-center gap-1 px-space-sm py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-label-sm font-label-sm">
@@ -70,7 +70,7 @@
 <span class="font-label-md text-label-md flex-1">Địa chỉ</span>
 </a>
 <!-- Mật khẩu & Bảo mật -->
-<a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" href="#">
+<a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" th:href="@{/profile/security}">
 <span class="material-symbols-outlined text-[20px]">shield</span>
 <span class="font-label-md text-label-md flex-1">Bảo mật &amp; Mật khẩu</span>
 </a>
@@ -117,7 +117,9 @@
               </span>
 </div>
 <!-- Thymeleaf Form Container -->
-<form action="#" class="space-y-space-lg pt-space-md" id="profile-form" method="post">
+<form th:action="@{/profile}" th:object="${profileUpdateRequest}" class="space-y-space-lg pt-space-md" id="profile-form" method="post">
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+<div th:if="${param.updated}" class="rounded-lg bg-secondary-container px-space-md py-space-sm text-on-secondary-container" role="status">Đã lưu thông tin hồ sơ.</div>
 <!-- Avatar Section -->
 <div class="flex flex-wrap items-center gap-space-lg p-space-md bg-surface-container-low rounded-xl">
 <div class="relative w-20 h-20 rounded-full overflow-hidden shadow-sm bg-surface-container-highest flex-shrink-0">
@@ -145,14 +147,16 @@
 <label class="block font-label-md text-label-md text-on-surface" for="fullName">
                     Họ và tên <span class="text-primary">*</span>
 </label>
-<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="fullName" name="fullName" required="" th:value="${user?.fullName} ?: 'Nguyễn Hoàng Lan'" type="text" value="Nguyễn Hoàng Lan"/>
+<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="fullName" th:field="*{fullName}" required="" maxlength="100" type="text"/>
+<p class="font-body-sm text-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></p>
 </div>
 <!-- Số điện thoại -->
 <div class="space-y-1">
 <label class="block font-label-md text-label-md text-on-surface" for="phone">
                     Số điện thoại nhận bánh <span class="text-primary">*</span>
 </label>
-<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="phone" name="phone" required="" th:value="${user?.phone} ?: '0912 345 678'" type="tel" value="0912 345 678"/>
+<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="phone" th:field="*{phone}" required="" type="tel"/>
+<p class="font-body-sm text-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></p>
 </div>
 <!-- Email + Badge -->
 <div class="space-y-1">
@@ -165,7 +169,7 @@
 <span>Đã xác thực</span>
 </span>
 </div>
-<input class="w-full h-12 px-space-md bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm rounded-lg border border-outline-variant shadow-sm cursor-not-allowed" id="email" name="email" readonly th:value="${user?.email} ?: 'hoanglan.nguyen@gmail.com'" type="email" value="hoanglan.nguyen@gmail.com"/>
+<input class="w-full h-12 px-space-md bg-surface-container-low text-on-surface-variant font-body-sm text-body-sm rounded-lg border border-outline-variant shadow-sm cursor-not-allowed" id="email" th:value="${profile.email}" readonly type="email"/>
 </div>
 <!-- Ngày sinh nhật -->
 <div class="space-y-1">
@@ -173,30 +177,17 @@
                     Ngày sinh của bạn
                   </label>
 <div class="relative">
-<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="birthday" name="birthday" type="date" value="1994-08-22"/>
+<input class="w-full h-12 px-space-md bg-surface-container-lowest text-on-surface font-body-sm text-body-sm rounded-lg border border-outline-variant focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm" id="birthday" th:field="*{dateOfBirth}" type="date"/>
 </div>
+<p class="font-body-sm text-[12px] text-on-surface-variant" th:if="${profileUpdateRequest.dateOfBirth != null}">
+  Ngày sinh hiện tại: <span th:text="${profileUpdateRequest.dateOfBirth}">2004-08-20</span>
+</p>
+<p class="font-body-sm text-[12px] text-on-surface-variant" th:unless="${profileUpdateRequest.dateOfBirth != null}">Bạn chưa cập nhật ngày sinh.</p>
+<p class="font-body-sm text-error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></p>
 <p class="font-body-sm text-[12px] text-primary flex items-center gap-1 pt-0.5">
 <span class="material-symbols-outlined text-[14px]">redeem</span>
 <span>Tặng 01 hộp Croissant Bơ Hạnh Nhân thơm lừng vào tuần sinh nhật</span>
 </p>
-</div>
-</div>
-<!-- Giới tính Radio Buttons -->
-<div class="space-y-2 pt-space-xs">
-<span class="block font-label-md text-label-md text-on-surface">Giới tính</span>
-<div class="flex flex-wrap items-center gap-space-lg">
-<label class="flex items-center gap-space-xs cursor-pointer text-body-sm font-body-sm text-on-surface">
-<input checked="" class="w-4 h-4 text-primary focus:ring-primary" name="gender" type="radio" value="FEMALE"/>
-<span>Nữ</span>
-</label>
-<label class="flex items-center gap-space-xs cursor-pointer text-body-sm font-body-sm text-on-surface">
-<input class="w-4 h-4 text-primary focus:ring-primary" name="gender" type="radio" value="MALE"/>
-<span>Nam</span>
-</label>
-<label class="flex items-center gap-space-xs cursor-pointer text-body-sm font-body-sm text-on-surface">
-<input class="w-4 h-4 text-primary focus:ring-primary" name="gender" type="radio" value="OTHER"/>
-<span>Khác</span>
-</label>
 </div>
 </div>
 <!-- Form Action Buttons -->
@@ -204,7 +195,7 @@
 <button class="px-space-lg py-2.5 rounded-full text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md" type="reset">
                   Hủy thay đổi
                 </button>
-<button class="cursor-pointer px-space-xl py-2.5 rounded-full bg-primary hover:bg-primary-container text-on-primary transition-all shadow-sm font-label-md text-label-md flex items-center gap-2" type="button">
+<button class="cursor-pointer px-space-xl py-2.5 rounded-full bg-primary hover:bg-primary-container text-on-primary transition-all shadow-sm font-label-md text-label-md flex items-center gap-2" type="submit">
 <span class="material-symbols-outlined text-[18px]">done</span>
 <span>Lưu Thay Đổi</span>
 </button>
@@ -322,7 +313,7 @@
 </div>
 <p class="font-body-md text-body-md text-on-surface flex items-start gap-space-xs">
 <span class="material-symbols-outlined text-[18px] text-primary flex-shrink-0 mt-1">pin_drop</span>
-<span>158/4 Pasteur, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+<span th:text="${profile.address != null and !profile.address.isBlank() ? profile.address : 'Chưa cập nhật địa chỉ'}">Chưa cập nhật địa chỉ</span>
 </p>
 <!-- Delivery Note / Artisan Instruction -->
 <div class="flex items-start gap-space-xs text-body-sm font-body-sm text-on-surface-variant bg-surface-container-lowest p-space-sm rounded-lg">

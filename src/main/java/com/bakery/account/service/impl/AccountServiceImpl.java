@@ -3,6 +3,7 @@ package com.bakery.account.service.impl;
 import com.bakery.account.dto.AccountProfileResponse;
 import com.bakery.account.dto.AccountStatusUpdateRequest;
 import com.bakery.account.dto.AccountSummaryResponse;
+import com.bakery.account.dto.ChangePasswordRequest;
 import com.bakery.account.dto.ProfileUpdateRequest;
 import com.bakery.account.dto.RegisterRequest;
 import com.bakery.account.dto.StaffCreateRequest;
@@ -69,8 +70,25 @@ public class AccountServiceImpl implements AccountService {
     Account account = findAccount(accountId);
     account.setFullName(request.getFullName().trim());
     account.setPhone(request.getPhone().trim());
-    account.setAddress(request.getAddress().trim());
+    if (request.getAddress() != null) {
+      account.setAddress(normalizeOptional(request.getAddress()));
+    }
+    account.setDateOfBirth(request.getDateOfBirth());
     return toProfileResponse(account);
+  }
+
+  @Override
+  @Transactional
+  public void changePassword(Long accountId, ChangePasswordRequest request) {
+    Account account = findAccount(accountId);
+    if (!passwordEncoder.matches(request.getCurrentPassword(), account.getPasswordHash())) {
+      throw new InvalidOperationException("Mật khẩu hiện tại không chính xác");
+    }
+    if (passwordEncoder.matches(request.getNewPassword(), account.getPasswordHash())) {
+      throw new InvalidOperationException("Mật khẩu mới phải khác mật khẩu hiện tại");
+    }
+
+    account.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
   }
 
   @Override
@@ -103,6 +121,7 @@ public class AccountServiceImpl implements AccountService {
     response.setFullName(account.getFullName());
     response.setPhone(account.getPhone());
     response.setAddress(account.getAddress());
+    response.setDateOfBirth(account.getDateOfBirth());
     response.setRole(account.getRole());
     response.setStatus(account.getStatus());
     return response;
