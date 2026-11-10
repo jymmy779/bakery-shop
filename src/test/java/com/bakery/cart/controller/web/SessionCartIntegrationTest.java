@@ -8,9 +8,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.bakery.cart.service.impl.*;
+import com.bakery.cart.model.Cart;
 import com.bakery.catalog.dto.ProductDetailResponse;
 import com.bakery.catalog.entity.ProductStatus;
 import com.bakery.catalog.service.ProductQueryService;
+import com.bakery.account.entity.Account;
+import com.bakery.account.entity.AccountStatus;
+import com.bakery.account.entity.Role;
+import com.bakery.account.security.CustomUserDetails;
 import com.bakery.config.SecurityConfig;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +27,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
@@ -37,9 +44,19 @@ class SessionCartIntegrationTest {
   @Configuration
   @EnableWebMvc
   @Import({SecurityConfig.class, CartQuantityController.class, CartQuantityServiceImpl.class,
-      CartServiceImpl.class, SessionCartServiceImpl.class})
+      CartServiceImpl.class, SessionCartServiceImpl.class,
+      com.bakery.cart.service.impl.AccountCartServiceImpl.class})
   static class Config {
     @Bean ProductQueryService products() { return mock(ProductQueryService.class); }
+    @Bean com.bakery.cart.repository.AccountCartRepository accountCarts() {
+      return mock(com.bakery.cart.repository.AccountCartRepository.class);
+    }
+    @Bean com.bakery.account.repository.AccountRepository accounts() {
+      return mock(com.bakery.account.repository.AccountRepository.class);
+    }
+    @Bean com.bakery.catalog.repository.ProductRepository productRepository() {
+      return mock(com.bakery.catalog.repository.ProductRepository.class);
+    }
     @Bean UserDetailsService users() {
       return new InMemoryUserDetailsManager(User.withUsername("customer@example.test")
           .password(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
@@ -50,6 +67,7 @@ class SessionCartIntegrationTest {
   @Autowired WebApplicationContext context;
   @Autowired ProductQueryService products;
   @Autowired SessionCartServiceImpl sessions;
+  @Autowired com.bakery.cart.repository.AccountCartRepository accountCarts;
   MockMvc mvc;
 
   @BeforeEach void setup() {
@@ -130,6 +148,33 @@ class SessionCartIntegrationTest {
     assertTrue(session.isInvalid());
     mvc.perform(get("/cart/items").session(new MockHttpSession()))
         .andExpect(jsonPath("$.items").isEmpty());
+  }
+
+  @Test void authenticatedCustomerReadsCartByAccountInsteadOfSession() {
+    Account account = new Account();
+    account.setId(73L);
+    account.setEmail("customer@example.test");
+    account.setPasswordHash("encoded");
+    account.setStatus(AccountStatus.ACTIVE);
+    account.setRole(Role.ROLE_CUSTOMER);
+    var authentication = new UsernamePasswordAuthenticationToken(
+        new CustomUserDetails(account), "encoded", new CustomUserDetails(account).getAuthorities());
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+    MockHttpSession session = new MockHttpSession();
+    Cart guest = new Cart();
+    var item = new com.bakery.cart.model.CartItem();
+    item.setProductId(1L);
+    item.setQuantity(1);
+    item.setUnitPrice(new BigDecimal("120000"));
+    guest.getItems().put(1L, item);
+    session.setAttribute(SessionCartServiceImpl.CART_ATTRIBUTE, guest);
+    try {
+      assertEquals(0, sessions.getCart(session).getTotalQuantity());
+      verify(accountCarts).findByAccount_Id(73L);
+      assertNotNull(session.getAttribute(SessionCartServiceImpl.CART_ATTRIBUTE));
+    } finally {
+      SecurityContextHolder.clearContext();
+    }
   }
 
   @Test void checkoutSuccessClearsOnlyCartAndFailurePreservesIt() throws Exception {

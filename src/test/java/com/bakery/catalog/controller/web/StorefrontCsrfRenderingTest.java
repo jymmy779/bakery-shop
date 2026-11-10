@@ -46,11 +46,21 @@ class StorefrontCsrfRenderingTest {
   @EnableWebMvc
   @Import({SecurityConfig.class, ProductPageController.class, CartController.class,
       com.bakery.cart.service.impl.SessionCartServiceImpl.class,
+      com.bakery.cart.service.impl.AccountCartServiceImpl.class,
       com.bakery.cart.service.impl.CartServiceImpl.class,
       com.bakery.cart.service.impl.CartQuantityServiceImpl.class})
   static class Config {
     @Bean ProductQueryService products() { return mock(ProductQueryService.class); }
     @Bean UserDetailsService users() { return mock(UserDetailsService.class); }
+    @Bean com.bakery.cart.repository.AccountCartRepository accountCarts() {
+      return mock(com.bakery.cart.repository.AccountCartRepository.class);
+    }
+    @Bean com.bakery.account.repository.AccountRepository accounts() {
+      return mock(com.bakery.account.repository.AccountRepository.class);
+    }
+    @Bean com.bakery.catalog.repository.ProductRepository productRepository() {
+      return mock(com.bakery.catalog.repository.ProductRepository.class);
+    }
     @Bean ThymeleafViewResolver views() {
       var templates = new ClassLoaderTemplateResolver();
       templates.setPrefix("templates/");
