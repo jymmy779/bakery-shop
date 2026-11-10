@@ -202,6 +202,31 @@
       </script>
     </th:block>
 
+    <!-- Shared confirmation dialog and toast for storefront pages. -->
+    <th:block th:fragment="storefrontUiComponents">
+      <dialog id="app-confirm-dialog" aria-labelledby="app-confirm-title" aria-describedby="app-confirm-message"
+              class="w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-on-surface shadow-2xl backdrop:bg-black/40">
+        <div class="p-space-lg">
+          <h2 id="app-confirm-title" class="font-headline-md text-headline-md">Xác nhận xóa</h2>
+          <p id="app-confirm-message" class="mt-space-sm text-body-md text-on-surface-variant"></p>
+          <div class="mt-space-lg flex justify-end gap-space-sm">
+            <button id="app-confirm-cancel" type="button" autofocus
+                    class="min-h-11 rounded-xl border border-outline-variant px-space-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container">Hủy</button>
+            <button id="app-confirm-accept" type="button"
+                    class="min-h-11 rounded-xl bg-primary-container px-space-md text-on-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-container focus-visible:ring-offset-2">Xóa</button>
+          </div>
+        </div>
+      </dialog>
+      <div id="app-toast" aria-live="polite" aria-atomic="true" role="status"
+           class="pointer-events-none fixed left-4 right-4 top-24 z-[100] mx-auto max-w-md -translate-y-3 opacity-0 transition-all duration-300 motion-reduce:transition-none sm:left-auto sm:right-6">
+        <div class="flex items-center gap-space-sm rounded-xl bg-inverse-surface px-space-md py-space-sm text-inverse-on-surface shadow-lg">
+          <span data-toast-icon aria-hidden="true" class="material-symbols-outlined text-[20px] text-secondary-fixed">check_circle</span>
+          <span data-toast-message class="text-label-md font-label-md"></span>
+        </div>
+      </div>
+      <script th:src="@{/js/storefront-components.js}" src="/js/storefront-components.js" defer></script>
+    </th:block>
+
     <!-- ========================================================
      FRAGMENT: scripts (mobile menu + header scroll)
      Usage: th:replace="~{fragments/layout :: scripts}"
@@ -390,6 +415,8 @@
           gap: 8px;
         }
         .sf-header__search {
+          display: flex;
+          align-items: center;
           position: relative;
           border-radius: 999px;
           background: #fff1ec;
@@ -437,6 +464,33 @@
           cursor: pointer;
           transition: 0.2s;
         }
+        .sf-header .material-symbols-outlined {
+          flex: none;
+          font-size: 24px;
+          line-height: 1;
+        }
+        .sf-header__cart {
+          position: relative;
+        }
+        .sf-header__cart-count {
+          position: absolute;
+          top: 1px;
+          right: 1px;
+          display: grid;
+          min-width: 19px;
+          height: 19px;
+          place-items: center;
+          padding: 0 4px;
+          border: 2px solid #fff8f6;
+          border-radius: 999px;
+          background: #8b263e;
+          color: #fff;
+          font: 700 10px/1 "Plus Jakarta Sans", sans-serif;
+          transform: translate(35%, -35%);
+        }
+        .sf-header__cart-count[hidden] {
+          display: none;
+        }
         .sf-header__action:hover,
         .sf-header__menu:hover {
           background: #ffe9e3;
@@ -447,9 +501,11 @@
           display: none;
         }
         @media (max-width: 980px) {
-          .sf-header__nav,
-          .sf-header__search {
+          .sf-header__nav {
             display: none;
+          }
+          #storefront-header .sf-header__search input {
+            width: clamp(110px, 25vw, 230px);
           }
           .sf-header__menu {
             display: grid;
@@ -486,6 +542,9 @@
           .sf-header__action--account {
             display: none;
           }
+          #storefront-header .sf-header__search input {
+            width: clamp(96px, 30vw, 150px);
+          }
         }
       </style>
       <div class="sf-header__inner">
@@ -517,10 +576,10 @@
         </nav>
         <div class="sf-header__actions">
           <form
-            class="sf-header__search"
+            class="sf-header__search flex items-center"
             id="header-search"
-            th:action="@{/products/search}"
-            action="/products/search"
+            th:action="@{/products}"
+            action="/products"
             method="get"
           >
             <input
@@ -548,11 +607,17 @@
             sec:authorize="hasRole('CUSTOMER')"
             ><span class="material-symbols-outlined">account_circle</span></a
           ><a
-            class="sf-header__action"
+            class="sf-header__action sf-header__cart"
             th:href="@{/cart}"
             href="/cart"
             aria-label="Giỏ hàng"
-            ><span class="material-symbols-outlined">shopping_bag</span></a
+            ><span class="material-symbols-outlined">shopping_bag</span><span
+              class="sf-header__cart-count"
+              data-cart-count
+              aria-live="polite"
+              hidden
+              >0</span
+            ></a
           ><button
             class="sf-header__menu"
             type="button"
@@ -593,6 +658,21 @@
             const open = nav.classList.toggle("is-open");
             button.setAttribute("aria-expanded", String(open));
           });
+
+          window.updateCartBadge = (totalQuantity) => {
+            const quantity = Math.max(0, Number(totalQuantity) || 0);
+            document.querySelectorAll("[data-cart-count]").forEach((badge) => {
+              badge.textContent = quantity > 99 ? "99+" : String(quantity);
+              badge.hidden = quantity === 0;
+            });
+          };
+
+          fetch("/cart/items", { headers: { Accept: "application/json" } })
+            .then((response) => (response.ok ? response.json() : null))
+            .then((cart) => {
+              if (cart) window.updateCartBadge(cart.totalQuantity);
+            })
+            .catch(() => {});
         })();
       </script>
     </header>

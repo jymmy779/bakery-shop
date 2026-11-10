@@ -160,7 +160,7 @@ public class ProductAdminServiceImpl implements ProductAdminService {
   }
 
   @Transactional
-  private void deleteProduct(Long productId) {
+  public void deleteProduct(Long productId) {
     Product product = find(productId);
     if (orderReferences.hasOrders(productId)) {
       throw new IllegalStateException(

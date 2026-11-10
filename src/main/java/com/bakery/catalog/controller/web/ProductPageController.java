@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
 @RequiredArgsConstructor
@@ -20,9 +21,15 @@ public class ProductPageController {
   }
 
   @GetMapping("/products/search")
-  public String search(@RequestParam(defaultValue = "") String keyword, Model model) {
-    model.addAttribute("keyword", keyword.strip());
-    return "product/search";
+  public String search(@RequestParam(defaultValue = "") String keyword,
+      @RequestParam(defaultValue = "newest") String sort,
+      @RequestParam(defaultValue = "0") int page) {
+    keyword = keyword.strip();
+    return "redirect:" + UriComponentsBuilder.fromPath("/products")
+        .queryParam("keyword", keyword)
+        .queryParam("sort", sort)
+        .queryParam("page", Math.max(0, page))
+        .build().encode().toUriString();
   }
 
   @GetMapping("/products/{productId}")

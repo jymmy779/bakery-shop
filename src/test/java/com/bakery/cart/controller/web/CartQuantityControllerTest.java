@@ -16,7 +16,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 class CartQuantityControllerTest {
   private final MockMvc mvc = MockMvcBuilders.standaloneSetup(new CartQuantityController(
       new SessionCartServiceImpl(new CartServiceImpl(mock(ProductQueryService.class),
-          new CartQuantityServiceImpl(mock(ProductQueryService.class)))))).build();
+          new CartQuantityServiceImpl(mock(ProductQueryService.class))),
+          mock(com.bakery.cart.service.impl.AccountCartServiceImpl.class)))).build();
 
   @Test
   void absentCartReturnsJson404() throws Exception {

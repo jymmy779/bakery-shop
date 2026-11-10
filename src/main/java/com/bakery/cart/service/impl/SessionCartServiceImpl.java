@@ -1,5 +1,6 @@
 package com.bakery.cart.service.impl;
 
+import com.bakery.account.security.CustomUserDetails;
 import com.bakery.cart.dto.AddToCartRequest;
 import com.bakery.cart.dto.CartResponse;
 import com.bakery.cart.dto.UpdateCartItemRequest;
@@ -8,7 +9,11 @@ import com.bakery.cart.service.CartService;
 import jakarta.servlet.http.HttpSession;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.util.WebUtils;
@@ -18,22 +23,31 @@ import org.springframework.web.util.WebUtils;
 public class SessionCartServiceImpl {
   public static final String CART_ATTRIBUTE = "cart";
   private final CartService carts;
+  private final AccountCartServiceImpl accountCarts;
 
   public CartResponse getCart(HttpSession session) {
+    Long accountId = currentAccountId();
+    if (accountId != null) return accountCarts.getCart(accountId);
     synchronized (WebUtils.getSessionMutex(session)) {
       return carts.getCart(current(session));
     }
   }
 
   public CartResponse addItem(HttpSession session, AddToCartRequest request) {
+    Long accountId = currentAccountId();
+    if (accountId != null) return accountCarts.addItem(accountId, request);
     return change(session, cart -> carts.addItem(cart, request));
   }
 
   public CartResponse updateItem(HttpSession session, Long productId, UpdateCartItemRequest request) {
+    Long accountId = currentAccountId();
+    if (accountId != null) return accountCarts.updateItem(accountId, productId, request);
     return change(session, cart -> carts.updateItem(cart, productId, request));
   }
 
   public CartResponse removeItem(HttpSession session, Long productId) {
+    Long accountId = currentAccountId();
+    if (accountId != null) return accountCarts.removeItem(accountId, productId);
     return change(session, cart -> carts.removeItem(cart, productId));
   }
 
@@ -49,17 +63,48 @@ public class SessionCartServiceImpl {
     return (Cart) session.getAttribute(CART_ATTRIBUTE);
   }
 
+  public void mergeGuestCartAfterLogin(HttpSession session, Long accountId) {
+    synchronized (WebUtils.getSessionMutex(session)) {
+      Cart guestCart = current(session);
+      accountCarts.mergeGuestCart(accountId, guestCart);
+      session.removeAttribute(CART_ATTRIBUTE);
+    }
+  }
+
+  private Long currentAccountId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated()
+        || authentication instanceof AnonymousAuthenticationToken
+        || !(authentication.getPrincipal() instanceof CustomUserDetails user)) {
+      return null;
+    }
+    return authentication.getAuthorities().stream()
+        .anyMatch(authority -> authority.getAuthority().equals("ROLE_CUSTOMER"))
+        ? user.getAccountId() : null;
+  }
+
   /** Called by checkout integration; never expose a client-controlled success/clear endpoint. */
+  @Transactional
   public <T> T checkout(HttpSession session, Function<Cart, T> placeOrder) {
+    Long accountId = currentAccountId();
+    if (accountId != null) {
+      Cart checkedOut = carts.refresh(accountCarts.getModel(accountId));
+      T result = placeOrder.apply(checkedOut);
+      accountCarts.clear(accountId);
+      return result;
+    }
     synchronized (WebUtils.getSessionMutex(session)) {
       Cart checkedOut = current(session);
+      // Revalidate sale status, stock and price before invoking order creation.
+      checkedOut = carts.refresh(checkedOut);
+      final Cart purchasedCart = checkedOut;
       T result = placeOrder.apply(checkedOut);
       if (TransactionSynchronizationManager.isActualTransactionActive()
           && TransactionSynchronizationManager.isSynchronizationActive()) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
           @Override
           public void afterCommit() {
-            clearPurchasedCart(session, checkedOut);
+            clearPurchasedCart(session, purchasedCart);
           }
         });
       } else {

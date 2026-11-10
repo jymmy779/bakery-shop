@@ -61,6 +61,7 @@ class ProductQueryServiceTest {
     product.setId(10L);
     product.setName("Tiramisu");
     product.setCategory(category);
+    product.setStatus(com.bakery.catalog.entity.ProductStatus.SELLING);
     when(products.searchByNameOrDescription("%TIRA%"))
         .thenReturn(List.of(product));
     when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(10L))).thenReturn(List.of());
@@ -155,6 +156,7 @@ class ProductQueryServiceTest {
     Product product = new Product();
     product.setId(10L);
     product.setName("Bánh dâu");
+    product.setStatus(com.bakery.catalog.entity.ProductStatus.SELLING);
     product.setCategory(category);
     product.setPrice(new BigDecimal("150000"));
     ProductImage first = new ProductImage();
@@ -182,6 +184,15 @@ class ProductQueryServiceTest {
     when(products.findAll(any(Sort.class)))
         .thenReturn(List.of());
 
+    assertTrue(service.list().isEmpty());
+    verifyNoInteractions(images);
+  }
+
+  @Test
+  void legacyListHidesStoppedProducts() {
+    Product stopped = new Product();
+    stopped.setStatus(com.bakery.catalog.entity.ProductStatus.STOPPED);
+    when(products.findAll(any(Sort.class))).thenReturn(List.of(stopped));
     assertTrue(service.list().isEmpty());
     verifyNoInteractions(images);
   }

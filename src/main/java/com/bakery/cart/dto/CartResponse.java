@@ -16,4 +16,5 @@ public class CartResponse {
   private int totalQuantity;
   private BigDecimal totalAmount;
   private int maximumPreparationDays;
+  private boolean checkoutAllowed;
 }
