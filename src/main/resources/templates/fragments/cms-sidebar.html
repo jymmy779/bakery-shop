@@ -17,6 +17,7 @@
       <a th:href="@{/cms/products}" th:classappend="${active == 'products'} ? ' active'">Quản lý sản phẩm</a>
       <a th:href="@{/cms/categories}" th:classappend="${active == 'categories'} ? ' active'">Quản lý danh mục</a>
       <a th:href="@{/cms/orders}" th:classappend="${active == 'orders'} ? ' active'">Quản lý đơn hàng</a>
+      <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/transactions}" th:classappend="${active == 'transactions'} ? ' active'">Quản lý giao dịch</a>
       <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/staff}" th:classappend="${active == 'staff'} ? ' active'">Quản lý nhân viên</a>
       <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}" th:classappend="${active == 'accounts'} ? ' active'">Quản lý người dùng</a>
     </nav>

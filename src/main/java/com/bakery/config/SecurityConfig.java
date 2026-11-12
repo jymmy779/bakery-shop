@@ -33,99 +33,96 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-      .authorizeHttpRequests(auth -> auth
-        .requestMatchers(
-            "/",
-            "/products",
-            "/products/**",
-            "/about",
-            "/contact",
-            "/api/products/**",
-            "/api/categories/**",
-            "/cart/**",
-            "/register/**",
-            "/login",
-            "/forgot-password/**",
-            "/error",
-            "/css/**",
-            "/js/**",
-            "/images/**",
-            "/assets/**",
-            "/uploads/**").permitAll()
-        .requestMatchers("/checkout/**", "/orders/**", "/profile/**")
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/",
+                "/products",
+                "/products/**",
+                "/about",
+                "/contact",
+                "/api/products/**",
+                "/api/categories/**",
+                "/cart/**",
+                "/register/**",
+                "/login",
+                "/forgot-password/**",
+                "/error",
+                "/css/**",
+                "/js/**",
+                "/images/**",
+                "/assets/**",
+                "/uploads/**")
+            .permitAll()
+            .requestMatchers("/checkout/**", "/orders/**", "/profile/**")
             .hasRole("CUSTOMER")
-        .requestMatchers("/cms/login").permitAll()
-        .requestMatchers("/cms/accounts/**", "/cms/staff/**")
+            .requestMatchers("/cms/login").permitAll()
+        .requestMatchers("/cms/accounts/**", "/cms/staff/**", "/cms/transactions", "/cms/transactions/**")
             .hasRole("ADMIN")
-        .requestMatchers("/cms/**")
+            .requestMatchers("/cms/**")
             .hasAnyRole("STAFF", "ADMIN")
-        .anyRequest().authenticated()
-      )
-      .exceptionHandling(exceptions -> exceptions
-        .authenticationEntryPoint((request, response, exception) -> {
-          String requestPath = request.getRequestURI().substring(request.getContextPath().length());
-          String loginPage = requestPath.equals("/cms") || requestPath.startsWith("/cms/")
-              ? "/cms/login"
-              : "/login";
-          response.sendRedirect(request.getContextPath() + loginPage);
-        })
-      )
-      .formLogin(form -> form
-        .loginPage("/cms/login")
-        .loginProcessingUrl("/login")
-        .usernameParameter("email")
-        .successHandler((request, response, authentication) -> {
-          boolean cmsLogin = "cms".equals(request.getParameter("loginType"));
-          boolean customer = authentication.getAuthorities().stream()
-              .anyMatch(authority -> authority.getAuthority().equals("ROLE_CUSTOMER"));
-          boolean cmsUser = authentication.getAuthorities().stream()
-              .anyMatch(authority -> authority.getAuthority().equals("ROLE_STAFF")
-                  || authority.getAuthority().equals("ROLE_ADMIN"));
+            .anyRequest().authenticated())
+        .exceptionHandling(exceptions -> exceptions
+            .authenticationEntryPoint((request, response, exception) -> {
+              String requestPath = request.getRequestURI().substring(request.getContextPath().length());
+              String loginPage = requestPath.equals("/cms") || requestPath.startsWith("/cms/")
+                  ? "/cms/login"
+                  : "/login";
+              response.sendRedirect(request.getContextPath() + loginPage);
+            }))
+        .formLogin(form -> form
+            .loginPage("/cms/login")
+            .loginProcessingUrl("/login")
+            .usernameParameter("email")
+            .successHandler((request, response, authentication) -> {
+              boolean cmsLogin = "cms".equals(request.getParameter("loginType"));
+              boolean customer = authentication.getAuthorities().stream()
+                  .anyMatch(authority -> authority.getAuthority().equals("ROLE_CUSTOMER"));
+              boolean cmsUser = authentication.getAuthorities().stream()
+                  .anyMatch(authority -> authority.getAuthority().equals("ROLE_STAFF")
+                      || authority.getAuthority().equals("ROLE_ADMIN"));
 
-          if ((cmsLogin && !cmsUser) || (!cmsLogin && !customer)) {
-            SecurityContextHolder.clearContext();
-            if (request.getSession(false) != null) {
-              request.getSession(false).invalidate();
-            }
-            response.sendRedirect(cmsLogin ? "/cms/login?roleError" : "/login?roleError");
-            return;
-          }
+              if ((cmsLogin && !cmsUser) || (!cmsLogin && !customer)) {
+                SecurityContextHolder.clearContext();
+                if (request.getSession(false) != null) {
+                  request.getSession(false).invalidate();
+                }
+                response.sendRedirect(cmsLogin ? "/cms/login?roleError" : "/login?roleError");
+                return;
+              }
 
-          if (customer && carts != null
-              && authentication.getPrincipal() instanceof CustomUserDetails user) {
-            HttpSession session = request.getSession(false);
-            if (session != null) {
-              carts.mergeGuestCartAfterLogin(session, user.getAccountId());
-            }
-          }
+              if (customer && carts != null
+                  && authentication.getPrincipal() instanceof CustomUserDetails user) {
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                  carts.mergeGuestCartAfterLogin(session, user.getAccountId());
+                }
+              }
 
-          HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
-          SavedRequest savedRequest = requestCache.getRequest(request, response);
-          String fallbackUrl = cmsLogin ? "/cms" : "/";
-          String targetUrl = cmsLogin ? null : savedCustomerTarget(savedRequest);
-          requestCache.removeRequest(request, response);
-          response.sendRedirect(targetUrl != null ? targetUrl : fallbackUrl);
-        })
-        .failureHandler((request, response, exception) -> {
-          String failureUrl = "cms".equals(request.getParameter("loginType"))
-              ? "/cms/login?error"
-              : "/login?error";
-          response.sendRedirect(failureUrl);
-        })
-        .permitAll()
-      )
-      .logout(logout -> logout
-        .logoutUrl("/logout")
-        .logoutSuccessHandler((request, response, authentication) -> {
-          String loginPage = "cms".equals(request.getParameter("loginType"))
-              ? "/cms/login?logout"
-              : "/login?logout";
-          response.sendRedirect(request.getContextPath() + loginPage);
-        })
-        .invalidateHttpSession(true)
-        .clearAuthentication(true)
-        .permitAll()
-      );
+              HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
+              SavedRequest savedRequest = requestCache.getRequest(request, response);
+              String fallbackUrl = cmsLogin ? "/cms" : "/";
+              String targetUrl = cmsLogin ? null : savedCustomerTarget(savedRequest);
+              requestCache.removeRequest(request, response);
+              response.sendRedirect(targetUrl != null ? targetUrl : fallbackUrl);
+            })
+            .failureHandler((request, response, exception) -> {
+              String failureUrl = "cms".equals(request.getParameter("loginType"))
+                  ? "/cms/login?error"
+                  : "/login?error";
+              response.sendRedirect(failureUrl);
+            })
+            .permitAll())
+        .logout(logout -> logout
+            .logoutUrl("/logout")
+            .logoutSuccessHandler((request, response, authentication) -> {
+              String loginPage = "cms".equals(request.getParameter("loginType"))
+                  ? "/cms/login?logout"
+                  : "/login?logout";
+              response.sendRedirect(request.getContextPath() + loginPage);
+            })
+            .invalidateHttpSession(true)
+            .clearAuthentication(true)
+            .permitAll());
 
     return http.build();
   }
@@ -137,13 +134,18 @@ public class SecurityConfig {
 
     try {
       URI savedUri = URI.create(savedRequest.getRedirectUrl());
-      String path = savedUri.getRawPath();
+      String path = savedUri.normalize().getPath();
       if (path == null || !path.startsWith("/")) {
         return null;
       }
 
-      boolean cmsPath = path.equals("/cms") || path.startsWith("/cms/");
-      if (cmsPath) {
+      boolean customerPath = path.equals("/checkout")
+          || path.equals("/orders")
+          || path.matches("/orders/[0-9]+")
+          || path.equals("/profile")
+          || path.equals("/profile/address")
+          || path.equals("/profile/security");
+      if (!customerPath) {
         return null;
       }
 

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/cms-layout :: head('Quản lý giao dịch')}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('transactions')}"></th:block>
+<main class="cms-page cms-accounts-page cms-transactions-page">
+  <div class="wrap cms-accounts-wrap">
+    <header class="cms-accounts-header">
+      <div>
+        <span class="cms-products-kicker">QUẢN TRỊ <span aria-hidden="true">/</span> THANH TOÁN</span>
+        <h1>Quản lý giao dịch</h1>
+        <p>Theo dõi và đối soát các giao dịch thanh toán của đơn hàng.</p>
+      </div>
+      <span class="cms-transactions-status">Chờ tích hợp</span>
+    </header>
+
+    <section class="cms-accounts-panel cms-transactions-panel" aria-labelledby="transactions-title">
+      <div class="cms-accounts-panel__heading">
+        <div>
+          <h2 id="transactions-title">Danh sách giao dịch</h2>
+          <p>Thông tin giao dịch sẽ xuất hiện sau khi phân hệ thanh toán được kết nối.</p>
+        </div>
+      </div>
+      <div class="cms-transactions-empty" role="status">
+        <span class="cms-transactions-empty__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/></svg>
+        </span>
+        <strong>Chưa có dữ liệu giao dịch</strong>
+        <p>Trang này sẽ hiển thị mã giao dịch, đơn hàng, phương thức và trạng thái thanh toán khi chức năng thanh toán hoàn tất.</p>
+      </div>
+    </section>
+  </div>
+</main>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+</body>
+</html>

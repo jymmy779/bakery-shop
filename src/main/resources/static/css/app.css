@@ -8574,6 +8574,91 @@ a.cms-dashboard-stat:hover {
   }
 }
 
+.cms-transactions-status,
+.cms-orders-status {
+  display: inline-flex;
+  min-height: 32px;
+  flex: none;
+  align-items: center;
+  padding: 0 11px;
+  border: 1px solid #e7e3d8;
+  border-radius: 999px;
+  background: #faf8f2;
+  color: #77715f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.cms-transactions-panel .cms-accounts-panel__heading,
+.cms-orders-panel .cms-accounts-panel__heading {
+  border-bottom: 1px solid #efeee9;
+}
+
+.cms-transactions-empty,
+.cms-orders-empty {
+  display: grid;
+  min-height: 300px;
+  justify-items: center;
+  align-content: center;
+  gap: 12px;
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.cms-transactions-empty__icon,
+.cms-orders-empty__icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid #e7e5df;
+  border-radius: 16px;
+  background: #f7f6f2;
+  color: #77786f;
+}
+
+.cms-transactions-empty__icon svg,
+.cms-orders-empty__icon svg {
+  width: 27px;
+  height: 27px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.cms-transactions-empty strong,
+.cms-orders-empty strong {
+  color: #303229;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cms-transactions-empty p,
+.cms-orders-empty p {
+  max-width: 500px;
+  margin: 0;
+  color: #77786f;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .cms-transactions-page .cms-accounts-header,
+  .cms-orders-page .cms-accounts-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .cms-transactions-empty,
+  .cms-orders-empty {
+    min-height: 240px;
+    padding: 25px 18px;
+  }
+}
+
 .cms-dashboard-orders__status {
   display: inline-flex;
   min-height: 30px;
