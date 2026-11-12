@@ -7,6 +7,8 @@ import com.bakery.account.dto.ChangePasswordRequest;
 import com.bakery.account.dto.ProfileUpdateRequest;
 import com.bakery.account.dto.RegisterRequest;
 import com.bakery.account.dto.StaffCreateRequest;
+import com.bakery.account.dto.StaffUpdateRequest;
+import com.bakery.account.entity.AccountStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,6 +17,17 @@ public interface AccountService {
   AccountProfileResponse registerCustomer(RegisterRequest request);
 
   AccountSummaryResponse createStaff(StaffCreateRequest request);
+
+  AccountSummaryResponse updateStaff(Long staffId, StaffUpdateRequest request);
+
+  AccountSummaryResponse updateStaffStatus(Long staffId, AccountStatusUpdateRequest request);
+
+  AccountSummaryResponse getStaffById(Long staffId);
+
+  Page<AccountSummaryResponse> findStaff(Pageable pageable);
+
+  Page<AccountSummaryResponse> findStaff(
+      String search, AccountStatus status, String order, Pageable pageable);
 
   AccountProfileResponse getById(Long accountId);
 
@@ -25,4 +38,7 @@ public interface AccountService {
   AccountSummaryResponse updateStatus(Long accountId, AccountStatusUpdateRequest request);
 
   Page<AccountSummaryResponse> findAll(Pageable pageable);
+
+  Page<AccountSummaryResponse> findAll(
+      String search, AccountStatus status, String order, Pageable pageable);
 }

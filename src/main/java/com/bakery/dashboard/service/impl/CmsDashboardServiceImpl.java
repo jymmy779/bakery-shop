@@ -32,6 +32,6 @@ public class CmsDashboardServiceImpl implements CmsDashboardService {
         products.search("", null, ProductStatus.STOPPED, "newest", countOnly).getTotalElements();
 
     return new CmsDashboardResponse(totalProducts, sellingProducts, stoppedProducts,
-        categories.findAll().size(), accounts.countUsers(), revenue.deliveredPaidRevenue());
+        categories.findAll().size(), accounts.countStaff(), revenue.deliveredPaidRevenue());
   }
 }

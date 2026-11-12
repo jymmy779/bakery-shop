@@ -1,39 +1,57 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/cms-layout :: head('Hồ sơ tài khoản')}"></head>
+<head th:replace="~{fragments/cms-layout :: head('Hồ sơ cá nhân')}"></head>
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('profile')}"></th:block>
-<main class="cms-page">
-  <div class="wrap cms-management-page">
-    <section class="cms-panel cms-profile-panel">
-      <div th:if="${successMessage}" class="toast show" role="status" th:text="${successMessage}"></div>
-      <form th:action="@{/cms/profile}" th:object="${profileUpdateRequest}" method="post" class="cms-product-form">
+<main class="cms-page cms-accounts-page cms-profile-page">
+  <div class="wrap cms-accounts-wrap cms-profile-wrap">
+    <header class="cms-accounts-header">
+      <div>
+        <span class="cms-products-kicker">QUẢN TRỊ <span aria-hidden="true">/</span> TÀI KHOẢN</span>
+        <h1>Hồ sơ cá nhân</h1>
+        <p>Cập nhật thông tin tài khoản đang dùng để truy cập CMS.</p>
+      </div>
+    </header>
+
+    <div th:if="${successMessage}" class="toast show" role="status" th:text="${successMessage}"></div>
+
+    <section class="cms-accounts-panel cms-profile-card" aria-labelledby="cms-profile-title">
+      <div class="cms-accounts-panel__heading">
+        <div>
+          <h2 id="cms-profile-title">Thông tin hồ sơ</h2>
+          <p>Email đăng nhập chỉ xem; họ tên và số điện thoại có thể cập nhật.</p>
+        </div>
+      </div>
+
+      <form th:action="@{/cms/profile}" th:object="${profileUpdateRequest}" method="post" class="cms-profile-form">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-        <header class="cms-profile-heading">
-          <span class="eyebrow">CMS / TÀI KHOẢN</span>
-          <h1 class="section-title">Hồ sơ <em>của tôi</em></h1>
-          <p>Cập nhật thông tin tài khoản quản trị đang đăng nhập.</p>
-        </header>
-        <div class="cms-product-form__grid">
+        <div class="cms-form-errors cms-profile-form__errors" th:if="${#fields.hasErrors()}">
+          <strong>Vui lòng kiểm tra lại thông tin:</strong>
+          <ul><li th:each="error : ${#fields.allErrors()}" th:text="${error}"></li></ul>
+        </div>
+
+        <div class="cms-profile-form__fields">
           <div class="cms-form-field">
-            <label for="fullName">Họ và tên</label>
-            <input id="fullName" th:field="*{fullName}" required maxlength="100" autocomplete="name">
+            <label for="fullName">Họ và tên <span aria-hidden="true">*</span></label>
+            <input id="fullName" th:field="*{fullName}" autocomplete="name" maxlength="100" required>
             <small class="field-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></small>
           </div>
           <div class="cms-form-field">
-            <label for="phone">Số điện thoại</label>
-            <input id="phone" th:field="*{phone}" required type="tel" autocomplete="tel">
+            <label for="phone">Số điện thoại <span aria-hidden="true">*</span></label>
+            <input id="phone" th:field="*{phone}" type="tel" autocomplete="tel" required>
             <small class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></small>
           </div>
           <div class="cms-form-field cms-form-field--wide">
             <label for="email">Email đăng nhập</label>
-            <input id="email" th:value="${profile.email}" type="email" readonly>
+            <input id="email" th:value="${profile.email}" type="email" readonly aria-describedby="profile-email-note">
+            <small id="profile-email-note">Email không thể thay đổi tại đây.</small>
           </div>
         </div>
-        <div class="cms-form-actions cms-profile-actions">
-          <a class="btn btn-plain" th:href="@{/cms/profile/security}">Đổi mật khẩu</a>
-          <button class="btn btn-primary" type="submit">Lưu hồ sơ</button>
-        </div>
+
+        <footer class="cms-profile-form__actions">
+          <a class="cms-profile-secondary" th:href="@{/cms/profile/security}">Đổi mật khẩu</a>
+          <button class="cms-profile-primary" type="submit">Lưu thay đổi</button>
+        </footer>
       </form>
     </section>
   </div>
