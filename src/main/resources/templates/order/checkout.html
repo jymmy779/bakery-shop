@@ -1,1 +1,15 @@
-<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><title>Thanh toán</title><link rel="stylesheet" th:href="@{/css/app.css}"></head><body><header th:replace="~{fragments/layout :: header}"></header><main class="container"><h1>Thanh toán</h1></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Thanh toán — LUNE Bakery</title><link rel="stylesheet" th:href="@{/css/app.css}"/></head>
+<body><header th:replace="~{fragments/layout :: storefrontHeader('auth')}"></header>
+<main class="container py-12"><h1 class="text-2xl font-semibold mb-2">Thanh toán</h1><p class="mb-6">Chọn địa chỉ nhận bánh cho đơn hàng này.</p>
+  <div th:if="${#lists.isEmpty(savedAddresses)}" class="rounded-xl border p-6"><p class="mb-4">Bạn chưa lưu địa chỉ giao hàng.</p><a class="button primary" th:href="@{/profile/address}">Thêm địa chỉ</a></div>
+  <form th:unless="${#lists.isEmpty(savedAddresses)}" th:action="@{/checkout}" method="get" class="space-y-4">
+    <label th:each="address : ${savedAddresses}" class="flex gap-3 rounded-xl border p-4 cursor-pointer">
+      <input type="radio" name="addressId" th:value="${address.id}" th:checked="${address.id == selectedAddressId}"/>
+      <span><strong th:text="${address.label}">Nhà riêng</strong><span th:if="${address.defaultAddress}" class="ml-2 text-sm">Mặc định</span><br/><span th:text="${address.receiverName}">Người nhận</span> · <span th:text="${address.receiverPhone}">Số điện thoại</span><br/><span th:text="${address.address}">Địa chỉ giao hàng</span><br/><small th:if="${address.deliveryNote != null and !address.deliveryNote.isBlank()}" th:text="|Ghi chú: ${address.deliveryNote}|">Ghi chú</small></span>
+    </label>
+    <button class="button primary" type="submit">Chọn địa chỉ này</button>
+  </form>
+  <a class="inline-block mt-6" th:href="@{/profile/address}">Quản lý sổ địa chỉ</a>
+</main><footer th:replace="~{fragments/layout :: storefrontFooter}"></footer></body></html>

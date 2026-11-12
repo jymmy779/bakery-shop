@@ -101,7 +101,7 @@ public class SecurityConfig {
 
           HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
           SavedRequest savedRequest = requestCache.getRequest(request, response);
-          String fallbackUrl = cmsLogin ? "/cms" : "/profile";
+          String fallbackUrl = cmsLogin ? "/cms" : "/";
           String targetUrl = cmsLogin ? null : savedCustomerTarget(savedRequest);
           requestCache.removeRequest(request, response);
           response.sendRedirect(targetUrl != null ? targetUrl : fallbackUrl);

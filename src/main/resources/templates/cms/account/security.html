@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/cms-layout :: head('Bảo mật và mật khẩu')}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('profile')}"></th:block>
+<main class="cms-page">
+  <div class="wrap cms-management-page">
+    <section class="cms-panel cms-profile-panel">
+      <div th:if="${successMessage}" class="toast show" role="status" th:text="${successMessage}"></div>
+      <div th:if="${errorMessage}" class="toast show error" role="alert" th:text="${errorMessage}"></div>
+      <form th:action="@{/cms/profile/security}" th:object="${changePasswordRequest}" method="post" class="cms-product-form">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <header class="cms-profile-heading">
+          <span class="eyebrow">CMS / TÀI KHOẢN</span>
+          <h1 class="section-title">Đổi <em>mật khẩu</em></h1>
+          <p>Nhập mật khẩu hiện tại, sau đó chọn mật khẩu mới cho tài khoản quản trị.</p>
+        </header>
+        <div class="cms-product-form__grid">
+          <div class="cms-form-field cms-form-field--wide">
+            <label for="currentPassword">Mật khẩu hiện tại</label>
+            <input id="currentPassword" th:field="*{currentPassword}" type="password" autocomplete="current-password" required>
+            <small class="field-error" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></small>
+          </div>
+          <div class="cms-form-field">
+            <label for="newPassword">Mật khẩu mới</label>
+            <input id="newPassword" th:field="*{newPassword}" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+            <small class="field-error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></small>
+            <small>Mật khẩu cần có từ 8 đến 72 ký tự.</small>
+          </div>
+          <div class="cms-form-field">
+            <label for="confirmPassword">Nhập lại mật khẩu mới</label>
+            <input id="confirmPassword" th:field="*{confirmPassword}" type="password" autocomplete="new-password" required>
+            <small class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></small>
+            <small class="field-error" th:if="${#fields.hasErrors('newPasswordConfirmed')}" th:errors="*{newPasswordConfirmed}"></small>
+          </div>
+        </div>
+        <div class="cms-form-actions cms-profile-actions">
+          <a class="btn btn-plain" th:href="@{/cms/profile}">Quay lại hồ sơ</a>
+          <button class="btn btn-primary" type="submit">Lưu mật khẩu mới</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+</body>
+</html>

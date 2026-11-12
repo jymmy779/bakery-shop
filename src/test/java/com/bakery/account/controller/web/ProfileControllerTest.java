@@ -1,5 +1,6 @@
 package com.bakery.account.controller.web;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -11,12 +12,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.bakery.account.dto.AccountProfileResponse;
+import com.bakery.account.dto.ChangePasswordRequest;
 import com.bakery.account.dto.ProfileUpdateRequest;
 import com.bakery.account.entity.Account;
 import com.bakery.account.entity.AccountStatus;
 import com.bakery.account.entity.Role;
 import com.bakery.account.security.CustomUserDetails;
 import com.bakery.account.service.AccountService;
+import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,10 +66,14 @@ class ProfileControllerTest {
   void loadsCurrentCustomerProfile() throws Exception {
     when(accountService.getById(7L)).thenReturn(profile());
 
-    mvc.perform(get("/profile"))
+    var result = mvc.perform(get("/profile"))
         .andExpect(status().isOk())
         .andExpect(view().name("account/profile"))
         .andExpect(model().attributeExists("profile", "profileUpdateRequest"));
+
+    ProfileUpdateRequest request = (ProfileUpdateRequest) result.andReturn().getModelAndView()
+        .getModel().get("profileUpdateRequest");
+    assertEquals(LocalDate.of(2004, 8, 20), request.getDateOfBirth());
 
     verify(accountService).getById(7L);
   }
@@ -76,7 +83,7 @@ class ProfileControllerTest {
     mvc.perform(post("/profile")
             .param("fullName", "Nguyen Van B")
             .param("phone", "0987654321")
-            .param("address", "Dia chi moi"))
+            .param("dateOfBirth", "2004-08-20"))
         .andExpect(status().is3xxRedirection())
         .andExpect(view().name("redirect:/profile?updated"));
 
@@ -90,10 +97,41 @@ class ProfileControllerTest {
     mvc.perform(post("/profile")
             .param("fullName", "")
             .param("phone", "bad")
-            .param("address", ""))
+            .param("dateOfBirth", "2999-01-01"))
         .andExpect(status().isOk())
         .andExpect(view().name("account/profile"))
         .andExpect(model().attributeExists("profile", "profileUpdateRequest"));
+  }
+
+  @Test
+  void loadsPasswordSecurityPage() throws Exception {
+    mvc.perform(get("/profile/security"))
+        .andExpect(status().isOk())
+        .andExpect(view().name("account/security"))
+        .andExpect(model().attributeExists("changePasswordRequest"));
+  }
+
+  @Test
+  void changesPasswordWithValidForm() throws Exception {
+    mvc.perform(post("/profile/security")
+            .param("currentPassword", "old-password")
+            .param("newPassword", "new-password")
+            .param("confirmPassword", "new-password"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(view().name("redirect:/profile/security?updated"));
+
+    verify(accountService).changePassword(eq(7L), any(ChangePasswordRequest.class));
+  }
+
+  @Test
+  void showsValidationErrorWhenNewPasswordsDoNotMatch() throws Exception {
+    mvc.perform(post("/profile/security")
+            .param("currentPassword", "old-password")
+            .param("newPassword", "new-password")
+            .param("confirmPassword", "different-password"))
+        .andExpect(status().isOk())
+        .andExpect(view().name("account/security"))
+        .andExpect(model().attributeExists("changePasswordRequest"));
   }
 
   private AccountProfileResponse profile() {
@@ -103,6 +141,7 @@ class ProfileControllerTest {
     profile.setFullName("Nguyen Van A");
     profile.setPhone("0912345678");
     profile.setAddress("Dia chi cu");
+    profile.setDateOfBirth(LocalDate.of(2004, 8, 20));
     profile.setRole(Role.ROLE_CUSTOMER);
     profile.setStatus(AccountStatus.ACTIVE);
     return profile;

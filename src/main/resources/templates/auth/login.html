@@ -334,8 +334,7 @@
                     <p
                       class="font-body-md text-body-md text-on-surface-variant leading-relaxed"
                     >
-                      Chào mừng bạn trở lại với hương bánh nướng mới mỗi ngày
-                      tại Lune.
+                      Chào mừng bạn trở lại với hương bánh nướng mới mỗi ngày tại Lune.
                     </p>
                   </div>
                   <!-- Thymeleaf Form Container -->
@@ -358,8 +357,7 @@
                       role="alert"
                       th:if="${param.roleError}"
                     >
-                      Trang này chỉ dành cho khách hàng. Staff/Admin vui lòng
-                      đăng nhập tại CMS.
+                      Trang này chỉ dành cho khách hàng. Staff/Admin vui lòng đăng nhập tại CMS.
                     </div>
                     <div
                       class="rounded-xl border border-secondary/20 bg-secondary-container/60 px-space-md py-space-sm text-body-sm text-secondary"
@@ -418,10 +416,6 @@
                           >
                           Mật khẩu
                         </label>
-                        <span
-                          class="font-label-sm text-label-sm text-on-surface-variant font-normal"
-                          >Tối thiểu 6 ký tự</span
-                        >
                       </div>
                       <div class="relative flex items-center">
                         <input
@@ -480,9 +474,13 @@
                         <span
                           class="material-symbols-outlined text-[15px] text-primary transition-transform group-hover:rotate-12"
                           >key</span
-                        ><span class="">Tài khoản demo</span>
+                        ><span class="">Tài khoản demo Customer</span>
                       </button>
                     </div>
+                    <p class="text-center text-body-sm text-on-surface-variant">
+                      Nhân viên hoặc quản trị viên?
+                      <a class="font-semibold text-primary-container hover:underline" th:href="@{/cms/login}">Đăng nhập CMS</a>
+                    </p>
                     <!-- Secondary Navigation: Register Callout -->
                     <div class="text-center pt-space-sm pb-space-xs">
                       <p

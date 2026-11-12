@@ -54,7 +54,8 @@ class AccountSecurityIntegrationTest {
     lockedCustomerEmail = "locked-" + marker + "@example.test";
 
     account(customerEmail, "customer-password", Role.ROLE_CUSTOMER, AccountStatus.ACTIVE);
-    account(adminEmail, "admin-password", Role.ROLE_ADMIN, AccountStatus.ACTIVE);
+    Account admin = account(adminEmail, "admin-password", Role.ROLE_ADMIN, AccountStatus.ACTIVE);
+    admin.setAddress("Office address");
     account(staffEmail, "staff-password", Role.ROLE_STAFF, AccountStatus.ACTIVE);
     account(lockedCustomerEmail, "locked-password", Role.ROLE_CUSTOMER, AccountStatus.LOCKED);
     entityManager.flush();
@@ -90,12 +91,13 @@ class AccountSecurityIntegrationTest {
   }
 
   @Test
-  void customerCanLoginAndAccessProfile() throws Exception {
+  void customerLoginDefaultsToHomeAndCanOpenProfile() throws Exception {
     MockHttpSession session = (MockHttpSession) mvc.perform(post("/login").with(csrf())
             .param("email", customerEmail)
-            .param("password", "customer-password"))
+            .param("password", "customer-password")
+            .param("loginType", "customer"))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/profile"))
+        .andExpect(redirectedUrl("/"))
         .andReturn().getRequest().getSession();
 
     mvc.perform(get("/profile").session(session))
@@ -112,7 +114,8 @@ class AccountSecurityIntegrationTest {
 
     mvc.perform(post("/login").session(session).with(csrf())
             .param("email", customerEmail)
-            .param("password", "customer-password"))
+            .param("password", "customer-password")
+            .param("loginType", "customer"))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/orders/42?tab=details"));
   }
@@ -133,6 +136,44 @@ class AccountSecurityIntegrationTest {
   }
 
   @Test
+  void staffCanUseCmsLoginAndIsRedirectedToCms() throws Exception {
+    mvc.perform(post("/login").with(csrf())
+            .param("email", staffEmail)
+            .param("password", "staff-password")
+            .param("loginType", "cms"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms"));
+  }
+
+  @Test
+  void customerCannotUseCmsLoginPage() throws Exception {
+    mvc.perform(post("/login").with(csrf())
+            .param("email", customerEmail)
+            .param("password", "customer-password")
+            .param("loginType", "cms"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms/login?roleError"));
+  }
+
+  @Test
+  void staffCannotUseCustomerLoginPage() throws Exception {
+    mvc.perform(post("/login").with(csrf())
+            .param("email", staffEmail)
+            .param("password", "staff-password")
+            .param("loginType", "customer"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/login?roleError"));
+  }
+
+  @Test
+  void cmsLoginRouteRendersSeparateLoginPage() throws Exception {
+    mvc.perform(get("/cms/login"))
+        .andExpect(status().isOk())
+        .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.view()
+            .name("cms/login"));
+  }
+
+  @Test
   void customerDoesNotReturnToSavedCmsPage() throws Exception {
     MockHttpSession session = (MockHttpSession) mvc.perform(get("/cms/accounts"))
         .andExpect(status().is3xxRedirection())
@@ -141,15 +182,16 @@ class AccountSecurityIntegrationTest {
 
     mvc.perform(post("/login").session(session).with(csrf())
             .param("email", customerEmail)
-            .param("password", "customer-password"))
+            .param("password", "customer-password")
+            .param("loginType", "customer"))
         .andExpect(status().is3xxRedirection())
-        .andExpect(redirectedUrl("/profile"));
+        .andExpect(redirectedUrl("/"));
   }
 
   @Test
   void adminCanViewAccountsButCustomerAndStaffCannot() throws Exception {
     var adminSession = login(adminEmail, "admin-password", "cms");
-    var customerSession = login(customerEmail, "customer-password", null);
+    var customerSession = login(customerEmail, "customer-password", "customer");
     var staffSession = login(staffEmail, "staff-password", "cms");
 
     mvc.perform(get("/cms/accounts").session(adminSession))
@@ -161,17 +203,38 @@ class AccountSecurityIntegrationTest {
   }
 
   @Test
+  void adminCanViewAndUpdateOwnCmsProfile() throws Exception {
+    var adminSession = login(adminEmail, "admin-password", "cms");
+
+    mvc.perform(get("/cms/profile").session(adminSession))
+        .andExpect(status().isOk())
+        .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.view()
+            .name("cms/account/profile"));
+
+    mvc.perform(post("/cms/profile").session(adminSession).with(csrf())
+            .param("fullName", "Updated Admin")
+            .param("phone", "0912345678"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms/profile"));
+
+    Account updated = accountRepository.findByEmailIgnoreCase(adminEmail).orElseThrow();
+    assertEquals("Updated Admin", updated.getFullName());
+    assertEquals("Office address", updated.getAddress());
+  }
+
+  @Test
   void lockedCustomerCannotLogin() throws Exception {
     mvc.perform(post("/login").with(csrf())
             .param("email", lockedCustomerEmail)
-            .param("password", "locked-password"))
+            .param("password", "locked-password")
+            .param("loginType", "customer"))
         .andExpect(status().is3xxRedirection())
         .andExpect(redirectedUrl("/login?error"));
   }
 
   @Test
   void logoutInvalidatesAuthenticatedSession() throws Exception {
-    var session = login(customerEmail, "customer-password", null);
+    var session = login(customerEmail, "customer-password", "customer");
 
     mvc.perform(post("/logout").session(session).with(csrf()))
         .andExpect(status().is3xxRedirection())
@@ -182,15 +245,24 @@ class AccountSecurityIntegrationTest {
         .andExpect(redirectedUrl("/login"));
   }
 
-  private MockHttpSession login(String email, String password, String loginType)
-      throws Exception {
-    var request = post("/login").with(csrf())
+  @Test
+  void cmsLogoutReturnsToCmsLoginAndInvalidatesSession() throws Exception {
+    var session = login(staffEmail, "staff-password", "cms");
+
+    mvc.perform(post("/logout").session(session).with(csrf()).param("loginType", "cms"))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms/login?logout"));
+
+    mvc.perform(get("/cms").session(session))
+        .andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/cms/login"));
+  }
+
+  private MockHttpSession login(String email, String password, String loginType) throws Exception {
+    return (MockHttpSession) mvc.perform(post("/login").with(csrf())
         .param("email", email)
-        .param("password", password);
-    if (loginType != null) {
-      request = request.param("loginType", loginType);
-    }
-    return (MockHttpSession) mvc.perform(request)
+        .param("password", password)
+        .param("loginType", loginType))
         .andExpect(status().is3xxRedirection())
         .andReturn().getRequest().getSession();
   }
