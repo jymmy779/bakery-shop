@@ -101,7 +101,7 @@
 </label>
 <div class="relative">
 <span class="absolute left-3.5 top-1/2 -translate-y-1/2 material-symbols-outlined text-outline text-[19px] pointer-events-none">lock_reset</span>
-<input class="w-full h-12 pl-11 pr-10 bg-surface-container-lowest text-on-surface text-body-md font-body-md rounded-lg border border-outline-variant shadow-sm placeholder:text-outline/70 focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/20 transition-all" id="confirmPassword" minlength="8" name="confirmPassword" placeholder="Nhập lại mật khẩu" required="" th:field="*{confirmPassword}" type="password"/>
+<input class="w-full h-12 pl-11 pr-10 bg-surface-container-lowest text-on-surface text-body-md font-body-md rounded-lg border border-outline-variant shadow-sm placeholder:text-outline/70 focus:border-primary-container focus:outline-none focus:ring-2 focus:ring-primary-container/20 transition-all" id="confirmPassword" minlength="8" maxlength="72" name="confirmPassword" placeholder="Nhập lại mật khẩu" required="" th:field="*{confirmPassword}" type="password"/>
 <button aria-label="Hiển thị xác nhận mật khẩu" class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors p-1" onclick="togglePasswordVisibility('confirmPassword', this)" type="button">
 <span class="material-symbols-outlined text-[19px]">visibility</span>
 </button>

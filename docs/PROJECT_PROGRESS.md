@@ -76,6 +76,16 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 12/11/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Lương Việt Thái | Authentication và User — xem/cập nhật hồ sơ `/profile` | Mặc định trang chỉ hiển thị thông tin; nút Chỉnh sửa mở form và avatar, Hủy quay về chế độ xem, Lưu giữ xử lý cập nhật hiện tại | Đang làm | Branch `Dat`; PR/commit: Chưa có | `git diff --check` đạt; chưa chạy test hoặc demo trình duyệt | Kiểm tra trực quan luồng xem, chỉnh sửa, hủy và lỗi validation trên runtime |
+| Lương Việt Thái | Authentication và User — đồng bộ UI `/profile/security` | Dùng khung từ `/profile`; nạp `profile` cho tất cả nhánh render security để tránh lỗi Thymeleaf khi layout đọc `profile.fullName`; chọn đúng mục Security ở sidebar | Đang làm | Branch `Dat`; PR/commit: Chưa có | `git diff --check` đạt; chưa chạy test hoặc demo trình duyệt | Kiểm tra trực quan trang bảo mật trên desktop/mobile và xác nhận thao tác đổi mật khẩu |
+| Lương Việt Thái | Authentication và User — thống nhất độ dài mật khẩu | Mật khẩu tạo/đặt lại/đổi và ô xác nhận áp dụng 8–72 ký tự; bỏ gợi ý độ dài ở đăng nhập, đặt placeholder đổi mật khẩu mới là “Tối thiểu 8 ký tự” | Đang làm | Branch `Dat`; PR/commit: Chưa có | `git diff --check` đạt; chưa chạy test hoặc demo trình duyệt | Rà lại đăng ký, đăng nhập và đổi mật khẩu trên runtime |
+| Lương Việt Thái | Authentication và User — sổ địa chỉ giao hàng | Thêm nhiều địa chỉ có người nhận, số điện thoại, nhãn, ghi chú và thao tác mặc định/sửa/xóa; chuyển địa chỉ cũ sang sổ địa chỉ khi đọc lần đầu; checkout hiển thị và cho chọn địa chỉ đã lưu | Đang làm | Branch `Dat`; PR/commit: Chưa có | `git diff --check` đạt; chưa chạy compile hoặc demo runtime | Chạy `src/main/resources/db/manual/account_addresses.sql`; tích hợp địa chỉ đã chọn vào Order khi luồng checkout POST được triển khai |
+| Lương Việt Thái | Account UI — thu gọn sổ địa chỉ | Mặc định chỉ hiện danh sách; form thêm mới hoặc chỉnh sửa chỉ mở khi người dùng chọn thao tác tương ứng | Đang làm | Branch `Dat`; PR/commit: Chưa có | Chưa chạy test hoặc demo trình duyệt | Kiểm tra mở/đóng form thêm và sửa trên runtime |
+
 ### 10/11/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |

@@ -21,5 +21,6 @@ public class ResetPasswordRequest {
   private String newPassword;
 
   @NotBlank(message = REQUIRED)
+  @Size(min = 8, max = 72, message = "Mật khẩu xác nhận phải có từ 8 đến 72 ký tự")
   private String confirmPassword;
 }

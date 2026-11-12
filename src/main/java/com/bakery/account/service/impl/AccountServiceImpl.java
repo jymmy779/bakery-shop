@@ -69,7 +69,9 @@ public class AccountServiceImpl implements AccountService {
   public AccountProfileResponse updateProfile(Long accountId, ProfileUpdateRequest request) {
     Account account = findAccount(accountId);
     account.setFullName(request.getFullName().trim());
-    account.setPhone(request.getPhone().trim());
+    if (request.getPhone() != null) {
+      account.setPhone(request.getPhone().trim());
+    }
     if (request.getAddress() != null) {
       account.setAddress(normalizeOptional(request.getAddress()));
     }
