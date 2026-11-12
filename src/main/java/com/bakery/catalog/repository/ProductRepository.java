@@ -39,24 +39,24 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   List<Product> findAll(Sort sort);
 
   @Query(value = """
-      SELECT p.* FROM products p
+      SELECT p.* FROM products p JOIN categories c ON c.id = p.category_id
       WHERE REPLACE(REPLACE(CONVERT(p.name USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
                 COLLATE utf8mb4_unicode_ci LIKE :pattern ESCAPE '!'
-         OR REPLACE(REPLACE(CONVERT(p.description USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
+         OR REPLACE(REPLACE(CONVERT(c.name USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
                 COLLATE utf8mb4_unicode_ci LIKE :pattern ESCAPE '!'
       ORDER BY p.name, p.id
       """, nativeQuery = true)
-  List<Product> searchByNameOrDescription(@Param("pattern") String pattern);
+  List<Product> searchByNameOrCategory(@Param("pattern") String pattern);
 
   String FILTER_WHERE = """
-      FROM products p WHERE p.status = 'SELLING'
+      FROM products p JOIN categories c ON c.id = p.category_id WHERE p.status = 'SELLING'
         AND (:categoryId IS NULL OR p.category_id = :categoryId)
         AND (:minPrice IS NULL OR p.price >= :minPrice)
         AND (:maxPrice IS NULL OR p.price <= :maxPrice)
         AND (:pattern IS NULL OR
           REPLACE(REPLACE(CONVERT(p.name USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
             COLLATE utf8mb4_unicode_ci LIKE :pattern ESCAPE '!'
-          OR REPLACE(REPLACE(CONVERT(p.description USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
+          OR REPLACE(REPLACE(CONVERT(c.name USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
             COLLATE utf8mb4_unicode_ci LIKE :pattern ESCAPE '!')
       """;
 

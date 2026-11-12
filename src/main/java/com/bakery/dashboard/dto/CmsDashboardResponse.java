@@ -7,6 +7,6 @@ public record CmsDashboardResponse(
     long sellingProducts,
     long stoppedProducts,
     long totalCategories,
-    long totalUsers,
+    long totalStaff,
     BigDecimal deliveredRevenue) {
 }

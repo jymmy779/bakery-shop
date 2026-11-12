@@ -12,7 +12,7 @@
     support_agent: "headset", menu_book: "book-open", logout: "log-out",
     receipt_long: "receipt-text", local_shipping: "truck", cake: "cake", photo_camera: "camera",
     star: "star", stars: "sparkles", redeem: "gift", lock: "lock-keyhole",
-    lock_reset: "key-round", visibility: "eye", visibility_off: "eye-off",
+    key: "key-round", lock_reset: "key-round", visibility: "eye", visibility_off: "eye-off",
     error: "triangle-alert", info: "info", bolt: "zap", notifications_active: "bell-ring",
     format_quote: "quote", local_fire_department: "flame", archive: "archive", cookie: "cookie",
     bakery_dining: "croissant", oven_gen: "oven", local_cafe: "coffee", eco: "leaf",

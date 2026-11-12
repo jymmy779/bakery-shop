@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/cms-layout :: head('Quản lý tài khoản')}"></head>
+<head th:replace="~{fragments/cms-layout :: head('Quản lý người dùng')}"></head>
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('accounts')}"></th:block>
 <main class="cms-page cms-accounts-page">
@@ -8,12 +8,12 @@
     <header class="cms-accounts-header">
       <div>
         <span class="cms-products-kicker">QUẢN TRỊ <span aria-hidden="true">/</span> KHÁCH HÀNG</span>
-        <h1>Quản lý tài khoản</h1>
-        <p>Xem hồ sơ khách hàng và quản lý quyền truy cập tài khoản.</p>
+        <h1>Quản lý người dùng</h1>
+        <p>Xem hồ sơ khách hàng và quản lý quyền truy cập.</p>
       </div>
       <div class="cms-accounts-total">
         <span class="cms-accounts-total__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span>
-        <span><strong th:text="${accounts.totalElements}">0</strong><small>khách hàng</small></span>
+        <span><strong th:text="${accounts.totalElements}">0</strong><small th:text="${hasFilters ? 'kết quả' : 'khách hàng'}">khách hàng</small></span>
       </div>
     </header>
 
@@ -22,16 +22,42 @@
 
     <section class="cms-accounts-panel" aria-labelledby="cms-accounts-title">
       <div class="cms-accounts-panel__heading">
-        <div><h2 id="cms-accounts-title">Danh sách khách hàng</h2><p>Thông tin tài khoản và quyền truy cập</p></div>
+        <div><h2 id="cms-accounts-title">Danh sách khách hàng</h2><p>Thông tin người dùng và quyền truy cập</p></div>
         <span class="cms-accounts-page-count" th:if="${accounts.totalPages > 0}" th:text="${'Trang ' + (accounts.number + 1) + ' / ' + accounts.totalPages}">Trang 1 / 1</span>
       </div>
+      <form class="cms-accounts-filter" method="get" th:action="@{/cms/accounts}">
+        <label class="cms-accounts-filter__search">
+          <span>Tìm kiếm</span>
+          <input type="search" name="search" th:value="${search}" placeholder="Tên, email hoặc số điện thoại" autocomplete="off">
+        </label>
+        <label>
+          <span>Trạng thái</span>
+          <select name="status">
+            <option value="" th:selected="${selectedStatus == ''}">Tất cả</option>
+            <option value="ACTIVE" th:selected="${selectedStatus == 'ACTIVE'}">Đang hoạt động</option>
+            <option value="LOCKED" th:selected="${selectedStatus == 'LOCKED'}">Đã khóa</option>
+          </select>
+        </label>
+        <label>
+          <span>Sắp xếp</span>
+          <select name="order">
+            <option value="newest" th:selected="${selectedOrder == 'newest'}">Mới nhất</option>
+            <option value="oldest" th:selected="${selectedOrder == 'oldest'}">Cũ nhất</option>
+            <option value="name_asc" th:selected="${selectedOrder == 'name_asc'}">Tên A–Z</option>
+            <option value="name_desc" th:selected="${selectedOrder == 'name_desc'}">Tên Z–A</option>
+          </select>
+        </label>
+        <div class="cms-accounts-filter__actions">
+          <button type="submit">Áp dụng</button>
+          <a th:href="@{/cms/accounts}">Xóa lọc</a>
+        </div>
+      </form>
       <div class="cms-accounts-table-scroll" tabindex="0" role="region" aria-label="Danh sách khách hàng, cuộn ngang để xem thêm trên màn hình nhỏ">
         <table class="cms-accounts-table">
           <thead><tr><th scope="col">Khách hàng</th><th scope="col">Số điện thoại</th><th scope="col">Ngày tham gia</th><th scope="col">Trạng thái</th><th scope="col"><span class="sr-only">Thao tác</span></th></tr></thead>
           <tbody>
           <tr th:each="account : ${accounts.content}">
             <td class="cms-accounts-person">
-              <span class="cms-accounts-avatar" aria-hidden="true" th:text="${account.fullName != null and !account.fullName.isBlank() ? #strings.toUpperCase(#strings.substring(account.fullName, 0, 1)) : 'K'}">K</span>
               <span class="cms-accounts-person__copy"><strong th:text="${account.fullName}">Tên khách hàng</strong><small th:text="${account.email}">email@example.com</small></span>
             </td>
             <td class="cms-accounts-phone" th:text="${account.phone != null ? account.phone : 'Chưa cập nhật'}">Chưa cập nhật</td>
@@ -49,15 +75,15 @@
           </tr>
           <tr th:if="${accounts.empty}"><td colspan="5" class="cms-accounts-empty">
             <span class="cms-accounts-empty__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span>
-            <strong>Chưa có tài khoản khách hàng</strong><span>Tài khoản sẽ xuất hiện tại đây khi khách hàng đăng ký.</span>
+            <strong th:text="${hasFilters ? 'Không tìm thấy người dùng phù hợp' : 'Chưa có tài khoản khách hàng'}">Chưa có tài khoản khách hàng</strong><span th:text="${hasFilters ? 'Thử thay đổi từ khóa hoặc bộ lọc.' : 'Tài khoản sẽ xuất hiện tại đây khi khách hàng đăng ký.'}">Tài khoản sẽ xuất hiện tại đây khi khách hàng đăng ký.</span>
           </td></tr>
           </tbody>
         </table>
       </div>
       <nav class="cms-accounts-pagination" th:if="${accounts.totalPages > 1}" aria-label="Phân trang tài khoản">
-        <a th:if="${accounts.hasPrevious()}" th:href="@{/cms/accounts(page=${accounts.number - 1},size=${accounts.size})}">← Trước</a>
+        <a th:if="${accounts.hasPrevious()}" th:href="@{/cms/accounts(page=${accounts.number - 1},size=${accounts.size},search=${search},status=${selectedStatus},order=${selectedOrder})}">← Trước</a>
         <span th:text="${'Trang ' + (accounts.number + 1) + ' / ' + accounts.totalPages}">Trang 1 / 1</span>
-        <a th:if="${accounts.hasNext()}" th:href="@{/cms/accounts(page=${accounts.number + 1},size=${accounts.size})}">Sau →</a>
+        <a th:if="${accounts.hasNext()}" th:href="@{/cms/accounts(page=${accounts.number + 1},size=${accounts.size},search=${search},status=${selectedStatus},order=${selectedOrder})}">Sau →</a>
       </nav>
     </section>
   </div>

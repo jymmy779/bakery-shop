@@ -38,15 +38,15 @@
           <strong th:text="${#numbers.formatInteger(dashboard.totalCategories(), 0, 'POINT')}">0</strong>
           <span class="cms-dashboard-stat__foot">Danh mục trong cửa hàng</span>
         </a>
-        <a class="cms-dashboard-stat cms-dashboard-stat--users" sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}">
-          <span class="cms-dashboard-stat__top"><span>Tài khoản</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span></span>
-          <strong th:text="${#numbers.formatInteger(dashboard.totalUsers(), 0, 'POINT')}">0</strong>
-          <span class="cms-dashboard-stat__foot">Tài khoản trong cửa hàng</span>
+        <a class="cms-dashboard-stat cms-dashboard-stat--users" sec:authorize="hasRole('ADMIN')" th:href="@{/cms/staff}">
+          <span class="cms-dashboard-stat__top"><span>Nhân viên</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span></span>
+          <strong th:text="${#numbers.formatInteger(dashboard.totalStaff(), 0, 'POINT')}">0</strong>
+          <span class="cms-dashboard-stat__foot">Tài khoản nhân viên</span>
         </a>
         <div class="cms-dashboard-stat cms-dashboard-stat--users" sec:authorize="!hasRole('ADMIN')">
-          <span class="cms-dashboard-stat__top"><span>Tài khoản</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span></span>
-          <strong th:text="${#numbers.formatInteger(dashboard.totalUsers(), 0, 'POINT')}">0</strong>
-          <span class="cms-dashboard-stat__foot">Tài khoản trong cửa hàng</span>
+          <span class="cms-dashboard-stat__top"><span>Nhân viên</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span></span>
+          <strong th:text="${#numbers.formatInteger(dashboard.totalStaff(), 0, 'POINT')}">0</strong>
+          <span class="cms-dashboard-stat__foot">Tài khoản nhân viên</span>
         </div>
         <div class="cms-dashboard-stat cms-dashboard-stat--revenue">
           <span class="cms-dashboard-stat__top"><span>Doanh thu đã giao</span><span class="cms-dashboard-stat__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.8v18.4M17 7.2c0-1.8-2-3.2-5-3.2S7 5.4 7 7.2s1.4 2.7 5 3.6 5 2 5 4-2 3.5-5 3.5-5-1.5-5-3.5"/></svg></span></span>
@@ -57,17 +57,27 @@
     </section>
 
     <div class="cms-dashboard-lower">
-      <section class="cms-dashboard-panel cms-dashboard-inventory" aria-labelledby="inventory-title">
+      <section class="cms-dashboard-panel cms-dashboard-orders" aria-labelledby="dashboard-orders-title">
         <div class="cms-dashboard-panel__heading">
-          <div><span class="eyebrow">DANH MỤC SẢN PHẨM</span><h2 id="inventory-title">Tình trạng sản phẩm</h2></div>
-          <a th:href="@{/cms/products}">Xem danh sách <span aria-hidden="true">→</span></a>
+          <div><span class="eyebrow">ĐƠN HÀNG</span><h2 id="dashboard-orders-title">Đơn hàng cần xử lý</h2></div>
+          <span class="cms-dashboard-orders__status">Chờ tích hợp</span>
         </div>
-        <div class="cms-dashboard-inventory__body">
-          <div class="cms-dashboard-donut" role="img" aria-label="Biểu đồ tỷ lệ sản phẩm đang bán và ngừng bán" th:classappend="${dashboard.totalProducts() == 0} ? ' is-empty' : ''" th:style="|--selling-share: ${dashboard.totalProducts() == 0 ? 0 : dashboard.sellingProducts() * 100.0 / dashboard.totalProducts()}%|"><div><strong th:text="${#numbers.formatInteger(dashboard.totalProducts(), 0, 'POINT')}">0</strong><span>sản phẩm</span></div></div>
-          <div class="cms-dashboard-inventory__legend">
-            <div><span><i class="is-green"></i>Đang bán</span><strong th:text="${#numbers.formatInteger(dashboard.sellingProducts(), 0, 'POINT')}">0</strong></div>
-            <div><span><i class="is-rose"></i>Ngừng bán</span><strong th:text="${#numbers.formatInteger(dashboard.stoppedProducts(), 0, 'POINT')}">0</strong></div>
+        <div class="cms-dashboard-orders__content">
+          <div class="cms-dashboard-orders__states" role="group" aria-label="Các trạng thái đơn hàng">
+            <article class="cms-dashboard-orders__state">
+              <span><i class="is-pending" aria-hidden="true"></i>Chờ xác nhận</span>
+              <strong aria-label="Chưa có số liệu">—</strong>
+            </article>
+            <article class="cms-dashboard-orders__state">
+              <span><i class="is-preparing" aria-hidden="true"></i>Đã xác nhận</span>
+              <strong aria-label="Chưa có số liệu">—</strong>
+            </article>
+            <article class="cms-dashboard-orders__state">
+              <span><i class="is-delivering" aria-hidden="true"></i>Đang giao</span>
+              <strong aria-label="Chưa có số liệu">—</strong>
+            </article>
           </div>
+          <p class="cms-dashboard-orders__note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>Dữ liệu đơn hàng sẽ hiển thị tại đây sau khi phân hệ được tích hợp.</p>
         </div>
       </section>
 
@@ -79,7 +89,7 @@
           <a th:href="@{/cms/products}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m4 7.5 8-4.5 8 4.5v9L12 21l-8-4.5zM4.5 7.8 12 12l7.5-4.2M12 12v8.5"/></svg></span><span><strong>Sản phẩm</strong><small>Quản lý bánh và tồn kho</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
           <a th:href="@{/cms/categories}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg></span><span><strong>Danh mục</strong><small>Sắp xếp nhóm sản phẩm</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
           <a th:href="@{/cms/orders}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/></svg></span><span><strong>Đơn hàng</strong><small>Xem và xử lý đơn hàng</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
-          <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/accounts}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span><span><strong>Tài khoản</strong><small>Quản lý người dùng</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
+          <a sec:authorize="hasRole('ADMIN')" th:href="@{/cms/staff}"><span class="cms-dashboard-shortcut-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.5a6.5 6.5 0 0 1 13 0V20M16 5a3.5 3.5 0 0 1 0 6.8M18 14a5 5 0 0 1 3.5 4.8V20"/></svg></span><span><strong>Nhân viên</strong><small>Quản lý nhân viên</small></span><span class="cms-dashboard-shortcut-arrow" aria-hidden="true">→</span></a>
         </nav>
       </section>
     </div>
