@@ -1,1 +1,66 @@
-<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><title>Chi tiết đơn hàng</title><link rel="stylesheet" th:href="@{/css/app.css}"></head><body><header th:replace="~{fragments/layout :: header}"></header><main class="container"><h1>Chi tiết đơn hàng</h1><p th:text="|Mã nội bộ: ${orderId}|">Mã đơn</p></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{order/fragments :: head('Chi tiết đơn hàng')}"></head>
+<body class="customer-orders-body">
+<header th:replace="~{fragments/layout :: storefrontHeader('orders')}"></header>
+<main class="orders-page orders-detail">
+  <nav class="orders-breadcrumb" aria-label="Đường dẫn"><a th:href="@{/}">Trang chủ</a><span aria-hidden="true">/</span><a th:href="@{/orders}">Đơn hàng của tôi</a><span aria-hidden="true">/</span><span aria-current="page">Chi tiết đơn hàng</span></nav>
+  <div class="orders-heading orders-detail__heading">
+    <div><p class="orders-eyebrow">THÔNG TIN ĐẶT BÁNH</p><h1>Đơn bánh <em>của bạn.</em></h1>
+      <p class="orders-detail__code" th:text="${order.orderCode}"></p>
+      <p>Đặt ngày <time th:datetime="${order.createdAt}" th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy · HH:mm')}"></time></p></div>
+    <div class="orders-detail__badges"><span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span><span th:replace="~{order/fragments :: paymentBadge(${order.payment.status})}"></span></div>
+  </div>
+  <aside th:if="${order.status.name() == 'CANCELLED'}" class="orders-cancellation" aria-label="Thông tin hủy đơn">
+    <strong>Đơn hàng đã được hủy<span th:if="${order.cancelledAt != null}" th:text="| ngày ${#temporals.format(order.cancelledAt, 'dd/MM/yyyy · HH:mm')}|"></span>.</strong>
+    <p th:if="${order.cancellationReason != null}" th:text="${order.cancellationReason}"></p>
+  </aside>
+  <div class="orders-detail__grid">
+    <div class="orders-detail__main">
+      <section class="orders-panel" aria-labelledby="order-items-title">
+        <div class="orders-panel__heading"><h2 id="order-items-title">Những chiếc bánh đã chọn</h2><span th:text="|${#lists.size(order.items)} loại bánh|"></span></div>
+        <table class="orders-items">
+          <thead><tr><th scope="col">Bánh</th><th scope="col">Đơn giá</th><th scope="col">Số lượng</th><th scope="col">Thành tiền</th></tr></thead>
+          <tbody><tr th:each="item : ${order.items}">
+            <td><strong th:text="${item.productName}"></strong><p th:if="${item.note != null}" th:text="|Lời nhắn: ${item.note}|"></p></td>
+            <td data-label="Đơn giá" th:text="|${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} ₫|"></td>
+            <td data-label="Số lượng" th:text="${item.quantity}"></td>
+            <td data-label="Thành tiền" th:text="|${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} ₫|"></td>
+          </tr></tbody>
+        </table>
+        <div class="orders-detail__total"><span>Tổng tiền bánh</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></div>
+        <div th:if="${order.note != null}" class="orders-note"><span class="orders-label">LỜI NHẮN CHO LUNE</span><p th:text="${order.note}"></p></div>
+      </section>
+      <section class="orders-panel" aria-labelledby="order-history-title">
+        <div class="orders-panel__heading"><h2 id="order-history-title">Hành trình đơn bánh</h2></div>
+        <p th:if="${#lists.isEmpty(order.statusHistory)}" class="orders-history-empty">Chưa có lịch sử cập nhật cho đơn hàng này.</p>
+        <ol th:unless="${#lists.isEmpty(order.statusHistory)}" class="orders-timeline">
+          <li th:each="event, iter : ${order.statusHistory}" th:classappend="${iter.last} ? 'is-latest'">
+            <span class="orders-timeline__marker" aria-hidden="true"></span>
+            <div><h3><span th:replace="~{order/fragments :: statusLabel(${event.toStatus})}"></span></h3>
+              <time th:datetime="${event.changedAt}" th:text="${#temporals.format(event.changedAt, 'dd/MM/yyyy · HH:mm')}"></time>
+              <p th:if="${event.note != null}" class="orders-timeline__note" th:text="${event.note}"></p>
+              <p th:if="${event.changedByName != null}" class="orders-timeline__actor" th:text="|Cập nhật bởi ${event.changedByName}|"></p>
+            </div>
+          </li>
+        </ol>
+      </section>
+    </div>
+    <aside class="orders-detail__sidebar">
+      <section class="orders-panel" aria-labelledby="order-recipient-title">
+        <div class="orders-panel__heading"><h2 id="order-recipient-title">Thông tin nhận bánh</h2></div>
+        <div class="orders-delivery-date"><span class="material-symbols-outlined" aria-hidden="true">schedule</span><div><span>Ngày nhận bánh</span><strong th:text="${#temporals.format(order.deliveryDate, 'dd/MM/yyyy')}"></strong><small th:if="${order.deliveryTime != null}" th:text="|Lúc ${#temporals.format(order.deliveryTime, 'HH:mm')}|"></small></div></div>
+        <dl class="orders-info"><div><dt>Người nhận</dt><dd th:text="${order.receiverName}"></dd></div><div><dt>Số điện thoại</dt><dd th:text="${order.receiverPhone}"></dd></div><div><dt>Địa chỉ</dt><dd th:text="${order.receiverAddress}"></dd></div><div th:if="${order.receiverEmail != null}"><dt>Email</dt><dd th:text="${order.receiverEmail}"></dd></div></dl>
+      </section>
+      <section class="orders-panel orders-payment" aria-labelledby="order-payment-title">
+        <div class="orders-panel__heading"><h2 id="order-payment-title">Thanh toán</h2><span th:replace="~{order/fragments :: paymentBadge(${order.payment.status})}"></span></div>
+        <p class="orders-payment__method">Chuyển khoản ngân hàng</p>
+        <dl class="orders-info"><div><dt>Số tiền</dt><dd class="orders-payment__amount" th:text="|${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></dd></div><div th:if="${order.payment.paidAt != null}"><dt>Thời gian thanh toán</dt><dd th:text="${#temporals.format(order.payment.paidAt, 'dd/MM/yyyy · HH:mm')}"></dd></div><div th:if="${order.payment.bankReference != null}"><dt>Mã tham chiếu</dt><dd th:text="${order.payment.bankReference}"></dd></div></dl>
+      </section>
+    </aside>
+  </div>
+  <div class="orders-detail__footer"><a class="orders-back" th:href="@{/orders}"><span aria-hidden="true">←</span> Đơn hàng của tôi</a><a class="orders-button orders-button--outline" th:href="@{/products}">Tiếp tục khám phá bánh <span aria-hidden="true">→</span></a></div>
+</main>
+<footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+</body>
+</html>

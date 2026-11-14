@@ -1,1 +1,67 @@
-<!DOCTYPE html><html lang="vi" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><title>Đơn hàng</title><link rel="stylesheet" th:href="@{/css/app.css}"></head><body><header th:replace="~{fragments/layout :: header}"></header><main class="container"><h1>Đơn hàng của tôi</h1></main></body></html>
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{order/fragments :: head('Đơn hàng của tôi')}"></head>
+<body class="customer-orders-body">
+<header th:replace="~{fragments/layout :: storefrontHeader('orders')}"></header>
+<main class="orders-page">
+  <nav class="orders-breadcrumb" aria-label="Đường dẫn">
+    <a th:href="@{/}">Trang chủ</a><span aria-hidden="true">/</span><span aria-current="page">Đơn hàng của tôi</span>
+  </nav>
+  <div class="orders-heading">
+    <div><p class="orders-eyebrow">TÀI KHOẢN LUNE</p><h1>Những đơn bánh<br/><em>của bạn.</em></h1>
+      <p>Theo dõi hành trình những chiếc bánh, từ bếp LUNE đến tay bạn.</p></div>
+    <a class="orders-button orders-button--outline" th:href="@{/products}">Khám phá bánh <span aria-hidden="true">↗</span></a>
+  </div>
+  <nav class="orders-filters" aria-label="Lọc trạng thái đơn hàng">
+    <a th:href="@{/orders}" th:classappend="${selectedStatus == null} ? 'is-active'" th:attr="aria-current=${selectedStatus == null} ? 'page'">Tất cả</a>
+    <a th:each="filter : ${T(com.bakery.order.entity.OrderStatus).values()}"
+       th:href="@{/orders(status=${filter})}" th:classappend="${selectedStatus == filter} ? 'is-active'"
+       th:attr="aria-current=${selectedStatus == filter} ? 'page'">
+      <span th:replace="~{order/fragments :: statusLabel(${filter})}"></span>
+    </a>
+  </nav>
+  <section class="orders-results" aria-labelledby="orders-results-title">
+    <div class="orders-results__heading">
+      <h2 id="orders-results-title"><span th:text="${orders.totalElements}"></span> đơn hàng<span th:if="${selectedStatus != null}"> · <span th:replace="~{order/fragments :: statusLabel(${selectedStatus})}"></span></span></h2>
+      <span>Mới nhất trước</span>
+    </div>
+    <div th:if="${orders.empty}" class="orders-empty">
+      <span class="orders-empty__icon material-symbols-outlined" aria-hidden="true">shopping_bag</span>
+      <h2 th:text="${selectedStatus == null} ? 'Chưa có đơn bánh nào ở đây.' : 'Chưa có đơn ở trạng thái này.'"></h2>
+      <p th:text="${selectedStatus == null} ? 'Chọn một chiếc bánh cho dịp đặc biệt sắp tới của bạn nhé.' : 'Bạn có thể xem các đơn ở trạng thái khác hoặc quay lại tất cả đơn hàng.'"></p>
+      <a th:if="${selectedStatus == null}" class="orders-button" th:href="@{/products}">Khám phá bánh <span aria-hidden="true">→</span></a>
+      <a th:if="${selectedStatus != null}" class="orders-button" th:href="@{/orders}">Xem tất cả đơn hàng <span aria-hidden="true">→</span></a>
+    </div>
+    <div th:unless="${orders.empty}" class="orders-list">
+      <article class="orders-card" th:each="order : ${orders.content}">
+        <div class="orders-card__top">
+          <div><p class="orders-label">MÃ ĐƠN HÀNG</p><h2><a th:href="@{/orders/{id}(id=${order.id})}" th:text="${order.orderCode}"></a></h2>
+            <p class="orders-card__placed">Đặt ngày <time th:datetime="${order.createdAt}" th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy · HH:mm')}"></time></p></div>
+          <span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span>
+        </div>
+        <div class="orders-card__bottom">
+          <div class="orders-card__delivery"><span class="orders-label">NGÀY NHẬN BÁNH</span><strong th:text="${#temporals.format(order.deliveryDate, 'dd/MM/yyyy')}"></strong><span th:text="${order.customerName}"></span></div>
+          <div class="orders-card__amount"><span class="orders-label">TỔNG TIỀN</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong><span th:replace="~{order/fragments :: paymentBadge(${order.paymentStatus})}"></span></div>
+          <a class="orders-card__link" th:href="@{/orders/{id}(id=${order.id})}" th:attr="aria-label=|Xem chi tiết đơn ${order.orderCode}|">Xem chi tiết <span aria-hidden="true">→</span></a>
+        </div>
+      </article>
+    </div>
+  </section>
+  <nav th:if="${orders.totalPages > 1}" class="orders-pagination" aria-label="Phân trang đơn hàng">
+    <a th:if="${orders.hasPrevious()}" th:href="@{/orders(page=${orders.number - 1},status=${selectedStatus})}" rel="prev" aria-label="Trang trước">←</a>
+    <span th:unless="${orders.hasPrevious()}" class="is-disabled" aria-hidden="true">←</span>
+    <a th:if="${orders.number > 2}" th:href="@{/orders(page=0,status=${selectedStatus})}" aria-label="Trang 1">1</a>
+    <span th:if="${orders.number > 3}" class="orders-pagination__ellipsis">…</span>
+    <th:block th:each="index : ${#numbers.sequence(orders.number > 2 ? orders.number - 2 : 0, orders.number + 2 < orders.totalPages ? orders.number + 2 : orders.totalPages - 1)}">
+      <span th:if="${index == orders.number}" class="is-current" aria-current="page" th:text="${index + 1}"></span>
+      <a th:unless="${index == orders.number}" th:href="@{/orders(page=${index},status=${selectedStatus})}" th:attr="aria-label=|Trang ${index + 1}|" th:text="${index + 1}"></a>
+    </th:block>
+    <span th:if="${orders.number < orders.totalPages - 4}" class="orders-pagination__ellipsis">…</span>
+    <a th:if="${orders.number < orders.totalPages - 3}" th:href="@{/orders(page=${orders.totalPages - 1},status=${selectedStatus})}" th:attr="aria-label=|Trang ${orders.totalPages}|" th:text="${orders.totalPages}"></a>
+    <a th:if="${orders.hasNext()}" th:href="@{/orders(page=${orders.number + 1},status=${selectedStatus})}" rel="next" aria-label="Trang sau">→</a>
+    <span th:unless="${orders.hasNext()}" class="is-disabled" aria-hidden="true">→</span>
+  </nav>
+</main>
+<footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+</body>
+</html>

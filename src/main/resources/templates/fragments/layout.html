@@ -496,6 +496,57 @@
           background: #ffe9e3;
           color: #8b263e;
         }
+        .sf-header__account {
+          position: relative;
+        }
+        .sf-header__account > summary {
+          list-style: none;
+        }
+        .sf-header__account > summary::-webkit-details-marker {
+          display: none;
+        }
+        .sf-header__account[open] > summary,
+        .sf-header__account > summary.is-active {
+          background: #ffe9e3;
+          color: #8b263e;
+        }
+        .sf-header__account > summary:focus-visible,
+        .sf-header__account-menu a:focus-visible {
+          outline: 2px solid #8b263e;
+          outline-offset: 3px;
+        }
+        .sf-header__account-menu {
+          position: absolute;
+          top: calc(100% + 10px);
+          right: 0;
+          display: grid;
+          width: 224px;
+          padding: 7px;
+          border: 1px solid #ead5cf;
+          border-radius: 12px;
+          background: #fff8f6;
+          box-shadow: 0 12px 30px rgba(70, 33, 42, 0.12);
+        }
+        .sf-header__account-menu a {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          min-height: 44px;
+          padding: 10px 12px;
+          border-radius: 7px;
+          color: #564244;
+          font-size: 12px;
+          font-weight: 600;
+          text-decoration: none;
+        }
+        .sf-header__account-menu a:hover,
+        .sf-header__account-menu a.is-active {
+          background: #ffe9e3;
+          color: #8b263e;
+        }
+        .sf-header__account-menu .material-symbols-outlined {
+          font-size: 19px;
+        }
         .sf-header__menu,
         .sf-header__mobile {
           display: none;
@@ -530,6 +581,11 @@
             font-size: 13px;
             font-weight: 700;
             text-decoration: none;
+          }
+          .sf-header__mobile a.is-active {
+            border-radius: 8px;
+            background: #ffe9e3;
+            color: #8b263e;
           }
         }
         @media (max-width: 520px) {
@@ -599,14 +655,23 @@
             aria-label="Đăng nhập"
             sec:authorize="isAnonymous()"
             ><span class="material-symbols-outlined">account_circle</span></a
-          ><a
-            class="sf-header__action sf-header__action--account"
-            th:href="@{/profile}"
-            href="/profile"
-            aria-label="Hồ sơ của tôi"
+          ><details
+            class="sf-header__account sf-header__action--account"
             sec:authorize="hasRole('CUSTOMER')"
-            ><span class="material-symbols-outlined">account_circle</span></a
-          ><a
+          >
+            <summary class="sf-header__action" aria-label="Mở menu tài khoản"
+                     th:classappend="${activePage == 'orders'} ? 'is-active'">
+              <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
+            </summary>
+            <nav class="sf-header__account-menu" aria-label="Tài khoản của tôi">
+              <a th:href="@{/profile}" href="/profile"><span class="material-symbols-outlined" aria-hidden="true">account_circle</span>Hồ sơ của tôi</a>
+              <a th:href="@{/orders}" href="/orders"
+                 th:classappend="${activePage == 'orders'} ? 'is-active'"
+                 th:attr="aria-current=${activePage == 'orders'} ? 'page'">
+                <span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>Đơn hàng của tôi
+              </a>
+            </nav>
+          </details><a
             class="sf-header__action sf-header__cart"
             th:href="@{/cart}"
             href="/cart"
@@ -641,6 +706,10 @@
           >Đăng nhập</a
         ><a th:href="@{/profile}" href="/profile" sec:authorize="hasRole('CUSTOMER')"
           >Tài khoản</a
+        ><a th:href="@{/orders}" href="/orders" sec:authorize="hasRole('CUSTOMER')"
+            th:classappend="${activePage == 'orders'} ? 'is-active'"
+            th:attr="aria-current=${activePage == 'orders'} ? 'page'"
+          >Đơn hàng của tôi</a
         ><a
           th:href="@{/cms}"
           href="/cms"
@@ -654,6 +723,18 @@
             button = header?.querySelector(".sf-header__menu"),
             nav = header?.querySelector(".sf-header__mobile");
           if (!button || !nav) return;
+          const accountMenu = header.querySelector(".sf-header__account");
+          if (accountMenu) {
+            document.addEventListener("click", (event) => {
+              if (!accountMenu.contains(event.target)) accountMenu.open = false;
+            });
+            document.addEventListener("keydown", (event) => {
+              if (event.key === "Escape" && accountMenu.open) {
+                accountMenu.open = false;
+                accountMenu.querySelector("summary").focus();
+              }
+            });
+          }
           button.addEventListener("click", () => {
             const open = nav.classList.toggle("is-open");
             button.setAttribute("aria-expanded", String(open));

@@ -26,6 +26,8 @@ public class CheckoutOrderMapper {
     result.setNote(order.getNote());
     result.setTotalAmount(order.getTotalAmount());
     result.setStatus(order.getStatus());
+    result.setCancellationReason(order.getCancellationReason());
+    result.setCancelledAt(order.getCancelledAt());
     result.setCreatedAt(order.getCreatedAt());
     result.setItems(details.stream().map(detail -> {
       var item = new OrderItemResponse();

@@ -154,6 +154,9 @@
 .checkout-receipt__products p, .checkout-receipt__products small { margin: 6px 0 0; font-size: 11px; color: var(--checkout-muted); overflow-wrap: anywhere; }
 .checkout-receipt__products strong { color: var(--checkout-wine); white-space: nowrap; font-size: 12px; }
 .checkout-receipt__continue { width: fit-content; margin: 30px auto 0; }
+.checkout-receipt__actions { display: flex; gap: 12px; width: min(560px, 100%); margin: 30px auto 0; }
+.checkout-receipt__browse { display: block; width: fit-content; margin: 20px auto 0; }
+@media (max-width: 600px) { .checkout-receipt__actions { flex-direction: column; } }
 @media (max-width: 640px) { .checkout-receipt__grid { grid-template-columns: 1fr; } .checkout-dialog__actions { flex-direction: column-reverse; } }
 @media (min-width: 1001px) and (max-height: 850px) { .checkout-summary { position: static; } }
 @media (max-width: 1000px) { .checkout-grid { grid-template-columns: minmax(0, 1fr) 330px; gap: 20px; } .checkout-card { padding: 23px; } .checkout-summary { padding: 24px 20px; } .checkout-steps { gap: 18px; } .checkout-address-grid { grid-template-columns: 1fr; } }

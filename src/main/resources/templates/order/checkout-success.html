@@ -28,7 +28,11 @@
       <div class="checkout-totals"><div class="checkout-total"><span>Tổng tiền bánh</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></div></div>
     </section>
   </div>
-  <a class="checkout-button checkout-receipt__continue" th:href="@{/products}">Tiếp tục khám phá bánh <span aria-hidden="true">→</span></a>
+  <div class="checkout-receipt__actions">
+    <a class="checkout-button" th:href="@{/orders/{id}(id=${order.id})}">Xem chi tiết đơn hàng <span aria-hidden="true">→</span></a>
+    <a class="checkout-button checkout-button--secondary" th:href="@{/orders}">Đơn hàng của tôi</a>
+  </div>
+  <a class="checkout-back checkout-receipt__browse" th:href="@{/products}">Tiếp tục khám phá bánh <span aria-hidden="true">↗</span></a>
 </main>
 <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
 </body>
