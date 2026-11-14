@@ -80,6 +80,41 @@ theo quyền của tài khoản.
 Thư mục `uploads/` cũng được tạo tự động tại thư mục chạy project. File trong
 thư mục này được phục vụ qua URL `/uploads/<ten-file>` và không được commit.
 
+## Cấu hình chuyển khoản cho Customer
+
+Trang đặt hàng thành công và chi tiết đơn hàng dùng các biến môi trường sau
+trong IntelliJ Run Configuration:
+
+- `PAYMENT_BANK_ID`: BIN ngân hàng hoặc mã ngân hàng được VietQR hỗ trợ.
+- `PAYMENT_BANK_NAME`: tên ngân hàng hiển thị cho khách.
+- `PAYMENT_ACCOUNT_NUMBER`: số tài khoản nhận tiền, giữ nguyên số 0 ở đầu nếu có.
+- `PAYMENT_ACCOUNT_NAME`: tên chủ tài khoản nhận tiền.
+- `PAYMENT_QR_TEMPLATE`: mẫu QR, mặc định `qr_only`.
+
+Chưa có tài khoản ngân hàng thì để trống. Ứng dụng vẫn cho đặt đơn, nhưng sẽ
+hiển thị thông báo đang cập nhật thông tin chuyển khoản và không tạo QR.
+Sau khi thêm hoặc đổi cấu hình, khởi động lại ứng dụng. `.env.example` chỉ là
+tham khảo, Spring Boot không tự đọc file `.env`.
+
+QR sử dụng [VietQR Quick Link dạng SVG](https://www.vietqr.io/qr-dong).
+Trình duyệt gửi ngân hàng, số tài khoản nhận, tên chủ tài khoản, số tiền và mã
+đơn tới VietQR để tải ảnh; không gửi tên, địa chỉ hay số điện thoại của Customer.
+Nếu ảnh không tải được, khách vẫn có thể xem/sao chép thông tin để chuyển khoản.
+Số tiền và nội dung lấy từ đơn đã lưu; chỉ hiển thị hướng dẫn khi đơn còn
+`PENDING`, Payment còn `PENDING` và tổng tiền khớp, là số VND nguyên dương.
+Xem QR hoặc sao chép không cập nhật trạng thái thanh toán. Staff/Admin đăng nhập
+CMS tại `/cms/login`, vào **Quản lý đơn hàng** (`/cms/orders`), tìm mã đơn và mở
+chi tiết. Sau khi đối chiếu giao dịch thực nhận đúng số tiền/nội dung, bấm
+**Xác nhận đã nhận đủ tiền**; có thể nhập mã tham chiếu ngân hàng để tra cứu.
+
+Hệ thống chỉ cho xác nhận Order `PENDING` và Payment chuyển khoản `PENDING`,
+đồng thời lưu Payment `PAID`, Order `CONFIRMED`, người/thời điểm xác nhận và lịch
+sử trong cùng transaction. Gửi trùng hoặc xác nhận đơn đã hủy sẽ bị từ chối.
+Trang Checkout thành công và chi tiết đơn của khách tự kiểm tra mỗi 10 giây khi
+đang mở, kiểm tra lại khi quay về tab và có nút **Kiểm tra thanh toán**. Sau khi
+Staff/Admin xác nhận, trang tải lại để báo **Thanh toán thành công!**, cập nhật
+trạng thái và ẩn QR. Đây là đối soát thủ công; chưa kết nối webhook ngân hàng.
+
 ## Chạy kiểm thử
 
 Trong IntelliJ, mở `src/test/java/com/bakery/BakeryShopApplicationTests.java`

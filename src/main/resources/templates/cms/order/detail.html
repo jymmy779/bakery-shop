@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{cms/order/fragments :: head('Chi tiết đơn hàng')}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('orders')}"></th:block>
+<main class="cms-page cms-accounts-page cms-order-page">
+  <div class="wrap cms-accounts-wrap">
+    <a class="cms-order-back" th:href="@{/cms/orders}">← Danh sách đơn hàng</a>
+    <header class="cms-accounts-header">
+      <div><p class="cms-accounts-kicker">CHI TIẾT ĐƠN BÁNH</p><h1 th:text="${order.orderCode}"></h1><p class="cms-accounts-desc" th:text="|Đặt ngày ${#temporals.format(order.createdAt, 'dd/MM/yyyy · HH:mm')}|"></p></div>
+      <div class="cms-order-badges"><span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span><span th:replace="~{order/fragments :: paymentBadge(${order.payment.status})}"></span></div>
+    </header>
+    <p th:if="${successMessage}" class="cms-order-message is-success" role="status" th:text="${successMessage}"></p>
+    <p th:if="${errorMessage}" class="cms-order-message is-error" role="alert" th:text="${errorMessage}"></p>
+    <div class="cms-order-grid">
+      <div class="cms-order-main">
+        <section class="cms-accounts-panel">
+          <div class="cms-accounts-panel__heading"><h2>Bánh trong đơn</h2><span th:text="|${#lists.size(order.items)} loại bánh|"></span></div>
+          <div class="cms-accounts-table-scroll" role="region" aria-label="Bánh trong đơn" tabindex="0">
+            <table class="cms-accounts-table cms-order-items"><thead><tr><th scope="col">Bánh / Lời nhắn</th><th scope="col">Đơn giá</th><th scope="col">SL</th><th scope="col">Thành tiền</th></tr></thead>
+              <tbody><tr th:each="item : ${order.items}"><td><strong th:text="${item.productName}"></strong><small th:if="${item.note != null}" th:text="${item.note}"></small></td><td th:text="|${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} ₫|"></td><td th:text="${item.quantity}"></td><td th:text="|${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} ₫|"></td></tr></tbody>
+            </table>
+          </div>
+          <div class="cms-order-total"><span>Tổng tiền đơn hàng</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></div>
+          <p th:if="${order.note != null}" class="cms-order-note"><strong>Lời nhắn cho cửa hàng</strong><span th:text="${order.note}"></span></p>
+        </section>
+        <section class="cms-accounts-panel">
+          <div class="cms-accounts-panel__heading"><h2>Lịch sử đơn hàng</h2></div>
+          <p class="cms-order-empty" th:if="${#lists.isEmpty(order.statusHistory)}">Chưa có lịch sử cập nhật.</p>
+          <ol class="cms-order-history" th:unless="${#lists.isEmpty(order.statusHistory)}"><li th:each="event : ${order.statusHistory}">
+            <strong><span th:replace="~{order/fragments :: statusLabel(${event.toStatus})}"></span></strong>
+            <time th:datetime="${event.changedAt}" th:text="${#temporals.format(event.changedAt, 'dd/MM/yyyy · HH:mm')}"></time>
+            <p th:if="${event.note != null}" th:text="${event.note}"></p><small th:if="${event.changedByName != null}" th:text="|Cập nhật bởi ${event.changedByName}|"></small>
+          </li></ol>
+        </section>
+      </div>
+      <aside class="cms-order-aside">
+        <section class="cms-accounts-panel">
+          <div class="cms-accounts-panel__heading"><h2>Đối soát thanh toán</h2></div>
+          <div class="cms-order-payment">
+            <p class="cms-order-muted">Chuyển khoản ngân hàng</p><strong class="cms-order-amount" th:text="|${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong>
+            <dl class="cms-order-info"><div><dt>Nội dung chuyển khoản</dt><dd class="cms-order-code" th:text="${order.orderCode}"></dd></div><div th:if="${order.payment.paidAt != null}"><dt>Đã xác nhận lúc</dt><dd th:text="${#temporals.format(order.payment.paidAt, 'dd/MM/yyyy · HH:mm')}"></dd></div><div th:if="${order.payment.confirmedByName != null}"><dt>Người xác nhận</dt><dd th:text="${order.payment.confirmedByName}"></dd></div><div th:if="${order.payment.bankReference != null}"><dt>Mã tham chiếu ngân hàng</dt><dd th:text="${order.payment.bankReference}"></dd></div></dl>
+            <form th:if="${canConfirmPayment}" method="post" th:action="@{/cms/orders/{id}/payment/confirm(id=${order.id})}" th:object="${confirmation}" class="cms-order-confirm">
+              <p class="cms-order-reconcile">Kiểm tra giao dịch thực nhận: đúng số tiền và mã đơn ở trên. Chỉ xác nhận khi cửa hàng đã nhận đủ tiền.</p>
+              <label for="bank-reference">Mã tham chiếu ngân hàng <small>(không bắt buộc)</small></label><input id="bank-reference" type="text" th:field="*{bankReference}" maxlength="100" autocomplete="off" placeholder="Mã giao dịch đã đối soát"/>
+              <button class="cms-order-button" type="submit">Xác nhận đã nhận đủ tiền</button>
+              <small>Thao tác sẽ ghi nhận đã thanh toán và xác nhận đơn hàng.</small>
+            </form>
+            <p th:unless="${canConfirmPayment}" class="cms-order-payment-notice" th:text="${order.payment.status.name() == 'PAID'} ? 'Đã ghi nhận thanh toán. Không cần xác nhận lại.' : 'Trạng thái hiện tại của đơn không cho phép xác nhận thanh toán.'"></p>
+          </div>
+        </section>
+        <section class="cms-accounts-panel"><div class="cms-accounts-panel__heading"><h2>Thông tin nhận bánh</h2></div>
+          <dl class="cms-order-info cms-order-recipient"><div><dt>Ngày nhận</dt><dd><span th:text="${#temporals.format(order.deliveryDate, 'dd/MM/yyyy')}"></span><span th:if="${order.deliveryTime != null}" th:text="| · ${#temporals.format(order.deliveryTime, 'HH:mm')}|"></span></dd></div><div><dt>Người nhận</dt><dd th:text="${order.receiverName}"></dd></div><div><dt>Số điện thoại</dt><dd th:text="${order.receiverPhone}"></dd></div><div><dt>Địa chỉ</dt><dd th:text="${order.receiverAddress}"></dd></div><div th:if="${order.receiverEmail != null}"><dt>Email</dt><dd th:text="${order.receiverEmail}"></dd></div></dl>
+        </section>
+      </aside>
+    </div>
+  </div>
+</main>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="instructions(order, transfer, compact)" class="bank-transfer"
+     th:classappend="${compact} ? 'bank-transfer--compact'" data-bank-transfer
+     th:attr="data-order-id=${order.id},data-payment-status-url=@{/orders/{id}/payment-status(id=${order.id})}">
+  <div th:unless="${transfer.available}" class="bank-transfer__notice"
+       th:classappend="${order.payment.status.name() == 'PAID' and order.status.name() != 'CANCELLED'} ? 'is-paid'">
+    <span class="material-symbols-outlined" aria-hidden="true" th:text="${order.payment.status.name() == 'PAID'} ? 'check_circle' : 'info'"></span>
+    <p th:text="${transfer.notice}"></p>
+  </div>
+  <th:block th:if="${transfer.available}">
+    <div class="bank-transfer__content">
+      <div class="bank-transfer__qr">
+        <p class="bank-transfer__eyebrow">QUÉT MÃ ĐỂ CHUYỂN KHOẢN</p>
+        <div class="bank-transfer__frame">
+          <img th:src="${transfer.qrImageUrl}" width="240" height="240" referrerpolicy="no-referrer"
+               alt="Mã QR chuyển khoản cho đơn hàng này" data-transfer-qr/>
+          <p hidden data-qr-error>Chưa tải được mã QR. Bạn có thể chuyển khoản bằng thông tin bên cạnh.</p>
+        </div>
+        <p class="bank-transfer__qr-hint">Mở ứng dụng ngân hàng để quét mã.</p>
+      </div>
+      <div class="bank-transfer__details">
+        <div class="bank-transfer__bank"><span>NGÂN HÀNG THỤ HƯỞNG</span><strong th:text="${transfer.bankName}"></strong></div>
+        <div class="bank-transfer__field"><label for="transfer-account-number">Số tài khoản</label>
+          <div class="bank-transfer__value"><input id="transfer-account-number" type="text" readonly th:value="${transfer.accountNumber}" spellcheck="false"/><button type="button" data-copy-target="transfer-account-number" data-copy-label="số tài khoản" aria-label="Sao chép số tài khoản"><span class="material-symbols-outlined" aria-hidden="true">sticky_note_2</span>Sao chép</button></div>
+        </div>
+        <div class="bank-transfer__holder"><span>Chủ tài khoản</span><strong th:text="${transfer.accountName}"></strong></div>
+        <div class="bank-transfer__field"><label for="transfer-amount">Số tiền chuyển khoản <small>(VND)</small></label>
+          <div class="bank-transfer__value"><input id="transfer-amount" type="text" readonly th:value="${transfer.amount}"/><button type="button" data-copy-target="transfer-amount" data-copy-label="số tiền" aria-label="Sao chép số tiền"><span class="material-symbols-outlined" aria-hidden="true">sticky_note_2</span>Sao chép</button></div>
+          <p class="bank-transfer__amount" th:text="|${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></p>
+        </div>
+        <div class="bank-transfer__field"><label for="transfer-content">Nội dung chuyển khoản</label>
+          <div class="bank-transfer__value bank-transfer__value--content"><input id="transfer-content" type="text" readonly th:value="${transfer.content}" spellcheck="false"/><button type="button" data-copy-target="transfer-content" data-copy-label="nội dung chuyển khoản" aria-label="Sao chép nội dung chuyển khoản"><span class="material-symbols-outlined" aria-hidden="true">sticky_note_2</span>Sao chép</button></div>
+        </div>
+        <p class="bank-transfer__feedback" role="status" aria-live="polite" data-copy-feedback> </p>
+      </div>
+    </div>
+    <p class="bank-transfer__hint"><span class="material-symbols-outlined" aria-hidden="true">info</span><span>Vui lòng chuyển đúng số tiền và giữ nguyên nội dung theo mã đơn. Sau khi nhận tiền, LUNE sẽ đối chiếu và cập nhật trạng thái trong Đơn hàng của tôi.</span></p>
+  </th:block>
+  <div th:if="${order.status.name() == 'PENDING' and order.payment.status.name() == 'PENDING'}"
+       class="bank-transfer__tracking" data-payment-tracking>
+    <p>Đang chờ cửa hàng đối soát. Trang sẽ tự cập nhật sau khi Staff/Admin xác nhận đã nhận tiền.</p>
+    <button type="button" class="bank-transfer__check" data-check-payment>Kiểm tra thanh toán</button>
+    <p class="bank-transfer__feedback" role="status" aria-live="polite" data-payment-feedback> </p>
+  </div>
+</div>
+</body>
+</html>

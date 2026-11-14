@@ -1,33 +1,49 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/cms-layout :: head('Quản lý đơn hàng')}"></head>
+<head th:replace="~{cms/order/fragments :: head('Quản lý đơn hàng')}"></head>
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('orders')}"></th:block>
-<main class="cms-page cms-accounts-page cms-orders-page">
+<main class="cms-page cms-accounts-page cms-order-page">
   <div class="wrap cms-accounts-wrap">
     <header class="cms-accounts-header">
       <div>
         <span class="cms-products-kicker">QUẢN TRỊ <span aria-hidden="true">/</span> VẬN HÀNH</span>
         <h1>Quản lý đơn hàng</h1>
-        <p>Theo dõi đơn đặt bánh, thanh toán và trạng thái giao hàng.</p>
+        <p>Tra cứu đơn bánh và đối soát chuyển khoản của khách hàng.</p>
       </div>
-      <span class="cms-orders-status">Chờ tích hợp</span>
+      <span class="cms-accounts-total" th:text="|${orders.totalElements} đơn hàng|"></span>
     </header>
 
-    <section class="cms-accounts-panel cms-orders-panel" aria-labelledby="orders-title">
+    <section class="cms-accounts-panel" aria-labelledby="orders-title">
       <div class="cms-accounts-panel__heading">
         <div>
           <h2 id="orders-title">Danh sách đơn hàng</h2>
-          <p>Dữ liệu đơn hàng sẽ xuất hiện sau khi nghiệp vụ đơn hàng được kết nối.</p>
+          <p>Mở chi tiết đơn để xác nhận sau khi đã nhận đủ tiền.</p>
         </div>
       </div>
-      <div class="cms-orders-empty" role="status">
-        <span class="cms-orders-empty__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6m-6 4h6m-6 4h3"/></svg>
-        </span>
-        <strong>Chưa có dữ liệu đơn hàng</strong>
-        <p>Danh sách, trạng thái xử lý và thông tin thanh toán sẽ hiển thị tại đây khi chức năng đơn hàng được triển khai.</p>
+      <form method="get" th:action="@{/cms/orders}" class="cms-order-filter">
+        <div><label for="order-search">Mã đơn hàng</label><input id="order-search" type="search" name="search" th:value="${search}" placeholder="Nhập mã LN…" maxlength="60"/></div>
+        <div><label for="order-status">Trạng thái đơn</label><select id="order-status" name="status"><option value="">Tất cả trạng thái</option><option th:each="s : ${T(com.bakery.order.entity.OrderStatus).values()}" th:value="${s}" th:selected="${s == selectedStatus}" th:text="${s.name() == 'PENDING' ? 'Chờ xử lý' : (s.name() == 'CONFIRMED' ? 'Đã xác nhận' : (s.name() == 'DELIVERING' ? 'Đang giao' : (s.name() == 'DELIVERED' ? 'Đã giao' : 'Đã hủy')))}"></option></select></div>
+        <div><label for="payment-status">Thanh toán</label><select id="payment-status" name="paymentStatus"><option value="">Tất cả thanh toán</option><option value="PENDING" th:selected="${selectedPaymentStatus != null and selectedPaymentStatus.name() == 'PENDING'}">Chờ thanh toán</option><option value="PAID" th:selected="${selectedPaymentStatus != null and selectedPaymentStatus.name() == 'PAID'}">Đã thanh toán</option></select></div>
+        <button class="cms-order-button" type="submit">Áp dụng</button>
+      </form>
+      <div class="cms-accounts-table-scroll" role="region" aria-label="Danh sách đơn hàng" tabindex="0">
+        <table class="cms-accounts-table cms-order-table">
+          <thead><tr><th scope="col">Mã đơn / Ngày đặt</th><th scope="col">Người nhận</th><th scope="col">Tổng tiền</th><th scope="col">Trạng thái</th><th scope="col">Thanh toán</th><th scope="col">Chi tiết</th></tr></thead>
+          <tbody><tr th:each="order : ${orders.content}">
+            <td><a class="cms-order-code" th:href="@{/cms/orders/{id}(id=${order.id})}" th:text="${order.orderCode}"></a><small th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy · HH:mm')}"></small></td>
+            <td th:text="${order.customerName}"></td><td class="cms-order-money" th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></td>
+            <td><span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span></td>
+            <td><span th:replace="~{order/fragments :: paymentBadge(${order.paymentStatus})}"></span></td>
+            <td><a class="cms-order-link" th:href="@{/cms/orders/{id}(id=${order.id})}" th:aria-label="|Xem đơn ${order.orderCode}|">Xem đơn →</a></td>
+          </tr><tr th:if="${orders.empty}"><td colspan="6" class="cms-order-empty">Không tìm thấy đơn hàng phù hợp. Hãy kiểm tra mã đơn hoặc đổi bộ lọc.</td></tr></tbody>
+        </table>
       </div>
+      <nav class="cms-order-pagination" th:if="${orders.totalPages > 1}" aria-label="Phân trang đơn hàng">
+        <a th:if="${orders.hasPrevious()}" th:href="@{/cms/orders(page=${orders.number - 1},search=${search},status=${selectedStatus},paymentStatus=${selectedPaymentStatus})}">← Trang trước</a>
+        <span th:text="|Trang ${orders.number + 1} / ${orders.totalPages}|"></span>
+        <a th:if="${orders.hasNext()}" th:href="@{/cms/orders(page=${orders.number + 1},search=${search},status=${selectedStatus},paymentStatus=${selectedPaymentStatus})}">Trang sau →</a>
+      </nav>
     </section>
   </div>
 </main>

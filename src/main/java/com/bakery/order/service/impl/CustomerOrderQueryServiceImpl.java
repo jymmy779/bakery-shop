@@ -1,6 +1,8 @@
 package com.bakery.order.service.impl;
 
 import com.bakery.order.dto.OrderDetailResponse;
+import com.bakery.order.dto.CustomerPaymentStatusResponse;
+import com.bakery.common.exception.ResourceNotFoundException;
 import com.bakery.order.dto.OrderStatusHistoryResponse;
 import com.bakery.order.dto.OrderSummaryResponse;
 import com.bakery.order.entity.OrderStatus;
@@ -24,6 +26,14 @@ public class CustomerOrderQueryServiceImpl {
   private final OrderRepository orders;
   private final OrderStatusHistoryRepository history;
   private final CheckoutResultServiceImpl results;
+
+  public CustomerPaymentStatusResponse getPaymentStatus(Long accountId, Long orderId) {
+    // A single owner-scoped query observes the committed order/payment pair together.
+    var row = orders.findCustomerPaymentStatus(orderId, accountId)
+        .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đơn hàng."));
+    return new CustomerPaymentStatusResponse(row.getOrderId(), row.getOrderStatus(),
+        row.getPaymentStatus(), row.getPaidAt());
+  }
 
   public Page<OrderSummaryResponse> findCustomerOrders(Long accountId, OrderStatus status, int page) {
     var found = orders.findCustomerOrders(accountId, status,

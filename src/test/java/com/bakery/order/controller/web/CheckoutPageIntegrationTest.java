@@ -28,6 +28,8 @@ import com.bakery.cart.service.impl.SessionCartServiceImpl;
 import com.bakery.config.SecurityConfig;
 import com.bakery.order.service.impl.CheckoutPageServiceImpl;
 import com.bakery.order.service.impl.CheckoutQuoteStore;
+import com.bakery.order.service.impl.BankTransferProperties;
+import com.bakery.order.service.impl.BankTransferServiceImpl;
 import com.bakery.order.service.impl.CheckoutSubmissionServiceImpl;
 import com.bakery.order.service.impl.CheckoutResultServiceImpl;
 import com.bakery.order.dto.OrderDetailResponse;
@@ -50,7 +52,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @WebMvcTest(CheckoutController.class)
-@Import({SecurityConfig.class, CheckoutPageServiceImpl.class, CheckoutQuoteStore.class})
+@Import({SecurityConfig.class, CheckoutPageServiceImpl.class, CheckoutQuoteStore.class,
+    BankTransferServiceImpl.class, BankTransferProperties.class})
 class CheckoutPageIntegrationTest {
 
   @Autowired MockMvc mvc;

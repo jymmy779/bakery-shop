@@ -3,6 +3,7 @@ package com.bakery.order.controller.web;
 import com.bakery.account.security.CustomUserDetails;
 import com.bakery.common.exception.BusinessException;
 import com.bakery.order.dto.CheckoutRequest;
+import com.bakery.order.service.impl.BankTransferServiceImpl;
 import com.bakery.order.service.impl.CheckoutPageServiceImpl;
 import com.bakery.order.service.impl.CheckoutResultServiceImpl;
 import com.bakery.order.service.impl.CheckoutSubmissionServiceImpl;
@@ -31,6 +32,7 @@ public class CheckoutController {
   private final CheckoutPageServiceImpl checkoutPages;
   private final CheckoutSubmissionServiceImpl submissions;
   private final CheckoutResultServiceImpl results;
+  private final BankTransferServiceImpl bankTransfers;
 
   @InitBinder("checkoutRequest")
   public void bindCheckout(WebDataBinder binder) {
@@ -75,7 +77,9 @@ public class CheckoutController {
   @GetMapping("/success/{orderId}")
   public String success(@AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long orderId, Model model) {
-    model.addAttribute("order", results.getForCustomer(userDetails.getAccountId(), orderId));
+    var order = results.getForCustomer(userDetails.getAccountId(), orderId);
+    model.addAttribute("order", order);
+    model.addAttribute("bankTransfer", bankTransfers.prepare(order));
     return "order/checkout-success";
   }
 }

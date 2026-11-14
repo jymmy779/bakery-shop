@@ -155,6 +155,7 @@
 .checkout-receipt__products strong { color: var(--checkout-wine); white-space: nowrap; font-size: 12px; }
 .checkout-receipt__continue { width: fit-content; margin: 30px auto 0; }
 .checkout-receipt__actions { display: flex; gap: 12px; width: min(560px, 100%); margin: 30px auto 0; }
+.checkout-receipt__payment { margin-top: 24px; }
 .checkout-receipt__browse { display: block; width: fit-content; margin: 20px auto 0; }
 @media (max-width: 600px) { .checkout-receipt__actions { flex-direction: column; } }
 @media (max-width: 640px) { .checkout-receipt__grid { grid-template-columns: 1fr; } .checkout-dialog__actions { flex-direction: column-reverse; } }

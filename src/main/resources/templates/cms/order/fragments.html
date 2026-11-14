@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <th:block th:replace="~{fragments/cms-layout :: head-meta(${title})}"></th:block>
+  <link rel="stylesheet" th:href="@{/css/admin-orders.css}"/>
+</head>
+</html>

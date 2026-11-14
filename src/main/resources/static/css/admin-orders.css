@@ -1,0 +1,55 @@
+.cms-order-page { --order-wine: #6a263b; --order-ink: #3f2830; --order-muted: #84717a; }
+.cms-order-page .cms-accounts-header h1 { overflow-wrap: anywhere; }
+.cms-order-back { display: inline-block; margin-bottom: 24px; color: var(--order-wine); text-decoration: none; font-weight: 600; }
+.cms-order-filter { display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 16px; align-items: end; padding: 22px 26px; border-bottom: 1px solid #efe7e8; }
+.cms-order-filter label, .cms-order-confirm label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--order-ink); }
+.cms-order-page input, .cms-order-page select { width: 100%; min-height: 44px; border: 1px solid #dfd2d7; border-radius: 10px; background: #fff; padding: 10px 12px; font: inherit; font-size: 13px; color: var(--order-ink); }
+.cms-order-page :is(input, select, button, a):focus-visible { outline: 3px solid #bb879a; outline-offset: 3px; }
+.cms-order-button { border: 0; background: var(--order-wine); color: #fff; min-height: 44px; padding: 12px 20px; border-radius: 10px; font: inherit; font-weight: 600; font-size: 13px; cursor: pointer; }
+.cms-order-button:hover { background: #4c1c2c; }
+.cms-order-table { min-width: 950px; }
+.cms-order-code { font-weight: 700; color: var(--order-wine); text-decoration: none; overflow-wrap: anywhere; }
+.cms-order-table small, .cms-order-items small { display: block; margin-top: 7px; color: var(--order-muted); font-size: 11px; line-height: 1.6; }
+.cms-order-table .cms-order-code { font-size: 12px; }
+.cms-order-money { white-space: nowrap; font-weight: 600; }
+.cms-order-link { color: var(--order-wine); font-weight: 600; white-space: nowrap; text-decoration: none; }
+.cms-order-empty { padding: 30px 26px !important; color: var(--order-muted); line-height: 1.8; }
+.cms-order-pagination { display: flex; justify-content: center; align-items: center; gap: 24px; padding: 22px; font-size: 13px; }
+.cms-order-pagination a { color: var(--order-wine); }
+.cms-order-page .orders-status, .cms-order-page .orders-payment-status { display: inline-flex; align-items: center; gap: 6px; padding: 7px 11px; border-radius: 100px; font-size: 11px; font-weight: 600; white-space: nowrap; background: #fff1d7; color: #8a601d; }
+.cms-order-page .orders-status--confirmed, .cms-order-page .orders-payment-status.is-paid, .cms-order-page .orders-status--delivered { background: #e8f3ec; color: #2b6844; }
+.cms-order-page .orders-status--delivering { background: #eaf0fc; color: #456298; }
+.cms-order-page .orders-status--cancelled { background: #f5e7ea; color: #934157; }
+.cms-order-badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.cms-order-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); gap: 24px; align-items: start; }
+.cms-order-main, .cms-order-aside { display: grid; gap: 24px; min-width: 0; }
+.cms-order-items { min-width: 560px; }
+.cms-order-items td { font-size: 13px; }
+.cms-order-total { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 24px 26px; border-top: 1px solid #efe7e8; font-size: 14px; }
+.cms-order-total strong { font-size: 22px; color: var(--order-wine); white-space: nowrap; }
+.cms-order-note { display: grid; gap: 8px; margin: 0; padding: 0 26px 24px; font-size: 13px; line-height: 1.8; overflow-wrap: anywhere; }
+.cms-order-history { margin: 0; padding: 24px 28px 24px 46px; }
+.cms-order-history li { padding: 0 0 22px 6px; color: var(--order-wine); }
+.cms-order-history li:last-child { padding-bottom: 0; }
+.cms-order-history time { display: block; font-size: 11px; margin-top: 6px; color: var(--order-muted); }
+.cms-order-history p { margin: 9px 0; font-size: 13px; line-height: 1.7; color: var(--order-ink); }
+.cms-order-history small { color: var(--order-muted); }
+.cms-order-payment { padding: 24px; }
+.cms-order-muted { margin: 0 0 8px; font-size: 12px; color: var(--order-muted); }
+.cms-order-amount { font-size: 30px; color: var(--order-wine); }
+.cms-order-info { margin: 22px 0 0; font-size: 13px; }
+.cms-order-info > div { margin-bottom: 16px; }
+.cms-order-info dt { color: var(--order-muted); margin-bottom: 5px; font-size: 11px; }
+.cms-order-info dd { margin: 0; line-height: 1.7; overflow-wrap: anywhere; }
+.cms-order-confirm { border-top: 1px solid #efe7e8; padding-top: 18px; margin-top: 22px; }
+.cms-order-reconcile { background: #fff6e9; padding: 14px; border-radius: 10px; color: #81572e; font-size: 12px; line-height: 1.8; margin: 0 0 20px; }
+.cms-order-confirm label small { font-weight: 400; }
+.cms-order-confirm button { width: 100%; margin-top: 14px; }
+.cms-order-confirm > small { display: block; margin-top: 12px; color: var(--order-muted); line-height: 1.7; font-size: 11px; }
+.cms-order-payment-notice { margin: 20px 0 0; padding: 14px; background: #f6f1f3; border-radius: 10px; font-size: 12px; line-height: 1.8; }
+.cms-order-recipient { padding: 4px 24px 12px; }
+.cms-order-message { border-radius: 12px; padding: 16px 20px; margin: 0 0 24px; font-size: 13px; line-height: 1.7; }
+.cms-order-message.is-success { background: #e8f3ec; color: #2b6844; }
+.cms-order-message.is-error { background: #fae9ec; color: #93384b; }
+@media (max-width: 1150px) { .cms-order-grid { grid-template-columns: minmax(0, 1fr); } .cms-order-filter { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .cms-order-filter { grid-template-columns: 1fr; padding: 20px; } .cms-order-payment { padding: 20px; } .cms-order-total { flex-wrap: wrap; padding: 20px; } .cms-order-page .cms-accounts-header h1 { font-size: 25px; } }

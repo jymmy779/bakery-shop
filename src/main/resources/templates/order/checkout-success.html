@@ -6,7 +6,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
   <link rel="stylesheet" th:href="@{/css/app.css}"/><link rel="stylesheet" th:href="@{/css/local-icons.css}"/><link rel="stylesheet" th:href="@{/css/checkout.css}"/>
+  <link rel="stylesheet" th:href="@{/css/payment.css}"/>
   <script th:src="@{/js/local-icons.js}" defer></script>
+  <script th:src="@{/js/payment.js}" defer></script>
 </head>
 <body class="checkout-body">
 <header th:replace="~{fragments/layout :: storefrontHeader('checkout')}"></header>
@@ -28,6 +30,10 @@
       <div class="checkout-totals"><div class="checkout-total"><span>Tổng tiền bánh</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></div></div>
     </section>
   </div>
+  <section class="checkout-card checkout-receipt__payment" aria-labelledby="receipt-payment-title">
+    <div class="checkout-card__heading"><div><h2 id="receipt-payment-title">Thanh toán đơn bánh</h2><p>Thông tin chuyển khoản cho đơn hàng của bạn.</p></div></div>
+    <div th:replace="~{order/bank-transfer :: instructions(${order}, ${bankTransfer}, false)}"></div>
+  </section>
   <div class="checkout-receipt__actions">
     <a class="checkout-button" th:href="@{/orders/{id}(id=${order.id})}">Xem chi tiết đơn hàng <span aria-hidden="true">→</span></a>
     <a class="checkout-button checkout-button--secondary" th:href="@{/orders}">Đơn hàng của tôi</a>

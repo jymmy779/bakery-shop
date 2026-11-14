@@ -56,6 +56,7 @@
         <div class="orders-panel__heading"><h2 id="order-payment-title">Thanh toán</h2><span th:replace="~{order/fragments :: paymentBadge(${order.payment.status})}"></span></div>
         <p class="orders-payment__method">Chuyển khoản ngân hàng</p>
         <dl class="orders-info"><div><dt>Số tiền</dt><dd class="orders-payment__amount" th:text="|${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></dd></div><div th:if="${order.payment.paidAt != null}"><dt>Thời gian thanh toán</dt><dd th:text="${#temporals.format(order.payment.paidAt, 'dd/MM/yyyy · HH:mm')}"></dd></div><div th:if="${order.payment.bankReference != null}"><dt>Mã tham chiếu</dt><dd th:text="${order.payment.bankReference}"></dd></div></dl>
+        <div th:replace="~{order/bank-transfer :: instructions(${order}, ${bankTransfer}, true)}"></div>
       </section>
     </aside>
   </div>

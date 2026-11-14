@@ -39,13 +39,19 @@ public class CheckoutOrderMapper {
       item.setNote(detail.getNote());
       return item;
     }).toList());
+    result.setPayment(mapPayment(payment));
+    return result;
+  }
+
+  public PaymentResponse mapPayment(Payment payment) {
     var paymentResponse = new PaymentResponse();
     paymentResponse.setMethod(payment.getMethod());
     paymentResponse.setStatus(payment.getStatus());
     paymentResponse.setAmount(payment.getAmount());
     paymentResponse.setBankReference(payment.getBankReference());
     paymentResponse.setPaidAt(payment.getPaidAt());
-    result.setPayment(paymentResponse);
-    return result;
+    paymentResponse.setConfirmedByName(payment.getConfirmedBy() == null
+        ? null : payment.getConfirmedBy().getFullName());
+    return paymentResponse;
   }
 }
