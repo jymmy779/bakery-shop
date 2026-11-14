@@ -3,6 +3,7 @@ package com.bakery.order.controller.web;
 import com.bakery.account.security.CustomUserDetails;
 import com.bakery.order.entity.OrderStatus;
 import com.bakery.order.dto.CustomerPaymentStatusResponse;
+import com.bakery.order.dto.CancelOrderRequest;
 import com.bakery.order.service.impl.BankTransferServiceImpl;
 import com.bakery.order.service.impl.CustomerOrderQueryServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class OrderController {
     var order = orders.getCustomerOrder(customer.getAccountId(), orderId);
     model.addAttribute("order", order);
     model.addAttribute("bankTransfer", bankTransfers.prepare(order));
+    if (!model.containsAttribute("cancellation")) model.addAttribute("cancellation", new CancelOrderRequest());
     return "order/detail";
   }
 }

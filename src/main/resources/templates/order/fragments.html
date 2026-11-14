@@ -13,8 +13,16 @@
   <link rel="stylesheet" th:href="@{/css/payment.css}"/>
   <script th:src="@{/js/local-icons.js}" defer></script>
   <script th:src="@{/js/payment.js}" defer></script>
+  <script th:src="@{/js/order-cancellation.js}" defer></script>
 </head>
 <body>
+  <th:block th:fragment="orderPaymentBadge(orderStatus, paymentStatus)">
+    <span th:if="${orderStatus.name() == 'CANCELLED' and paymentStatus != null and paymentStatus.name() == 'PENDING'}"
+          class="orders-payment-status is-void">Không cần thanh toán</span>
+    <th:block th:unless="${orderStatus.name() == 'CANCELLED' and paymentStatus != null and paymentStatus.name() == 'PENDING'}">
+      <span th:replace="~{order/fragments :: paymentBadge(${paymentStatus})}"></span>
+    </th:block>
+  </th:block>
   <span th:fragment="statusLabel(status)" th:switch="${status.name()}">
     <th:block th:case="'PENDING'">Chờ xử lý</th:block>
     <th:block th:case="'CONFIRMED'">Đã xác nhận</th:block>

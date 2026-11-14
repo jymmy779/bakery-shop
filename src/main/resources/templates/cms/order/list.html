@@ -34,7 +34,7 @@
             <td><a class="cms-order-code" th:href="@{/cms/orders/{id}(id=${order.id})}" th:text="${order.orderCode}"></a><small th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy · HH:mm')}"></small></td>
             <td th:text="${order.customerName}"></td><td class="cms-order-money" th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></td>
             <td><span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span></td>
-            <td><span th:replace="~{order/fragments :: paymentBadge(${order.paymentStatus})}"></span></td>
+            <td><span th:replace="~{order/fragments :: orderPaymentBadge(${order.status}, ${order.paymentStatus})}"></span></td>
             <td><a class="cms-order-link" th:href="@{/cms/orders/{id}(id=${order.id})}" th:aria-label="|Xem đơn ${order.orderCode}|">Xem đơn →</a></td>
           </tr><tr th:if="${orders.empty}"><td colspan="6" class="cms-order-empty">Không tìm thấy đơn hàng phù hợp. Hãy kiểm tra mã đơn hoặc đổi bộ lọc.</td></tr></tbody>
         </table>

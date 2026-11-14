@@ -25,6 +25,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   int deductCheckoutStock(@Param("productId") Long productId,
       @Param("quantity") int quantity, @Param("expectedPrice") BigDecimal expectedPrice);
 
+  @Modifying(flushAutomatically = true)
+  @Query("""
+      UPDATE Product p SET p.stockQuantity = p.stockQuantity + :quantity,
+        p.version = p.version + 1
+      WHERE p.id = :productId AND p.stockQuantity >= 0
+        AND p.stockQuantity <= :maxStockBeforeReturn
+      """)
+  int restoreCancelledStock(@Param("productId") Long productId, @Param("quantity") int quantity,
+      @Param("maxStockBeforeReturn") int maxStockBeforeReturn);
+
   long countByCategoryId(Long categoryId);
 
   @Query("""

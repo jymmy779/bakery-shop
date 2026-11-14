@@ -41,7 +41,7 @@
         </div>
         <div class="orders-card__bottom">
           <div class="orders-card__delivery"><span class="orders-label">NGÀY NHẬN BÁNH</span><strong th:text="${#temporals.format(order.deliveryDate, 'dd/MM/yyyy')}"></strong><span th:text="${order.customerName}"></span></div>
-          <div class="orders-card__amount"><span class="orders-label">TỔNG TIỀN</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong><span th:replace="~{order/fragments :: paymentBadge(${order.paymentStatus})}"></span></div>
+          <div class="orders-card__amount"><span class="orders-label">TỔNG TIỀN</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong><span th:replace="~{order/fragments :: orderPaymentBadge(${order.status}, ${order.paymentStatus})}"></span></div>
           <a class="orders-card__link" th:href="@{/orders/{id}(id=${order.id})}" th:attr="aria-label=|Xem chi tiết đơn ${order.orderCode}|">Xem chi tiết <span aria-hidden="true">→</span></a>
         </div>
       </article>

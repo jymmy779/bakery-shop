@@ -8,7 +8,7 @@
     <a class="cms-order-back" th:href="@{/cms/orders}">← Danh sách đơn hàng</a>
     <header class="cms-accounts-header">
       <div><p class="cms-accounts-kicker">CHI TIẾT ĐƠN BÁNH</p><h1 th:text="${order.orderCode}"></h1><p class="cms-accounts-desc" th:text="|Đặt ngày ${#temporals.format(order.createdAt, 'dd/MM/yyyy · HH:mm')}|"></p></div>
-      <div class="cms-order-badges"><span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span><span th:replace="~{order/fragments :: paymentBadge(${order.payment.status})}"></span></div>
+      <div class="cms-order-badges"><span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span><span th:replace="~{order/fragments :: orderPaymentBadge(${order.status}, ${order.payment.status})}"></span></div>
     </header>
     <p th:if="${successMessage}" class="cms-order-message is-success" role="status" th:text="${successMessage}"></p>
     <p th:if="${errorMessage}" class="cms-order-message is-error" role="alert" th:text="${errorMessage}"></p>

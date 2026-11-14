@@ -3,10 +3,14 @@ package com.bakery.catalog.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-/** Checkout stock changes join the caller's order transaction. */
+/** Stock changes join the caller's order transaction. */
 public interface ProductStockService {
 
   List<StockSnapshot> deductForCheckout(List<StockRequest> requests);
+
+  void restoreAfterCancellation(List<StockReturn> returns);
+
+  record StockReturn(Long productId, int quantity) {}
 
   record StockRequest(Long productId, int quantity, BigDecimal expectedPrice) {}
 

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -17,6 +18,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductStockServiceImpl implements ProductStockService {
 
   private final ProductRepository products;
+
+  @Override
+  @Transactional(propagation = Propagation.MANDATORY)
+  public void restoreAfterCancellation(List<StockReturn> returns) {
+    if (returns == null || returns.isEmpty()) {
+      throw new ConflictException("Đơn hàng không có chi tiết bánh hợp lệ để hoàn kho.");
+    }
+    var quantities = new TreeMap<Long, Long>();
+    for (var item : returns) {
+      if (item == null || item.productId() == null || item.productId() <= 0 || item.quantity() <= 0) {
+        throw new ConflictException("Chi tiết bánh hoặc số lượng hoàn kho không hợp lệ.");
+      }
+      long total = quantities.merge(item.productId(), (long) item.quantity(), Long::sum);
+      if (total > Integer.MAX_VALUE) throw new ConflictException("Số lượng hoàn kho vượt giới hạn.");
+    }
+    // Same ascending product order as checkout. STOPPED products must also receive their stock back.
+    // Do not clear the persistence context: the caller still owns the locked, managed order.
+    for (var entry : quantities.entrySet()) {
+      int quantity = entry.getValue().intValue();
+      if (products.restoreCancelledStock(entry.getKey(), quantity, Integer.MAX_VALUE - quantity) != 1) {
+        throw new ConflictException("Không thể hoàn tồn kho bánh. Đơn hàng chưa được hủy; vui lòng liên hệ cửa hàng.");
+      }
+    }
+  }
 
   @Override
   @Transactional(propagation = Propagation.MANDATORY)

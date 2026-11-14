@@ -20,6 +20,7 @@
 .cms-order-page .orders-status--confirmed, .cms-order-page .orders-payment-status.is-paid, .cms-order-page .orders-status--delivered { background: #e8f3ec; color: #2b6844; }
 .cms-order-page .orders-status--delivering { background: #eaf0fc; color: #456298; }
 .cms-order-page .orders-status--cancelled { background: #f5e7ea; color: #934157; }
+.cms-order-page .orders-payment-status.is-void { background: #f0ecee; color: #84717a; }
 .cms-order-badges { display: flex; flex-wrap: wrap; gap: 8px; }
 .cms-order-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); gap: 24px; align-items: start; }
 .cms-order-main, .cms-order-aside { display: grid; gap: 24px; min-width: 0; }

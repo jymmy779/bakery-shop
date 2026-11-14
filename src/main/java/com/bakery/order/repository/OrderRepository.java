@@ -25,6 +25,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
   @Query("SELECT o FROM Order o WHERE o.id = :orderId")
   Optional<Order> findForPaymentConfirmation(@Param("orderId") Long orderId);
 
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT o FROM Order o WHERE o.id = :orderId AND o.account.id = :accountId")
+  Optional<Order> findForCustomerCancellation(@Param("orderId") Long orderId,
+      @Param("accountId") Long accountId);
+
   @Query("""
       SELECT o.id AS orderId, o.status AS orderStatus, p.status AS paymentStatus, p.paidAt AS paidAt
       FROM Order o JOIN Payment p ON p.order = o

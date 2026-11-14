@@ -9,8 +9,10 @@
     <div><p class="orders-eyebrow">THÔNG TIN ĐẶT BÁNH</p><h1>Đơn bánh <em>của bạn.</em></h1>
       <p class="orders-detail__code" th:text="${order.orderCode}"></p>
       <p>Đặt ngày <time th:datetime="${order.createdAt}" th:text="${#temporals.format(order.createdAt, 'dd/MM/yyyy · HH:mm')}"></time></p></div>
-    <div class="orders-detail__badges"><span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span><span th:replace="~{order/fragments :: paymentBadge(${order.payment.status})}"></span></div>
+    <div class="orders-detail__badges"><span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span><span th:replace="~{order/fragments :: orderPaymentBadge(${order.status}, ${order.payment.status})}"></span></div>
   </div>
+  <p th:if="${cancelSuccessMessage}" class="orders-alert is-success" role="status" th:text="${cancelSuccessMessage}"></p>
+  <p th:if="${cancelErrorMessage}" class="orders-alert is-error" role="alert" th:text="${cancelErrorMessage}"></p>
   <aside th:if="${order.status.name() == 'CANCELLED'}" class="orders-cancellation" aria-label="Thông tin hủy đơn">
     <strong>Đơn hàng đã được hủy<span th:if="${order.cancelledAt != null}" th:text="| ngày ${#temporals.format(order.cancelledAt, 'dd/MM/yyyy · HH:mm')}|"></span>.</strong>
     <p th:if="${order.cancellationReason != null}" th:text="${order.cancellationReason}"></p>
@@ -53,13 +55,33 @@
         <dl class="orders-info"><div><dt>Người nhận</dt><dd th:text="${order.receiverName}"></dd></div><div><dt>Số điện thoại</dt><dd th:text="${order.receiverPhone}"></dd></div><div><dt>Địa chỉ</dt><dd th:text="${order.receiverAddress}"></dd></div><div th:if="${order.receiverEmail != null}"><dt>Email</dt><dd th:text="${order.receiverEmail}"></dd></div></dl>
       </section>
       <section class="orders-panel orders-payment" aria-labelledby="order-payment-title">
-        <div class="orders-panel__heading"><h2 id="order-payment-title">Thanh toán</h2><span th:replace="~{order/fragments :: paymentBadge(${order.payment.status})}"></span></div>
+        <div class="orders-panel__heading"><h2 id="order-payment-title">Thanh toán</h2><span th:replace="~{order/fragments :: orderPaymentBadge(${order.status}, ${order.payment.status})}"></span></div>
         <p class="orders-payment__method">Chuyển khoản ngân hàng</p>
         <dl class="orders-info"><div><dt>Số tiền</dt><dd class="orders-payment__amount" th:text="|${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></dd></div><div th:if="${order.payment.paidAt != null}"><dt>Thời gian thanh toán</dt><dd th:text="${#temporals.format(order.payment.paidAt, 'dd/MM/yyyy · HH:mm')}"></dd></div><div th:if="${order.payment.bankReference != null}"><dt>Mã tham chiếu</dt><dd th:text="${order.payment.bankReference}"></dd></div></dl>
         <div th:replace="~{order/bank-transfer :: instructions(${order}, ${bankTransfer}, true)}"></div>
       </section>
     </aside>
   </div>
+  <section th:if="${order.status.name() == 'PENDING' and order.payment.status.name() == 'PENDING'}"
+           class="orders-cancel" data-order-cancellation>
+    <div class="orders-cancel__intro"><div><h2>Bạn muốn thay đổi kế hoạch?</h2><p>Bạn có thể hủy đơn khi cửa hàng chưa xác nhận. Đơn đã hủy không thể khôi phục.</p></div><button type="button" class="orders-button orders-button--outline" data-open-cancellation hidden>Hủy đơn hàng</button></div>
+    <section class="orders-cancel__panel" data-cancellation-panel th:object="${cancellation}">
+      <p class="orders-eyebrow">XÁC NHẬN HỦY ĐƠN</p><h2 id="cancel-order-title">Hủy đơn bánh này?</h2>
+      <p class="orders-cancel__description">Đơn <strong th:text="${order.orderCode}"></strong> sẽ được hủy. Bạn cần đặt đơn mới nếu muốn mua lại.</p>
+      <p class="orders-cancel__transfer-note">Nếu đã chuyển khoản, vui lòng liên hệ cửa hàng để đối soát trước khi hủy đơn.</p>
+      <form method="post" th:action="@{/orders/{id}/cancel(id=${order.id})}" data-cancellation-form
+            th:attr="data-cancellation-invalid=${#fields.hasErrors('reason')}">
+        <label for="cancel-reason">Lý do hủy đơn <span aria-hidden="true">*</span></label>
+        <textarea id="cancel-reason" th:field="*{reason}" rows="4" maxlength="500" required
+                  placeholder="Ví dụ: Tôi muốn đổi ngày nhận bánh…" aria-describedby="cancel-reason-help cancel-reason-error"
+                  th:attr="aria-invalid=${#fields.hasErrors('reason')}"></textarea>
+        <div class="orders-cancel__field-meta"><span id="cancel-reason-help">Vui lòng nhập lý do, tối đa 500 ký tự.</span><span data-cancellation-count>0 / 500</span></div>
+        <p id="cancel-reason-error" class="orders-cancel__error" aria-live="polite"
+           th:text="${#fields.hasErrors('reason')} ? ${#fields.errors('reason')[0]} : ' '"></p>
+        <div class="orders-cancel__actions"><button type="button" class="orders-button orders-button--outline" data-dismiss-cancellation hidden>Giữ đơn hàng</button><button type="submit" class="orders-button" data-submit-cancellation>Xác nhận hủy đơn</button></div>
+      </form>
+    </section>
+  </section>
   <div class="orders-detail__footer"><a class="orders-back" th:href="@{/orders}"><span aria-hidden="true">←</span> Đơn hàng của tôi</a><a class="orders-button orders-button--outline" th:href="@{/products}">Tiếp tục khám phá bánh <span aria-hidden="true">→</span></a></div>
 </main>
 <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
