@@ -21,6 +21,7 @@ public class CheckoutPageServiceImpl {
   private final SessionCartServiceImpl carts;
   private final AccountService accounts;
   private final AccountAddressService addresses;
+  private final CheckoutQuoteStore quotes;
 
   public CheckoutPageResponse prepare(Long accountId, HttpSession session, Long addressId) {
     var cart = carts.getCart(session);
@@ -36,6 +37,7 @@ public class CheckoutPageServiceImpl {
         .plusDays(Math.max(0, cart.getMaximumPreparationDays()));
 
     var request = new CheckoutRequest();
+    request.setCheckoutToken(quotes.issue(accountId, session, cart));
     request.setReceiverName(selected == null ? profile.getFullName() : selected.getReceiverName());
     request.setReceiverPhone(selected == null ? profile.getPhone() : selected.getReceiverPhone());
     request.setReceiverAddress(selected == null ? profile.getAddress() : selected.getAddress());

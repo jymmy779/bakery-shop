@@ -10,6 +10,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,6 +24,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CheckoutRequest {
+
+  @NotBlank(message = "Vui lòng mở lại trang thanh toán trước khi đặt hàng")
+  @Pattern(regexp = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+      message = "Phiên đặt hàng không hợp lệ, vui lòng mở lại trang thanh toán")
+  private String checkoutToken;
 
   @NotBlank(message = REQUIRED)
   @Size(max = 100)
@@ -46,8 +52,13 @@ public class CheckoutRequest {
 
   private LocalTime deliveryTime;
 
-  @Size(max = 1000)
+  @Size(max = 200, message = "Lời nhắn không được vượt quá 200 ký tự")
+  @Pattern(regexp = "(?s)^(?!.*<\\s*(?:/?\\s*[a-zA-Z]|[!?])).*$",
+      message = "Lời nhắn chỉ nhận văn bản, vui lòng bỏ thẻ HTML")
   private String note;
 
-  private Map<Long, String> productNotes = new HashMap<>();
+  private Map<@NotNull @Positive Long,
+      @Size(max = 200, message = "Lời nhắn cho bánh không được vượt quá 200 ký tự")
+      @Pattern(regexp = "(?s)^(?!.*<\\s*(?:/?\\s*[a-zA-Z]|[!?])).*$",
+          message = "Lời nhắn cho bánh chỉ nhận văn bản") String> productNotes = new HashMap<>();
 }

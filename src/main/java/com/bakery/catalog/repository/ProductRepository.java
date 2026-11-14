@@ -6,12 +6,25 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.domain.Sort;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
+
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  @Query("""
+      UPDATE Product p SET p.stockQuantity = p.stockQuantity - :quantity,
+        p.version = p.version + 1
+      WHERE p.id = :productId
+        AND p.status = com.bakery.catalog.entity.ProductStatus.SELLING
+        AND p.price = :expectedPrice AND p.stockQuantity >= :quantity
+      """)
+  int deductCheckoutStock(@Param("productId") Long productId,
+      @Param("quantity") int quantity, @Param("expectedPrice") BigDecimal expectedPrice);
+
   long countByCategoryId(Long categoryId);
 
   @Query("""

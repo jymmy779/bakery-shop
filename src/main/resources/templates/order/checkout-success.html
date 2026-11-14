@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Đã nhận đơn bánh — LUNE Bakery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/><link rel="stylesheet" th:href="@{/css/local-icons.css}"/><link rel="stylesheet" th:href="@{/css/checkout.css}"/>
+  <script th:src="@{/js/local-icons.js}" defer></script>
+</head>
+<body class="checkout-body">
+<header th:replace="~{fragments/layout :: storefrontHeader('checkout')}"></header>
+<main class="checkout-page checkout-receipt">
+  <section class="checkout-receipt__hero" aria-labelledby="receipt-title">
+    <span class="checkout-receipt__check" aria-hidden="true">✓</span><p class="checkout-eyebrow">CẢM ƠN BẠN ĐÃ CHỌN LUNE</p>
+    <h1 id="receipt-title">LUNE đã nhận<br/>đơn bánh <em>của bạn.</em></h1>
+    <p>Thông tin đặt bánh đã được lưu. Bạn có thể xem lại đơn tại trang này.</p>
+    <strong class="checkout-receipt__code" th:text="${order.orderCode}"></strong>
+    <div class="checkout-receipt__badges"><span th:switch="${order.status.name()}"><th:block th:case="'PENDING'">Chờ xử lý</th:block><th:block th:case="'CONFIRMED'">Đã xác nhận</th:block><th:block th:case="'DELIVERING'">Đang giao</th:block><th:block th:case="'DELIVERED'">Đã giao</th:block><th:block th:case="'CANCELLED'">Đã hủy</th:block></span><span th:text="${order.payment.status.name() == 'PAID' ? 'Đã thanh toán' : 'Chờ thanh toán'}"></span></div>
+  </section>
+  <div class="checkout-receipt__grid">
+    <section class="checkout-card" aria-labelledby="receipt-delivery"><h2 id="receipt-delivery">Thông tin nhận bánh</h2>
+      <dl class="checkout-review-details"><div><dt>Người nhận</dt><dd th:text="${order.receiverName}"></dd></div><div><dt>Số điện thoại</dt><dd th:text="${order.receiverPhone}"></dd></div><div><dt>Địa chỉ</dt><dd th:text="${order.receiverAddress}"></dd></div><div><dt>Ngày nhận bánh</dt><dd><span th:text="${#temporals.format(order.deliveryDate, 'dd/MM/yyyy')}"></span><span th:if="${order.deliveryTime != null}" th:text="| · ${#temporals.format(order.deliveryTime, 'HH:mm')}|"></span></dd></div><div th:if="${order.receiverEmail != null}"><dt>Email</dt><dd th:text="${order.receiverEmail}"></dd></div><div th:if="${order.note != null}"><dt>Lời nhắn</dt><dd th:text="${order.note}"></dd></div><div><dt>Thanh toán</dt><dd>Chuyển khoản ngân hàng</dd></div></dl>
+      <p class="checkout-receipt__hint">Bạn vui lòng giữ mã đơn để thuận tiện khi liên hệ với LUNE.</p>
+    </section>
+    <section class="checkout-card" aria-labelledby="receipt-products"><h2 id="receipt-products">Những chiếc bánh đã chọn</h2>
+      <ul class="checkout-receipt__products"><li th:each="item : ${order.items}"><div><h3 th:text="${item.productName}"></h3><p th:text="|${item.quantity} × ${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} ₫|"></p><small th:if="${item.note != null}" th:text="|Lời nhắn: ${item.note}|"></small></div><strong th:text="|${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></li></ul>
+      <div class="checkout-totals"><div class="checkout-total"><span>Tổng tiền bánh</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></div></div>
+    </section>
+  </div>
+  <a class="checkout-button checkout-receipt__continue" th:href="@{/products}">Tiếp tục khám phá bánh <span aria-hidden="true">→</span></a>
+</main>
+<footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+</body>
+</html>

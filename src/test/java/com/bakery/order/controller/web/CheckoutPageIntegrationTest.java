@@ -4,6 +4,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,6 +27,11 @@ import com.bakery.cart.dto.CartResponse;
 import com.bakery.cart.service.impl.SessionCartServiceImpl;
 import com.bakery.config.SecurityConfig;
 import com.bakery.order.service.impl.CheckoutPageServiceImpl;
+import com.bakery.order.service.impl.CheckoutQuoteStore;
+import com.bakery.order.service.impl.CheckoutSubmissionServiceImpl;
+import com.bakery.order.service.impl.CheckoutResultServiceImpl;
+import com.bakery.order.dto.OrderDetailResponse;
+import com.bakery.common.exception.ConflictException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -43,13 +50,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @WebMvcTest(CheckoutController.class)
-@Import({SecurityConfig.class, CheckoutPageServiceImpl.class})
+@Import({SecurityConfig.class, CheckoutPageServiceImpl.class, CheckoutQuoteStore.class})
 class CheckoutPageIntegrationTest {
 
   @Autowired MockMvc mvc;
   @MockitoBean SessionCartServiceImpl carts;
   @MockitoBean AccountService accounts;
   @MockitoBean AccountAddressService addresses;
+  @MockitoBean CheckoutSubmissionServiceImpl submissions;
+  @MockitoBean CheckoutResultServiceImpl results;
   @MockitoBean com.bakery.account.repository.AccountRepository accountRepository;
 
   private final MockHttpSession session = new MockHttpSession();
@@ -177,10 +186,62 @@ class CheckoutPageIntegrationTest {
   }
 
   @Test
-  void thisStageDoesNotExposeOrderCreation() throws Exception {
-    mvc.perform(post("/checkout").session(session).with(user(customer)).with(csrf()))
-        .andExpect(status().isMethodNotAllowed());
-    verifyNoInteractions(carts, accounts, addresses);
+  void invalidPostKeepsReceiverValuesAndDoesNotCreateOrder() throws Exception {
+    mvc.perform(validPost().param("receiverPhone", "123"))
+        .andExpect(status().isOk())
+        .andExpect(result -> org.junit.jupiter.api.Assertions.assertTrue(
+            org.springframework.web.util.HtmlUtils.htmlUnescape(result.getResponse().getContentAsString())
+                .contains("value=\"Người nhận riêng\"")))
+        .andExpect(content().string(containsString("Số điện thoại không đúng định dạng")));
+    verifyNoInteractions(submissions);
+  }
+
+  @Test
+  void validPostRedirectsToThePersistedOrderResult() throws Exception {
+    var order = new OrderDetailResponse();
+    order.setId(55L);
+    when(submissions.submit(eq(7L), eq(session), any())).thenReturn(order);
+    mvc.perform(validPost()).andExpect(status().is3xxRedirection())
+        .andExpect(redirectedUrl("/checkout/success/55"));
+  }
+
+  @Test
+  void businessConflictKeepsNotesAndShowsCurrentCart() throws Exception {
+    when(submissions.submit(eq(7L), eq(session), any()))
+        .thenThrow(new ConflictException("Giá bánh đã thay đổi, vui lòng kiểm tra lại."));
+    mvc.perform(validPost().param("productNotes[42]", "Ít ngọt"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("Giá bánh đã thay đổi")))
+        .andExpect(content().string(containsString("Ít ngọt")))
+        .andExpect(result -> org.junit.jupiter.api.Assertions.assertTrue(
+            org.springframework.web.util.HtmlUtils.htmlUnescape(result.getResponse().getContentAsString())
+                .contains("value=\"Người nhận riêng\"")));
+  }
+
+  @Test
+  void htmlOrOversizedProductNotesAreRejectedOnServer() throws Exception {
+    mvc.perform(validPost().param("productNotes[42]", "<script>alert(1)</script>"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("Lời nhắn cho bánh chỉ nhận văn bản")));
+    mvc.perform(validPost().param("note", "x".repeat(201)))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString("Lời nhắn không được vượt quá 200 ký tự")));
+    verifyNoInteractions(submissions);
+  }
+
+  @Test
+  void placingOrderRequiresCsrf() throws Exception {
+    mvc.perform(post("/checkout").session(session).with(user(customer)))
+        .andExpect(status().isForbidden());
+    verifyNoInteractions(submissions);
+  }
+
+  private org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder validPost() {
+    return post("/checkout").session(session).with(user(customer)).with(csrf())
+        .param("checkoutToken", java.util.UUID.randomUUID().toString())
+        .param("receiverName", "Người nhận riêng").param("receiverPhone", "0912345678")
+        .param("receiverAddress", "20 Lê Lợi, TP. Hồ Chí Minh")
+        .param("deliveryDate", LocalDate.now(ZoneId.of("Asia/Ho_Chi_Minh")).plusDays(3).toString());
   }
 
   private AccountAddressResponse address(Long id, boolean isDefault) {

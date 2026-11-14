@@ -5,10 +5,21 @@
   if (!form) return;
   const reviewButton = document.getElementById('checkout-review');
   const dialog = document.getElementById('checkout-review-dialog');
+  const confirmButton = document.getElementById('checkout-confirm');
+  let submitting = false;
   const fields = Array.from(form.querySelectorAll('.checkout-field input, .checkout-field textarea'));
   const addressFields = ['receiverName', 'receiverPhone', 'receiverAddress', 'note'];
   let manualAddress = Object.fromEntries(addressFields.map(id => [id, document.getElementById(id).value]));
   let selectedAddress = form.querySelector('[name="savedAddress"]:checked')?.value || 'manual';
+  const initialAddress = form.querySelector('[name="savedAddress"]:checked');
+  if (initialAddress && selectedAddress !== 'manual'
+      && (initialAddress.dataset.name !== manualAddress.receiverName
+          || initialAddress.dataset.phone !== manualAddress.receiverPhone
+          || initialAddress.dataset.address !== manualAddress.receiverAddress)) {
+    const manualRadio = form.querySelector('[name="savedAddress"][value="manual"]');
+    if (manualRadio) manualRadio.checked = true;
+    selectedAddress = 'manual';
+  }
   if (selectedAddress !== 'manual') {
     manualAddress.receiverAddress = '';
     manualAddress.note = '';
@@ -109,9 +120,34 @@
     if (image.complete && !image.naturalWidth) image.src = '/assets/product-placeholder.svg';
   });
 
-  // This stage only reviews information locally. No order or payment request is sent.
   reviewButton.addEventListener('click', review);
-  form.addEventListener('submit', event => { event.preventDefault(); review(); });
+  form.addEventListener('submit', event => {
+    if (submitting) { event.preventDefault(); return; }
+    if (event.submitter !== confirmButton || !dialog.open) {
+      event.preventDefault();
+      review();
+      return;
+    }
+    const invalidFields = fields.filter(field => !validate(field));
+    if (invalidFields.length) {
+      event.preventDefault();
+      dialog.close();
+      invalidFields[0].closest('details')?.setAttribute('open', '');
+      invalidFields[0].focus();
+      return;
+    }
+    submitting = true;
+    confirmButton.disabled = true;
+    reviewButton.disabled = true;
+    setText(confirmButton, 'Đang đặt hàng…');
+    form.setAttribute('aria-busy', 'true');
+    dialog.querySelectorAll('[data-close-review]').forEach(button => { button.disabled = true; });
+    // Continue the native same-origin POST, including Spring's CSRF token.
+  });
+  dialog.addEventListener('cancel', event => { if (submitting) event.preventDefault(); });
   document.querySelectorAll('[data-close-review]').forEach(button => button.addEventListener('click', () => dialog.close()));
   dialog.addEventListener('close', () => reviewButton.focus());
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) window.location.reload();
+  });
 })();
