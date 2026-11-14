@@ -1,8 +1,8 @@
 package com.bakery.order.controller.web;
 
 import com.bakery.account.security.CustomUserDetails;
-import com.bakery.account.service.AccountAddressService;
-import com.bakery.order.dto.CheckoutRequest;
+import com.bakery.order.service.impl.CheckoutPageServiceImpl;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,20 +16,17 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 @RequiredArgsConstructor
 public class CheckoutController {
 
-  private final AccountAddressService accountAddressService;
+  private final CheckoutPageServiceImpl checkoutPages;
 
   @GetMapping
   public String checkout(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestParam(name = "addressId", required = false) Long addressId,
+      HttpSession session,
       Model model) {
-    model.addAttribute("checkoutRequest", new CheckoutRequest());
-    var addresses = accountAddressService.findByAccountId(userDetails.getAccountId());
-    model.addAttribute("savedAddresses", addresses);
-    model.addAttribute("selectedAddressId", addressId != null ? addressId : addresses.stream()
-        .filter(address -> address.isDefaultAddress())
-        .map(address -> address.getId())
-        .findFirst().orElse(null));
+    var page = checkoutPages.prepare(userDetails.getAccountId(), session, addressId);
+    model.addAttribute("checkout", page);
+    model.addAttribute("checkoutRequest", page.getRequest());
     return "order/checkout";
   }
 }

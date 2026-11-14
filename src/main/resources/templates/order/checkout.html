@@ -1,15 +1,163 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Thanh toán — LUNE Bakery</title><link rel="stylesheet" th:href="@{/css/app.css}"/></head>
-<body><header th:replace="~{fragments/layout :: storefrontHeader('auth')}"></header>
-<main class="container py-12"><h1 class="text-2xl font-semibold mb-2">Thanh toán</h1><p class="mb-6">Chọn địa chỉ nhận bánh cho đơn hàng này.</p>
-  <div th:if="${#lists.isEmpty(savedAddresses)}" class="rounded-xl border p-6"><p class="mb-4">Bạn chưa lưu địa chỉ giao hàng.</p><a class="button primary" th:href="@{/profile/address}">Thêm địa chỉ</a></div>
-  <form th:unless="${#lists.isEmpty(savedAddresses)}" th:action="@{/checkout}" method="get" class="space-y-4">
-    <label th:each="address : ${savedAddresses}" class="flex gap-3 rounded-xl border p-4 cursor-pointer">
-      <input type="radio" name="addressId" th:value="${address.id}" th:checked="${address.id == selectedAddressId}"/>
-      <span><strong th:text="${address.label}">Nhà riêng</strong><span th:if="${address.defaultAddress}" class="ml-2 text-sm">Mặc định</span><br/><span th:text="${address.receiverName}">Người nhận</span> · <span th:text="${address.receiverPhone}">Số điện thoại</span><br/><span th:text="${address.address}">Địa chỉ giao hàng</span><br/><small th:if="${address.deliveryNote != null and !address.deliveryNote.isBlank()}" th:text="|Ghi chú: ${address.deliveryNote}|">Ghi chú</small></span>
-    </label>
-    <button class="button primary" type="submit">Chọn địa chỉ này</button>
-  </form>
-  <a class="inline-block mt-6" th:href="@{/profile/address}">Quản lý sổ địa chỉ</a>
-</main><footer th:replace="~{fragments/layout :: storefrontFooter}"></footer></body></html>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}"/>
+  <meta name="theme-color" content="#fff8f6"/>
+  <title>Thanh toán — LUNE Bakery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" th:href="@{/css/app.css}"/>
+  <link rel="stylesheet" th:href="@{/css/local-icons.css}"/>
+  <link rel="stylesheet" th:href="@{/css/checkout.css}"/>
+  <script th:src="@{/js/local-icons.js}" defer></script>
+  <script th:src="@{/js/checkout.js}" defer></script>
+</head>
+<body class="checkout-body">
+<header th:replace="~{fragments/layout :: storefrontHeader('checkout')}"></header>
+<main class="checkout-page" id="main-content">
+  <nav class="checkout-breadcrumb" aria-label="Đường dẫn trang">
+    <a th:href="@{/}">Trang chủ</a><span aria-hidden="true">/</span>
+    <a th:href="@{/cart}">Giỏ hàng</a><span aria-hidden="true">/</span>
+    <span aria-current="page">Thanh toán</span>
+  </nav>
+  <section class="checkout-heading" aria-labelledby="checkout-title">
+    <div><p class="checkout-eyebrow">MỘT CHÚT NGỌT NGÀO, GỬI ĐẾN BẠN</p>
+      <h1 id="checkout-title">Hoàn tất lựa chọn,<br/>đón chút <em>ngọt ngào.</em></h1>
+      <p>Kiểm tra giỏ bánh và cho LUNE biết nơi bạn muốn nhận nhé.</p>
+    </div>
+    <ol class="checkout-steps" aria-label="Các bước đặt bánh">
+      <li class="is-complete"><span aria-hidden="true">✓</span>Giỏ bánh</li>
+      <li class="is-current" aria-current="step"><span>02</span>Giao bánh</li>
+      <li><span>03</span>Thanh toán</li>
+    </ol>
+  </section>
+  <section th:if="${#lists.isEmpty(checkout.cart.items)}" class="checkout-empty" aria-labelledby="empty-title">
+    <span class="checkout-empty__icon material-symbols-outlined" aria-hidden="true">shopping_bag</span>
+    <p class="checkout-eyebrow">GIỎ BÁNH CỦA BẠN</p>
+    <h2 id="empty-title">Chưa có chiếc bánh nào ở đây.</h2>
+    <p>Chọn một món bánh yêu thích để LUNE chuẩn bị cho bạn.</p>
+    <a class="checkout-button" th:href="@{/products}">Khám phá các loại bánh <span aria-hidden="true">→</span></a>
+  </section>
+  <th:block th:unless="${#lists.isEmpty(checkout.cart.items)}">
+    <div th:if="${!checkout.cart.checkoutAllowed}" class="checkout-alert" role="alert">
+      <span class="material-symbols-outlined" aria-hidden="true">info</span>
+      <div><strong>Giỏ bánh cần được cập nhật</strong><p>Một số bánh đã hết hàng, ngừng bán hoặc vượt số lượng còn lại. Bạn hãy <a th:href="@{/cart}">quay lại giỏ hàng</a> để điều chỉnh.</p></div>
+    </div>
+    <div th:if="${checkout.addressUnavailable}" class="checkout-alert" role="status">
+      <span class="material-symbols-outlined" aria-hidden="true">info</span>
+      <p>Địa chỉ đã chọn không còn khả dụng. Bạn hãy chọn địa chỉ khác hoặc nhập thông tin bên dưới.</p>
+    </div>
+    <form id="checkout-form" class="checkout-grid" th:object="${checkoutRequest}" th:action="@{/checkout}" method="post" novalidate>
+      <div class="checkout-details">
+        <section class="checkout-card" aria-labelledby="receiver-title">
+          <div class="checkout-card__heading"><span class="checkout-section-number">01</span><div><h2 id="receiver-title">Gửi bánh đến đâu?</h2><p>Thông tin người nhận cho đơn hàng này.</p></div></div>
+          <fieldset th:unless="${#lists.isEmpty(checkout.savedAddresses)}" class="checkout-addresses">
+            <legend>Địa chỉ đã lưu</legend>
+            <div class="checkout-address-grid">
+              <label th:each="address : ${checkout.savedAddresses}" class="checkout-address">
+                <input type="radio" name="savedAddress" th:value="${address.id}" th:checked="${address.id == checkout.selectedAddressId}"
+                       th:attr="data-name=${address.receiverName},data-phone=${address.receiverPhone},data-address=${address.address},data-note=${address.deliveryNote}"/>
+                <span class="checkout-address__content"><span class="checkout-address__label"><strong th:text="${address.label}">Nhà riêng</strong><small th:if="${address.defaultAddress}">Mặc định</small></span>
+                  <span th:text="${address.receiverName}"></span><span th:text="${address.receiverPhone}"></span><span class="checkout-address__line" th:text="${address.address}"></span>
+                </span>
+              </label>
+              <label class="checkout-address checkout-address--manual">
+                <input type="radio" name="savedAddress" value="manual" th:checked="${checkout.selectedAddressId == null}"/>
+                <span class="checkout-address__content"><strong>Nhập địa chỉ khác</strong><span>Dành riêng cho lần nhận bánh này</span></span>
+              </label>
+            </div>
+            <a class="checkout-text-link" th:href="@{/profile/address}">Quản lý sổ địa chỉ <span aria-hidden="true">↗</span></a>
+          </fieldset>
+          <div class="checkout-fields">
+            <div class="checkout-field"><label for="receiverName">Họ tên người nhận <span aria-hidden="true">*</span></label>
+              <input th:field="*{receiverName}" autocomplete="shipping name" required maxlength="100" placeholder="Họ và tên người nhận" aria-describedby="receiverName-error"/>
+              <small class="checkout-field-error" id="receiverName-error" hidden></small>
+            </div>
+            <div class="checkout-field"><label for="receiverPhone">Số điện thoại <span aria-hidden="true">*</span></label>
+              <input th:field="*{receiverPhone}" type="tel" autocomplete="shipping tel" inputmode="tel" required maxlength="12" pattern="(0|\+84)[0-9]{9}" placeholder="Số điện thoại nhận bánh" aria-describedby="receiverPhone-error"/>
+              <small class="checkout-field-error" id="receiverPhone-error" hidden></small>
+            </div>
+            <div class="checkout-field checkout-field--wide"><label for="receiverAddress">Địa chỉ nhận bánh <span aria-hidden="true">*</span></label>
+              <textarea th:field="*{receiverAddress}" autocomplete="shipping street-address" required maxlength="500" rows="2" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" aria-describedby="receiverAddress-error"></textarea>
+              <small class="checkout-field-error" id="receiverAddress-error" hidden></small>
+            </div>
+            <div class="checkout-field checkout-field--wide"><label for="receiverEmail">Email nhận thông tin <span class="checkout-optional">(không bắt buộc)</span></label>
+              <input th:field="*{receiverEmail}" type="email" autocomplete="email" maxlength="150" placeholder="Email để nhận thông tin đơn hàng" aria-describedby="receiverEmail-hint receiverEmail-error"/>
+              <small id="receiverEmail-hint">Bạn vẫn có thể theo dõi đơn hàng trên website khi không nhập email.</small>
+              <small class="checkout-field-error" id="receiverEmail-error" hidden></small>
+            </div>
+          </div>
+          <p class="checkout-privacy"><span class="material-symbols-outlined" aria-hidden="true">lock</span>Thông tin chỉnh sửa tại đây chỉ dùng cho đơn hàng này.</p>
+        </section>
+        <section class="checkout-card" aria-labelledby="delivery-title">
+          <div class="checkout-card__heading"><span class="checkout-section-number">02</span><div><h2 id="delivery-title">Khi nào bạn muốn nhận?</h2><p>Để mỗi chiếc bánh đến tay bạn thật trọn vẹn.</p></div></div>
+          <div class="checkout-delivery-hint"><span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+            <p>LUNE có thể chuẩn bị giỏ bánh này sớm nhất vào <strong th:text="${#temporals.format(checkout.earliestDeliveryDate, 'dd/MM/yyyy')}"></strong>.<span th:if="${checkout.cart.maximumPreparationDays > 0}" th:text="| Một số bánh cần ${checkout.cart.maximumPreparationDays} ngày chuẩn bị.|"></span></p>
+          </div>
+          <div class="checkout-fields">
+            <div class="checkout-field"><label for="deliveryDate">Ngày nhận bánh <span aria-hidden="true">*</span></label>
+              <input id="deliveryDate" name="deliveryDate" type="date" th:value="${checkoutRequest.deliveryDate}" th:min="${checkout.earliestDeliveryDate}" required aria-describedby="deliveryDate-error"/>
+              <small class="checkout-field-error" id="deliveryDate-error" hidden></small>
+            </div>
+            <div class="checkout-field"><label for="deliveryTime">Giờ mong muốn <span class="checkout-optional">(tùy chọn)</span></label>
+              <input th:field="*{deliveryTime}" type="time" aria-describedby="deliveryTime-hint deliveryTime-error"/>
+              <small id="deliveryTime-hint">LUNE sẽ liên hệ để thống nhất giờ giao phù hợp.</small>
+              <small class="checkout-field-error" id="deliveryTime-error" hidden></small>
+            </div>
+            <div class="checkout-field checkout-field--wide"><label for="note">Lời nhắn cho LUNE <span class="checkout-optional">(tùy chọn)</span></label>
+              <textarea th:field="*{note}" rows="3" maxlength="200" data-note-counter="order-note-count" placeholder="Ví dụ: Gọi cho mình trước khi giao bánh nhé." aria-describedby="note-error order-note-count"></textarea>
+              <span class="checkout-field__footer"><small class="checkout-field-error" id="note-error" hidden></small><small id="order-note-count" class="checkout-count">0/200</small></span>
+            </div>
+          </div>
+        </section>
+        <section class="checkout-card checkout-payment" aria-labelledby="payment-title">
+          <div class="checkout-card__heading"><span class="checkout-section-number">03</span><div><h2 id="payment-title">Thanh toán chuyển khoản</h2><p>Một phương thức đơn giản, thông tin rõ ràng.</p></div><span class="checkout-payment__check" aria-hidden="true">✓</span></div>
+          <p>Sau khi đặt hàng, bạn sẽ nhận được mã QR, số tiền và nội dung chuyển khoản theo mã đơn. LUNE xác nhận đơn khi đã nhận đủ thanh toán.</p>
+        </section>
+        <a class="checkout-back" th:href="@{/cart}"><span aria-hidden="true">←</span> Quay lại giỏ bánh</a>
+      </div>
+      <aside class="checkout-summary" aria-labelledby="summary-title">
+        <div class="checkout-summary__top"><p class="checkout-eyebrow">ĐƯỢC CHỌN BỞI BẠN</p><div><h2 id="summary-title">Giỏ bánh của bạn</h2><span th:text="|${checkout.cart.totalQuantity} bánh|"></span></div></div>
+        <ul class="checkout-products">
+          <li th:each="item : ${checkout.cart.items}" class="checkout-product">
+            <div class="checkout-product__main">
+              <div class="checkout-product__image"><img th:src="${item.imagePath != null and !#strings.isEmpty(item.imagePath) ? item.imagePath : '/assets/product-placeholder.svg'}" th:alt="${item.productName}" width="76" height="88" loading="lazy"/><span th:text="${item.quantity}"></span></div>
+              <div class="checkout-product__info"><h3 th:text="${item.productName}"></h3><span th:text="|${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} ₫ / bánh|"></span>
+                <strong th:text="|${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} ₫|"></strong>
+                <small th:if="${!item.available}" class="checkout-product__warning" th:text="${item.availabilityMessage}"></small>
+              </div>
+            </div>
+            <details class="checkout-product__note"><summary>Thêm lời nhắn cho bánh <span aria-hidden="true">+</span></summary>
+              <div class="checkout-field"><label th:for="|product-note-${item.productId}|" class="checkout-sr-only" th:text="|Lời nhắn cho ${item.productName}|"></label>
+                <textarea th:id="|product-note-${item.productId}|" th:name="|productNotes[${item.productId}]|" rows="2" maxlength="200" th:attr="data-note-counter=|product-note-count-${item.productId}|,aria-describedby=|product-note-${item.productId}-error product-note-count-${item.productId}|" placeholder="Chữ viết trên bánh, yêu cầu riêng…"></textarea>
+                <span class="checkout-field__footer"><small th:id="|product-note-${item.productId}-error|" class="checkout-field-error" hidden></small><small th:id="|product-note-count-${item.productId}|" class="checkout-count">0/200</small></span>
+              </div>
+            </details>
+          </li>
+        </ul>
+        <div class="checkout-totals"><div><span>Tạm tính</span><strong th:text="|${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></div>
+          <p>Tổng tiền được tính theo số lượng và giá bánh trong giỏ.</p>
+          <div class="checkout-total"><span>Tổng tiền bánh</span><strong th:text="|${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></div>
+        </div>
+        <button id="checkout-review" class="checkout-button" type="button" th:disabled="${!checkout.cart.checkoutAllowed}">Xem lại thông tin <span aria-hidden="true">→</span></button>
+        <p class="checkout-summary__note">Kiểm tra thông tin nhận bánh trước khi đặt hàng.</p>
+        <noscript><p class="checkout-alert">Bạn cần bật JavaScript để kiểm tra thông tin giao bánh.</p></noscript>
+        <div class="checkout-summary__signature"><span class="material-symbols-outlined" aria-hidden="true">bakery_dining</span><p>Nướng bằng tâm huyết.<br/><em>Gửi bằng yêu thương.</em></p></div>
+      </aside>
+    </form>
+    <dialog id="checkout-review-dialog" class="checkout-dialog" aria-labelledby="review-title" aria-describedby="review-description">
+      <div class="checkout-dialog__heading"><p class="checkout-eyebrow">THÔNG TIN NHẬN BÁNH</p><button type="button" class="checkout-dialog__close" data-close-review aria-label="Đóng thông tin nhận bánh">×</button></div>
+      <h2 id="review-title">Một lần kiểm tra cuối.</h2>
+      <p id="review-description">Bạn đang xem lại thông tin. Đơn hàng chưa được tạo.</p>
+      <dl class="checkout-review-details"><div><dt>Người nhận</dt><dd id="review-receiver"></dd></div><div><dt>Số điện thoại</dt><dd id="review-phone"></dd></div><div><dt>Địa chỉ</dt><dd id="review-address"></dd></div><div><dt>Ngày, giờ mong muốn</dt><dd id="review-delivery"></dd></div><div><dt>Email</dt><dd id="review-email"></dd></div><div><dt>Lời nhắn</dt><dd id="review-note"></dd></div><div><dt>Tổng tiền bánh</dt><dd th:text="|${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></dd></div></dl>
+      <button type="button" class="checkout-button" data-close-review>Tiếp tục chỉnh sửa</button>
+    </dialog>
+  </th:block>
+</main>
+<footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
+</body>
+</html>
