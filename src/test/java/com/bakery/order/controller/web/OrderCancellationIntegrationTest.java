@@ -158,7 +158,8 @@ class OrderCancellationIntegrationTest {
   void maximumReasonAndStoredMarkupAreHandledWithoutInjection() throws Exception {
     var customer = account(Role.ROLE_CUSTOMER); var order = order(customer);
     item(order, product(10), 2);
-    String reason = "<script>alert('cancel')</script>" + "x".repeat(469);
+    String markup = "<script>alert('cancel')</script>";
+    String reason = markup + "x".repeat(500 - markup.length());
     assertEquals(500, reason.length());
     cancellations.cancel(customer.getId(), order.getId(), request(reason));
     assertEquals(reason, orders.findById(order.getId()).orElseThrow().getCancellationReason());

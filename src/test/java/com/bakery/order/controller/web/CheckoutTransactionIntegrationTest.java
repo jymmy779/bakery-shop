@@ -3,6 +3,11 @@ package com.bakery.order.controller.web;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,6 +35,8 @@ import com.bakery.order.repository.OrderRepository;
 import com.bakery.order.repository.OrderDetailRepository;
 import com.bakery.order.repository.PaymentRepository;
 import com.bakery.order.repository.OrderStatusHistoryRepository;
+import com.bakery.notification.OrderConfirmationMailSender;
+import com.bakery.notification.OrderConfirmationMail;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -46,6 +53,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -58,7 +66,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
     "spring.datasource.driver-class-name=org.h2.Driver", "spring.datasource.username=sa",
     "spring.datasource.password=", "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect", "spring.jpa.open-in-view=false",
-    "spring.sql.init.mode=never", "app.bootstrap-admin.enabled=false", "logging.level.root=WARN"
+    "spring.sql.init.mode=never", "app.bootstrap-admin.enabled=false", "logging.level.root=WARN",
+    "app.mail.order-confirmation-enabled=true"
 })
 @AutoConfigureMockMvc
 class CheckoutTransactionIntegrationTest {
@@ -72,6 +81,57 @@ class CheckoutTransactionIntegrationTest {
   @Autowired OrderDetailRepository details;
   @Autowired PaymentRepository payments;
   @MockitoSpyBean OrderStatusHistoryRepository history;
+  @MockitoBean OrderConfirmationMailSender mailSender;
+
+  @Test
+  void emailRunsAfterCommitWithCommittedCartAndOnlyOnceOnReplay() throws Exception {
+    var fixture = fixture(null, 5, 2); String token = token(fixture);
+    var checked = new CountDownLatch(1);
+    var failure = new java.util.concurrent.atomic.AtomicReference<Throwable>();
+    doAnswer(invocation -> {
+      try {
+        var mail = invocation.getArgument(0, OrderConfirmationMail.class);
+        assertEquals("customer@example.test", mail.recipient());
+        assertTrue(Thread.currentThread().getName().startsWith("order-mail-"));
+        assertFalse(org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive());
+        var saved = orders.findByOrderCodeAndAccount_Id(
+            com.bakery.order.service.impl.CheckoutQuoteStore.orderCode(token), fixture.account().getId()).orElseThrow();
+        assertEquals(OrderStatus.PENDING, saved.getStatus());
+        assertTrue(carts.findByAccount_Id(fixture.account().getId()).orElseThrow().getItems().isEmpty());
+        assertTrue(mail.body().contains(saved.getOrderCode()));
+        assertTrue(mail.body().contains("900.000 VND"));
+      } catch (Throwable error) { failure.set(error); }
+      finally { checked.countDown(); }
+      return null;
+    }).when(mailSender).send(any());
+    mvc.perform(place(fixture, token, "customer@example.test")).andExpect(status().is3xxRedirection());
+    assertTrue(checked.await(10, TimeUnit.SECONDS));
+    if (failure.get() != null) throw new AssertionError("After-commit mail assertions", failure.get());
+    mvc.perform(place(fixture, token, "customer@example.test")).andExpect(status().is3xxRedirection());
+    verify(mailSender, times(1)).send(any());
+  }
+
+  @Test
+  void smtpFailureDoesNotRollBackOrderOrRestorePurchasedCart() throws Exception {
+    var fixture = fixture(null, 5, 2);
+    doThrow(new org.springframework.mail.MailSendException("simulated SMTP failure")).when(mailSender).send(any());
+    mvc.perform(place(fixture, token(fixture), "customer@example.test")).andExpect(status().is3xxRedirection());
+    verify(mailSender, timeout(5000)).send(any());
+    assertEquals(3, products.findById(fixture.product().getId()).orElseThrow().getStockQuantity());
+    assertTrue(carts.findByAccount_Id(fixture.account().getId()).orElseThrow().getItems().isEmpty());
+    assertEquals(1, orders.findCustomerOrders(fixture.account().getId(), null,
+        org.springframework.data.domain.PageRequest.of(0, 6)).getTotalElements());
+  }
+
+  @Test
+  void noEmailOrRolledBackCheckoutNeverSendsMail() throws Exception {
+    var noEmail = fixture(null, 5, 1);
+    mvc.perform(place(noEmail, token(noEmail))).andExpect(status().is3xxRedirection());
+    var rollback = fixture(null, 5, 1);
+    doThrow(new DataIntegrityViolationException("simulated rollback")).when(history).saveAndFlush(any());
+    mvc.perform(place(rollback, token(rollback), "customer@example.test")).andExpect(status().isOk());
+    verifyNoInteractions(mailSender);
+  }
 
   @Test
   void placesOrderClearsCartAndReplayingPostReturnsSameOrder() throws Exception {
@@ -228,10 +288,14 @@ class CheckoutTransactionIntegrationTest {
   }
 
   private MockHttpServletRequestBuilder place(Fixture fixture, String token) {
+    return place(fixture, token, "");
+  }
+
+  private MockHttpServletRequestBuilder place(Fixture fixture, String token, String email) {
     return post("/checkout").session(fixture.session()).with(user(fixture.principal())).with(csrf())
         .param("checkoutToken", token).param("receiverName", "Người nhận kiểm thử")
         .param("receiverPhone", "0912345678").param("receiverAddress", "Địa chỉ nhận bánh kiểm thử")
-        .param("receiverEmail", "").param("deliveryDate", today().plusDays(3).toString())
+        .param("receiverEmail", email).param("deliveryDate", today().plusDays(3).toString())
         .param("productNotes[" + fixture.product().getId() + "]", "Ít ngọt");
   }
 

@@ -115,6 +115,40 @@ Trang Checkout thành công và chi tiết đơn của khách tự kiểm tra m�
 Staff/Admin xác nhận, trang tải lại để báo **Thanh toán thành công!**, cập nhật
 trạng thái và ẩn QR. Đây là đối soát thủ công; chưa kết nối webhook ngân hàng.
 
+## Email xác nhận đặt hàng
+
+Email được gửi tới **email nhận hàng khách nhập tại Checkout**, sau khi transaction
+tạo đơn và xóa giỏ đã commit. Không nhập email thì không gửi. Nội dung UTF-8 gồm
+mã đơn, snapshot bánh/đơn giá/số lượng, tổng tiền, thông tin nhận bánh, lời nhắn và
+thông tin chuyển khoản nếu cửa hàng đã cấu hình. Email này xác nhận **đã đặt đơn**,
+không xác nhận đã nhận tiền. Không phát lại email khi gửi lại cùng phiên đặt đơn.
+
+Để bật gửi thật, thêm các biến vào **IntelliJ Run Configuration → Environment
+variables**, rồi khởi động lại ứng dụng:
+ 
+```text
+ORDER_CONFIRMATION_EMAIL_ENABLED=true
+MAIL_HOST=<SMTP host của dịch vụ mail>
+MAIL_PORT=587
+MAIL_USERNAME=<tài khoản SMTP>
+MAIL_PASSWORD=<mật khẩu SMTP hoặc App Password>
+MAIL_FROM=<địa chỉ gửi được dịch vụ cho phép>
+MAIL_SMTP_AUTH=true
+MAIL_STARTTLS=true
+MAIL_SSL=false
+```
+
+Các giá trị host/port/TLS cần khớp nhà cung cấp SMTP. `.env.example` chỉ là mẫu,
+không tự được nạp; không ghi mật khẩu thật vào file được Git theo dõi. Mặc định
+`ORDER_CONFIRMATION_EMAIL_ENABLED=false`, nên có thể chạy local khi chưa có SMTP.
+
+Gửi mail chạy ở luồng nền riêng với hàng đợi giới hạn và timeout kết nối/đọc/ghi
+SMTP 5 giây. Lỗi SMTP hoặc hàng đợi đầy được ghi log theo mã đơn, không làm rollback
+hay biến kết quả đặt hàng thành lỗi. Hiện gửi best-effort, chưa lưu hàng đợi trong
+database hoặc tự thử lại: khởi động lại ứng dụng có thể làm mất mail chưa gửi.
+Nếu nhận lỗi, kiểm tra SMTP và đối chiếu đơn trên website; không đặt lại đơn chỉ
+để gửi lại email.
+
 ## Chạy kiểm thử
 
 Trong IntelliJ, mở `src/test/java/com/bakery/BakeryShopApplicationTests.java`

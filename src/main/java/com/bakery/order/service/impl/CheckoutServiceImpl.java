@@ -49,6 +49,7 @@ public class CheckoutServiceImpl implements CheckoutService {
   private final CheckoutOrderMapper mapper;
   private final CheckoutResultServiceImpl results;
   private final Validator validator;
+  private final OrderConfirmationNotifier notifications;
 
   @Override
   @Transactional
@@ -122,7 +123,9 @@ public class CheckoutServiceImpl implements CheckoutService {
     initial.setChangedAt(LocalDateTime.now(SHOP_ZONE));
     initial.setNote("Khách hàng đặt bánh");
     history.saveAndFlush(initial);
-    return mapper.map(order, orderDetails, payment);
+    var result = mapper.map(order, orderDetails, payment);
+    notifications.afterCheckout(result);
+    return result;
   }
 
   private String optional(String value) {
