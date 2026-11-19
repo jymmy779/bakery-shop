@@ -26,12 +26,12 @@
           <thead><tr><th scope="col">Bánh</th><th scope="col">Đơn giá</th><th scope="col">Số lượng</th><th scope="col">Thành tiền</th></tr></thead>
           <tbody><tr th:each="item : ${order.items}">
             <td><strong th:text="${item.productName}"></strong><p th:if="${item.note != null}" th:text="|Lời nhắn: ${item.note}|"></p></td>
-            <td data-label="Đơn giá" th:text="|${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} ₫|"></td>
+            <td data-label="Đơn giá" th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></td>
             <td data-label="Số lượng" th:text="${item.quantity}"></td>
-            <td data-label="Thành tiền" th:text="|${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} ₫|"></td>
+            <td data-label="Thành tiền" th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></td>
           </tr></tbody>
         </table>
-        <div class="orders-detail__total"><span>Tổng tiền bánh</span><strong th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong></div>
+        <div class="orders-detail__total"><span>Tổng tiền bánh</span><strong th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></strong></div>
         <div th:if="${order.note != null}" class="orders-note"><span class="orders-label">LỜI NHẮN CHO LUNE</span><p th:text="${order.note}"></p></div>
       </section>
 
@@ -71,7 +71,7 @@
         <div class="orders-panel__heading"><h2 id="order-payment-title">Thanh toán</h2><span th:replace="~{order/fragments :: orderPaymentBadge(${order.status}, ${order.payment.status})}"></span></div>
         <p class="orders-payment__method">Chuyển khoản ngân hàng</p>
         <dl class="orders-info">
-          <div><dt>Số tiền</dt><dd class="orders-payment__amount" th:text="|${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></dd></div>
+          <div><dt>Số tiền</dt><dd class="orders-payment__amount" th:text="${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></dd></div>
           <div th:if="${order.payment.paidAt != null}"><dt>Thời gian thanh toán</dt><dd th:text="${#temporals.format(order.payment.paidAt, 'dd/MM/yyyy · HH:mm')}"></dd></div>
           <div th:if="${order.payment.bankReference != null}"><dt>Mã tham chiếu</dt><dd th:text="${order.payment.bankReference}"></dd></div>
         </dl>

@@ -121,7 +121,7 @@
             <div>
               <h3 th:text="${item.productName}"></h3>
               <p><span th:text="${item.quantity}"></span> × <span th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')}"></span> ₫</p>
-              <small th:if="${item.note != null}" th:text="|Lời nhắn: ${item.note}|"></small>
+              <small th:if="${item.note != null}" th:text="${'Lời nhắn: ' + item.note}"></small>
             </div>
             <strong><span th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')}"></span> ₫</strong>
           </li>

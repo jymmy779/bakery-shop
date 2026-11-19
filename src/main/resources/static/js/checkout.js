@@ -109,11 +109,11 @@
     }
     const value = id => document.getElementById(id).value.trim();
     const preview = {
-      'review-receiver': value('receiverName'), 'review-phone': value('receiverPhone'),
-      'review-address': value('receiverAddress'),
-      'review-delivery': `${formatDate(value('deliveryDate'))}${value('deliveryTime') ? ` · ${value('deliveryTime')}` : ''}`,
-      'review-email': value('receiverEmail') || 'Không nhận qua email',
-      'review-note': value('note') || 'Không có lời nhắn'
+      'review-receiver-value': value('receiverName'), 'review-phone-value': value('receiverPhone'),
+      'review-address-value': value('receiverAddress'),
+      'review-delivery-value': `${formatDate(value('deliveryDate'))}${value('deliveryTime') ? ` · ${value('deliveryTime')}` : ''}`,
+      'review-email-value': value('receiverEmail') || 'Không nhận qua email',
+      'review-note-value': value('note') || 'Không có lời nhắn'
     };
     Object.entries(preview).forEach(([id, text]) => setText(document.getElementById(id), text));
     dialog.showModal();

@@ -28,7 +28,7 @@
         <div class="bank-transfer__holder"><span>Chủ tài khoản</span><strong th:text="${transfer.accountName}"></strong></div>
         <div class="bank-transfer__field"><label for="transfer-amount">Số tiền chuyển khoản <small>(VND)</small></label>
           <div class="bank-transfer__value"><input id="transfer-amount" type="text" readonly th:value="${transfer.amount}"/><button type="button" data-copy-target="transfer-amount" data-copy-label="số tiền" aria-label="Sao chép số tiền"><span class="material-symbols-outlined" aria-hidden="true">sticky_note_2</span>Sao chép</button></div>
-          <p class="bank-transfer__amount" th:text="|${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></p>
+          <p class="bank-transfer__amount" th:text="${#numbers.formatDecimal(order.payment.amount, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></p>
         </div>
         <div class="bank-transfer__field"><label for="transfer-content">Nội dung chuyển khoản</label>
           <div class="bank-transfer__value bank-transfer__value--content"><input id="transfer-content" type="text" readonly th:value="${transfer.content}" spellcheck="false"/><button type="button" data-copy-target="transfer-content" data-copy-label="nội dung chuyển khoản" aria-label="Sao chép nội dung chuyển khoản"><span class="material-symbols-outlined" aria-hidden="true">sticky_note_2</span>Sao chép</button></div>

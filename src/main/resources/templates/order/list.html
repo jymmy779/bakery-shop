@@ -37,6 +37,48 @@
       cursor: pointer;
     }
 
+    .order-status-badge[data-status="CANCELLED"] {
+      background-color: #ffdad6;
+      color: #93000a;
+    }
+
+    .order-status-badge[data-status="CANCELLED"] .order-status-badge__dot {
+      background-color: #ba1a1a;
+    }
+
+    .order-status-badge[data-status="CONFIRMED"],
+    .order-status-badge[data-status="DELIVERED"] {
+      background-color: #d5e9bf;
+      color: #586a48;
+    }
+
+    .order-status-badge[data-status="CONFIRMED"] .order-status-badge__dot,
+    .order-status-badge[data-status="DELIVERED"] .order-status-badge__dot {
+      background-color: #536443;
+    }
+
+    .order-payment-badge[data-paid="true"] {
+      background-color: #ecfdf5;
+      color: #047857;
+      border-color: #a7f3d0;
+    }
+
+    .order-filter[data-active="true"] {
+      background-color: #8b263e;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
+    }
+
+    .order-filter[data-active="false"] {
+      color: #564244;
+    }
+
+    .order-filter[data-active="false"]:hover {
+      background-color: #ffe9e3;
+      color: #261814;
+    }
+
     ::-webkit-scrollbar {
       display: none;
     }
@@ -170,9 +212,9 @@
               <!-- Personalized Greeting -->
               <div class="space-y-space-xs">
                 <div class="flex flex-wrap items-center gap-space-sm">
-                  <h1 class="font-headline-md text-headline-md text-on-surface tracking-tight"
-                    th:text="|Xin chào, ${profile != null ? profile.fullName : 'bạn'}|">
-                    Xin chào, bạn
+                  <h1 class="font-headline-md text-headline-md text-on-surface tracking-tight">
+                    Xin chào, <th:block th:if="${profile != null}" th:text="${profile.fullName}">bạn</th:block>
+                    <th:block th:if="${profile == null}">bạn</th:block>
                   </h1>
 
                 </div>
@@ -260,13 +302,13 @@
               <!-- Filters Tab -->
               <div
                 class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm flex flex-wrap gap-2 items-center">
-                <a th:href="@{/orders}" class="px-4 py-2 rounded-lg text-label-md transition-colors"
-                  th:classappend="${selectedStatus == null} ? 'bg-primary-container text-on-primary font-semibold shadow-xs' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'">
+                <a th:href="@{/orders}" class="order-filter px-4 py-2 rounded-lg text-label-md transition-colors"
+                  th:attr="data-active=${selectedStatus == null}">
                   Tất cả
                 </a>
                 <a th:each="filter : ${T(com.bakery.order.entity.OrderStatus).values()}"
-                  th:href="@{/orders(status=${filter})}" class="px-4 py-2 rounded-lg text-label-md transition-colors"
-                  th:classappend="${selectedStatus == filter} ? 'bg-primary-container text-on-primary font-semibold shadow-xs' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'">
+                  th:href="@{/orders(status=${filter})}" class="order-filter px-4 py-2 rounded-lg text-label-md transition-colors"
+                  th:attr="data-active=${selectedStatus == filter}">
                   <span th:switch="${filter.name()}">
                     <th:block th:case="'PENDING'">Chờ xử lý</th:block>
                     <th:block th:case="'CONFIRMED'">Đã xác nhận</th:block>
@@ -278,15 +320,15 @@
               </div>
 
               <!-- Empty State -->
-              <div th:if="${orders.empty}"
+              <div th:if="${orders.totalElements == 0}"
                 class="bg-surface-container-lowest rounded-xl p-space-xl shadow-sm text-center py-16 space-y-4">
                 <div
                   class="w-16 h-16 mx-auto rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
                   <span class="material-symbols-outlined text-3xl">shopping_bag</span>
                 </div>
-                <h3 class="font-headline-sm text-headline-sm text-on-surface"
-                  th:text="${selectedStatus == null} ? 'Chưa có đơn bánh nào ở đây.' : 'Chưa có đơn ở trạng thái này.'">
-                  Chưa có đơn bánh nào ở đây.
+                <h3 class="font-headline-sm text-headline-sm text-on-surface">
+                  <th:block th:if="${selectedStatus == null}">Chưa có đơn bánh nào ở đây.</th:block>
+                  <th:block th:if="${selectedStatus != null}">Chưa có đơn ở trạng thái này.</th:block>
                 </h3>
                 <p class="font-body-sm text-on-surface-variant max-w-md mx-auto">
                   Chọn một chiếc bánh thơm ngon cho dịp đặc biệt sắp tới của bạn nhé.
@@ -301,7 +343,7 @@
               </div>
 
               <!-- Orders List -->
-              <div th:unless="${orders.empty}" class="space-y-space-md">
+              <div th:if="${orders.totalElements > 0}" class="space-y-space-md">
                 <article th:each="order : ${orders.content}"
                   class="bg-surface-container-lowest rounded-xl p-space-lg shadow-sm border border-outline-variant/30 hover:border-outline-variant transition-all space-y-space-md">
                   <!-- Header: Code + Date + Status -->
@@ -323,10 +365,9 @@
                     <!-- Status Badges -->
                     <div class="flex flex-wrap items-center gap-2">
                       <!-- Order Status Badge -->
-                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
-                        th:classappend="${order.status.name() == 'CONFIRMED' or order.status.name() == 'DELIVERED'} ? 'bg-secondary-container text-on-secondary-container' : (${order.status.name() == 'CANCELLED'} ? 'bg-error-container text-on-error-container' : 'bg-surface-container-high text-on-surface')">
-                        <span class="w-1.5 h-1.5 rounded-full"
-                          th:classappend="${order.status.name() == 'CONFIRMED' or order.status.name() == 'DELIVERED'} ? 'bg-secondary' : (${order.status.name() == 'CANCELLED'} ? 'bg-error' : 'bg-amber-600')"></span>
+                      <span class="order-status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-surface-container-high text-on-surface"
+                        th:attr="data-status=${order.status.name()}">
+                        <span class="order-status-badge__dot w-1.5 h-1.5 rounded-full bg-amber-600"></span>
                         <span th:switch="${order.status.name()}">
                           <th:block th:case="'PENDING'">Chờ xử lý</th:block>
                           <th:block th:case="'CONFIRMED'">Đã xác nhận</th:block>
@@ -337,12 +378,11 @@
                       </span>
 
                       <!-- Payment Status Badge -->
-                      <span class="px-2.5 py-1 rounded-full text-xs font-medium"
+                      <span class="order-payment-badge px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200"
                         th:if="${order.status.name() != 'CANCELLED'}"
-                        th:classappend="${order.paymentStatus != null and order.paymentStatus.name() == 'PAID'} ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'">
-                        <th:block th:if="${order.paymentStatus != null}"
-                          th:text="${order.paymentStatus.name() == 'PAID'} ? 'Đã thanh toán' : 'Chờ thanh toán'">
-                        </th:block>
+                        th:attr="data-paid=${order.paymentStatus != null and order.paymentStatus.name() == 'PAID'}">
+                        <th:block th:if="${order.paymentStatus != null and order.paymentStatus.name() == 'PAID'}">Đã thanh toán</th:block>
+                        <th:block th:if="${order.paymentStatus != null and order.paymentStatus.name() != 'PAID'}">Chờ thanh toán</th:block>
                         <th:block th:if="${order.paymentStatus == null}">Chưa có thông tin</th:block>
                       </span>
                       <span class="px-2.5 py-1 rounded-full text-xs font-medium bg-neutral-100 text-neutral-500 border border-neutral-200"
@@ -366,7 +406,7 @@
                       <span class="text-xs uppercase tracking-wider text-on-surface-variant font-medium block">TỔNG
                         TIỀN</span>
                       <strong class="font-headline-sm text-primary font-bold text-lg"
-                        th:text="|${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|">
+                        th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'POINT', 0, 'COMMA')} + ' ₫'">
                         350.000 ₫
                       </strong>
                     </div>
