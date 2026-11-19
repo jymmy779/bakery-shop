@@ -8,5 +8,19 @@ public record CmsDashboardResponse(
     long stoppedProducts,
     long totalCategories,
     long totalStaff,
-    BigDecimal deliveredRevenue) {
+    BigDecimal deliveredRevenue,
+    long pendingOrders,
+    long confirmedOrders,
+    long deliveringOrders) {
+
+  public CmsDashboardResponse(
+      long totalProducts,
+      long sellingProducts,
+      long stoppedProducts,
+      long totalCategories,
+      long totalStaff,
+      BigDecimal deliveredRevenue) {
+    this(totalProducts, sellingProducts, stoppedProducts, totalCategories, totalStaff, deliveredRevenue, 0, 0, 0);
+  }
 }
+

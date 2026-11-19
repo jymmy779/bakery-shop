@@ -60,24 +60,29 @@
       <section class="cms-dashboard-panel cms-dashboard-orders" aria-labelledby="dashboard-orders-title">
         <div class="cms-dashboard-panel__heading">
           <div><span class="eyebrow">ĐƠN HÀNG</span><h2 id="dashboard-orders-title">Đơn hàng cần xử lý</h2></div>
-          <span class="cms-dashboard-orders__status">Chờ tích hợp</span>
+          <a class="cms-dashboard-orders__status" th:href="@{/cms/orders}" style="text-decoration: none; color: #43543d; background: #eaf3e8; border-color: #c9dec5;">
+            Xem tất cả đơn →
+          </a>
         </div>
         <div class="cms-dashboard-orders__content">
           <div class="cms-dashboard-orders__states" role="group" aria-label="Các trạng thái đơn hàng">
-            <article class="cms-dashboard-orders__state">
+            <a class="cms-dashboard-orders__state" th:href="@{/cms/orders(status='PENDING')}" style="text-decoration: none;">
               <span><i class="is-pending" aria-hidden="true"></i>Chờ xác nhận</span>
-              <strong aria-label="Chưa có số liệu">—</strong>
-            </article>
-            <article class="cms-dashboard-orders__state">
+              <strong style="color: #b69b62;" th:text="${#numbers.formatInteger(dashboard.pendingOrders(), 0, 'POINT')}">0</strong>
+            </a>
+            <a class="cms-dashboard-orders__state" th:href="@{/cms/orders(status='CONFIRMED')}" style="text-decoration: none;">
               <span><i class="is-preparing" aria-hidden="true"></i>Đã xác nhận</span>
-              <strong aria-label="Chưa có số liệu">—</strong>
-            </article>
-            <article class="cms-dashboard-orders__state">
+              <strong style="color: #4b6b94;" th:text="${#numbers.formatInteger(dashboard.confirmedOrders(), 0, 'POINT')}">0</strong>
+            </a>
+            <a class="cms-dashboard-orders__state" th:href="@{/cms/orders(status='DELIVERING')}" style="text-decoration: none;">
               <span><i class="is-delivering" aria-hidden="true"></i>Đang giao</span>
-              <strong aria-label="Chưa có số liệu">—</strong>
-            </article>
+              <strong style="color: #2e7d32;" th:text="${#numbers.formatInteger(dashboard.deliveringOrders(), 0, 'POINT')}">0</strong>
+            </a>
           </div>
-          <p class="cms-dashboard-orders__note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>Dữ liệu đơn hàng sẽ hiển thị tại đây sau khi phân hệ được tích hợp.</p>
+          <p class="cms-dashboard-orders__note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
+            Nhấp vào từng trạng thái để mở nhanh danh sách đơn hàng cần xử lý tương ứng.
+          </p>
         </div>
       </section>
 

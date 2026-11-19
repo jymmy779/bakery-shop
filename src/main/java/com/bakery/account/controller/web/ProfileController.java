@@ -8,6 +8,7 @@ import com.bakery.account.security.CustomUserDetails;
 import com.bakery.account.service.AccountService;
 import com.bakery.order.service.impl.CustomerOrderQueryServiceImpl;
 import com.bakery.order.dto.OrderSummaryResponse;
+import com.bakery.order.entity.OrderStatus;
 import com.bakery.common.exception.InvalidOperationException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,9 +47,13 @@ public class ProfileController {
     var ordersPage = customerOrderQueryService.findCustomerOrders(userDetails.getAccountId(), null, 0);
     model.addAttribute("orderCount", ordersPage.getTotalElements());
 
-    // The service returns orders newest first; the profile preview must show that order
-    // regardless of status, including a newly placed PENDING order.
-    OrderSummaryResponse chosenOrder = ordersPage.getContent().stream().findFirst().orElse(null);
+    // Ưu tiên hiện đơn đang cần xử lý (PENDING hoặc CONFIRMED) để khách dễ theo dõi.
+    // Nếu không có đơn nào đang chờ, fallback về đơn tạo mới nhất.
+    var allOrders = ordersPage.getContent();
+    OrderSummaryResponse chosenOrder = allOrders.stream()
+        .filter(o -> o.getStatus() == OrderStatus.PENDING || o.getStatus() == OrderStatus.CONFIRMED)
+        .findFirst()
+        .orElseGet(() -> allOrders.isEmpty() ? null : allOrders.get(0));
 
     if (chosenOrder != null) {
       try {

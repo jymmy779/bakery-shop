@@ -556,7 +556,11 @@
                     <div th:each="item : ${latestOrder.items}"
                       class="flex items-center gap-space-sm bg-surface-container-lowest p-space-sm rounded-lg shadow-sm">
                       <div class="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 bg-surface-container-high text-primary">
-                        <span class="material-symbols-outlined text-[24px]">bakery_dining</span>
+                        <img th:if="${item.imagePath != null}"
+                             th:src="@{${item.imagePath}}"
+                             th:alt="${item.productName}"
+                             class="w-12 h-12 rounded-lg object-cover"/>
+                        <span th:unless="${item.imagePath != null}" class="material-symbols-outlined text-[24px]">bakery_dining</span>
                       </div>
                       <div class="min-w-0 flex-1">
                         <h5 class="font-label-md text-label-md text-on-surface truncate"
