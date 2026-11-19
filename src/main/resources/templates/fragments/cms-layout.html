@@ -89,6 +89,9 @@
     })();
   </script>
 </th:block>
+<th:block th:fragment="logout-confirmation">
+  <th:block th:replace="~{fragments/layout :: storefrontUiComponents}"></th:block>
+</th:block>
 <aside th:fragment="login-brand" class="cms-login-brand">
   <a th:href="@{/}" class="cms-brand-logo">LUNE<span>.</span></a>
   <div class="cms-brand-copy">

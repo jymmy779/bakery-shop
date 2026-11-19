@@ -136,8 +136,7 @@
 .orders-cancel__intro h2 { margin: 0 0 8px; font-size: 13px; font-weight: 600; }
 .orders-cancel__intro p { margin: 0; max-width: 580px; font-size: 11px; color: var(--orders-muted); line-height: 1.8; }
 .orders-cancel__intro button { flex-shrink: 0; }
-.orders-cancel__dialog { width: min(540px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; box-sizing: border-box; border: 1px solid var(--orders-line); border-radius: 18px; padding: 30px; background: #fffaf7; color: var(--orders-ink); box-shadow: 0 24px 100px #44212c40; }
-.orders-cancel__dialog::backdrop { background: #30141e80; backdrop-filter: blur(3px); }
+.orders-cancel__dialog { --app-dialog-line: var(--orders-line); --app-dialog-ink: var(--orders-ink); }
 .orders-cancel__panel { padding-top: 20px; }
 .orders-cancel__dialog .orders-cancel__panel { padding: 0; }
 .orders-cancel__panel h2 { margin: 0 0 16px; font: 500 30px/1.2 "Playfair Display", Georgia, serif; letter-spacing: -.025em; }
