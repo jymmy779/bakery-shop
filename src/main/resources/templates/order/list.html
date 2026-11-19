@@ -285,7 +285,7 @@
                   </a>
                 </nav>
                 <div class="pt-space-md mt-space-sm px-space-xs">
-                  <form th:action="@{/logout}" method="post">
+                  <form th:action="@{/logout}" method="post" data-confirm-logout>
                     <button
                       class="cursor-pointer w-full flex items-center justify-center gap-space-xs py-space-xs px-space-md text-error hover:bg-error-container/40 rounded-lg transition-colors font-label-md text-label-md"
                       type="submit">
@@ -443,6 +443,7 @@
       </div>
     </div>
   </main>
+  <th:block th:replace="~{fragments/layout :: storefrontUiComponents}"></th:block>
   <footer th:replace="~{fragments/layout :: storefrontFooter}"></footer>
 </body>
 

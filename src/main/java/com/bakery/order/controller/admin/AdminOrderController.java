@@ -3,9 +3,11 @@ package com.bakery.order.controller.admin;
 import com.bakery.account.security.CustomUserDetails;
 import com.bakery.common.exception.ConflictException;
 import com.bakery.common.exception.InvalidOperationException;
+import com.bakery.order.dto.OrderStatusUpdateRequest;
 import com.bakery.order.dto.PaymentConfirmationRequest;
 import com.bakery.order.entity.OrderStatus;
 import com.bakery.order.entity.PaymentStatus;
+import com.bakery.order.service.AdminOrderStatusService;
 import com.bakery.order.service.PaymentService;
 import com.bakery.order.service.impl.AdminOrderQueryServiceImpl;
 import jakarta.validation.Valid;
@@ -25,10 +27,16 @@ public class AdminOrderController {
 
   private final AdminOrderQueryServiceImpl orders;
   private final PaymentService payments;
+  private final AdminOrderStatusService orderStatusService;
 
   @InitBinder("confirmation")
   void bindConfirmation(WebDataBinder binder) {
     binder.setAllowedFields("bankReference");
+  }
+
+  @InitBinder("statusUpdate")
+  void bindStatusUpdate(WebDataBinder binder) {
+    binder.setAllowedFields("status", "note");
   }
 
   @GetMapping
@@ -53,6 +61,9 @@ public class AdminOrderController {
     if (!model.containsAttribute("confirmation")) {
       model.addAttribute("confirmation", new PaymentConfirmationRequest());
     }
+    if (!model.containsAttribute("statusUpdate")) {
+      model.addAttribute("statusUpdate", new OrderStatusUpdateRequest());
+    }
     return "cms/order/detail";
   }
 
@@ -69,6 +80,24 @@ public class AdminOrderController {
       } catch (ConflictException | InvalidOperationException exception) {
         redirect.addFlashAttribute("errorMessage", exception.getMessage());
         redirect.addFlashAttribute("confirmation", request);
+      }
+    }
+    return "redirect:/cms/orders/" + orderId;
+  }
+
+  @PostMapping("/{orderId}/status")
+  public String updateStatus(@AuthenticationPrincipal CustomUserDetails staff, @PathVariable Long orderId,
+      @Valid @ModelAttribute("statusUpdate") OrderStatusUpdateRequest request,
+      BindingResult binding, RedirectAttributes redirect) {
+    if (binding.hasErrors()) {
+      redirect.addFlashAttribute("errorMessage", "Vui lòng chọn trạng thái hợp lệ.");
+    } else {
+      try {
+        orderStatusService.updateOrderStatus(staff.getAccountId(), orderId, request);
+        redirect.addFlashAttribute("successMessage", "Đã cập nhật trạng thái đơn hàng thành công.");
+      } catch (ConflictException | InvalidOperationException exception) {
+        redirect.addFlashAttribute("errorMessage", exception.getMessage());
+        redirect.addFlashAttribute("statusUpdate", request);
       }
     }
     return "redirect:/cms/orders/" + orderId;

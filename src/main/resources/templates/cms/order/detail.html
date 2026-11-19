@@ -74,8 +74,45 @@
         </section>
       </div>
 
-      <!-- Cột bên phải dành riêng cho Đối soát thanh toán -->
+      <!-- Cột bên phải: Cập nhật trạng thái đơn hàng & Đối soát thanh toán -->
       <aside class="cms-order-aside">
+        <!-- Panel 1: Cập nhật trạng thái đơn hàng -->
+        <section class="cms-accounts-panel">
+          <div class="cms-accounts-panel__heading">
+            <h2>Cập nhật trạng thái</h2>
+            <span th:replace="~{order/fragments :: statusBadge(${order.status})}"></span>
+          </div>
+          <div class="cms-order-payment">
+            <form th:if="${order.status.name() != 'DELIVERED' and order.status.name() != 'CANCELLED'}"
+                  method="post" th:action="@{/cms/orders/{id}/status(id=${order.id})}" th:object="${statusUpdate}" class="cms-order-confirm" style="margin-top: 0; padding-top: 0; border-top: 0;">
+              <div>
+                <label for="order-new-status">Chuyển sang trạng thái</label>
+                <select id="order-new-status" th:field="*{status}" required>
+                  <option value="">-- Chọn trạng thái mới --</option>
+                  <option th:if="${order.status.name() == 'PENDING'}" value="CONFIRMED">Đã xác nhận</option>
+                  <option th:if="${order.status.name() == 'CONFIRMED'}" value="DELIVERING">Đang giao bánh</option>
+                  <option th:if="${order.status.name() == 'DELIVERING'}" value="DELIVERED">Đã giao thành công</option>
+                  <option value="CANCELLED">Hủy đơn hàng này</option>
+                </select>
+              </div>
+              <div style="margin-top: 14px;">
+                <label for="order-status-note">Ghi chú xử lý / Lý do <small>(không bắt buộc)</small></label>
+                <input id="order-status-note" type="text" th:field="*{note}" maxlength="500" placeholder="VD: Đã đóng gói bánh xong, Shipper đã nhận..."/>
+              </div>
+              <button class="cms-order-button" type="submit" style="width: 100%; margin-top: 16px;">
+                Cập nhật trạng thái đơn
+              </button>
+            </form>
+            <p th:if="${order.status.name() == 'DELIVERED'}" class="cms-order-payment-notice" style="margin: 0; background: #e8f3ec; color: #2b6844;">
+              Đơn hàng đã giao thành công và kết thúc chu trình xử lý.
+            </p>
+            <p th:if="${order.status.name() == 'CANCELLED'}" class="cms-order-payment-notice" style="margin: 0; background: #fae9ec; color: #93384b;">
+              Đơn hàng đã bị hủy. Bánh đã được hoàn trả lại tồn kho.
+            </p>
+          </div>
+        </section>
+
+        <!-- Panel 2: Đối soát thanh toán -->
         <section class="cms-accounts-panel">
           <div class="cms-accounts-panel__heading"><h2>Đối soát thanh toán</h2></div>
           <div class="cms-order-payment">

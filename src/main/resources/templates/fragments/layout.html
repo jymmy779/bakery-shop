@@ -204,9 +204,48 @@
 
     <!-- Shared confirmation dialog and toast for storefront pages. -->
     <th:block th:fragment="storefrontUiComponents">
+      <!-- Self-contained styles so this dialog looks correct on pages that don't load app.css (e.g. account pages). -->
+      <style>
+        .app-dialog {
+          --app-dialog-line: #eadbd6;
+          --app-dialog-surface: #fffaf7;
+          --app-dialog-ink: #261814;
+          width: min(540px, calc(100vw - 32px));
+          max-height: calc(100dvh - 32px);
+          box-sizing: border-box;
+          margin: auto;
+          overflow: auto;
+          border: 1px solid var(--app-dialog-line);
+          border-radius: 18px;
+          padding: 30px;
+          background: var(--app-dialog-surface);
+          color: var(--app-dialog-ink);
+          box-shadow: 0 24px 100px #44212c40;
+          opacity: 0;
+          transform: translateY(12px) scale(.985);
+        }
+        .app-dialog[open] {
+          animation: app-dialog-enter 180ms cubic-bezier(.2, .8, .2, 1) both;
+        }
+        .app-dialog::backdrop {
+          background: rgba(0, 0, 0, 0.45);
+          animation: app-dialog-backdrop-enter 180ms ease-out both;
+        }
+        @keyframes app-dialog-enter {
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes app-dialog-backdrop-enter {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .app-dialog[open], .app-dialog::backdrop { animation: none; }
+          .app-dialog[open] { opacity: 1; transform: none; }
+        }
+      </style>
       <dialog id="app-confirm-dialog" aria-labelledby="app-confirm-title" aria-describedby="app-confirm-message"
-              class="w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white p-0 text-on-surface shadow-2xl backdrop:bg-black/40">
-        <div class="p-space-lg">
+              class="app-dialog app-dialog--confirm">
+        <div class="app-dialog__content">
           <h2 id="app-confirm-title" class="font-headline-md text-headline-md">Xác nhận xóa</h2>
           <p id="app-confirm-message" class="mt-space-sm text-body-md text-on-surface-variant"></p>
           <div class="mt-space-lg flex justify-end gap-space-sm">
@@ -217,6 +256,11 @@
           </div>
         </div>
       </dialog>
+      <th:block th:replace="~{fragments/layout :: appToast}"></th:block>
+    </th:block>
+
+    <!-- Reusable short-lived feedback for storefront and CMS interactions. -->
+    <th:block th:fragment="appToast">
       <div id="app-toast" aria-live="polite" aria-atomic="true" role="status"
            class="pointer-events-none fixed left-4 right-4 top-24 z-[100] mx-auto max-w-md -translate-y-3 opacity-0 transition-all duration-300 motion-reduce:transition-none sm:left-auto sm:right-6">
         <div class="flex items-center gap-space-sm rounded-xl bg-inverse-surface px-space-md py-space-sm text-inverse-on-surface shadow-lg">

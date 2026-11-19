@@ -88,6 +88,27 @@
       });
     })();
   </script>
+  <th:block th:replace="~{fragments/layout :: storefrontUiComponents}"></th:block>
+  <style>
+    /* Đảm bảo app-confirm-dialog hiển thị đúng trong CMS (không phụ thuộc Tailwind purge) */
+    #app-confirm-dialog.app-dialog { font-family: 'DM Sans', sans-serif; }
+    #app-confirm-dialog #app-confirm-title { font-size: 1.2rem; font-weight: 700; color: #261814; margin: 0 0 8px; }
+    #app-confirm-dialog #app-confirm-message { font-size: .95rem; color: #5a3c35; margin: 0; line-height: 1.55; }
+    #app-confirm-dialog .mt-space-lg { margin-top: 24px; display: flex; justify-content: flex-end; gap: 10px; }
+    #app-confirm-dialog #app-confirm-cancel {
+      min-height: 42px; border-radius: 10px; border: 1px solid #d8c5bf;
+      padding: 0 18px; background: transparent; cursor: pointer; font-size: .9rem; color: #3f1d26;
+    }
+    #app-confirm-dialog #app-confirm-cancel:hover { background: #f7ede9; }
+    #app-confirm-dialog #app-confirm-accept {
+      min-height: 42px; border-radius: 10px; border: none;
+      padding: 0 18px; background: #3f1d26; color: #fff; cursor: pointer; font-size: .9rem; font-weight: 600;
+    }
+    #app-confirm-dialog #app-confirm-accept:hover { background: #5a2b38; }
+  </style>
+</th:block>
+<th:block th:fragment="logout-confirmation">
+  <th:block th:replace="~{fragments/layout :: storefrontUiComponents}"></th:block>
 </th:block>
 <aside th:fragment="login-brand" class="cms-login-brand">
   <a th:href="@{/}" class="cms-brand-logo">LUNE<span>.</span></a>

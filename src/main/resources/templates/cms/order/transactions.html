@@ -1,33 +1,101 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/cms-layout :: head('Quản lý giao dịch')}"></head>
+<head th:replace="~{cms/order/fragments :: head('Quản lý giao dịch')}"></head>
 <body>
 <th:block th:replace="~{fragments/cms-sidebar :: nav('transactions')}"></th:block>
 <main class="cms-page cms-accounts-page cms-transactions-page">
   <div class="wrap cms-accounts-wrap">
     <header class="cms-accounts-header">
       <div>
-        <span class="cms-products-kicker">QUẢN TRỊ <span aria-hidden="true">/</span> THANH TOÁN</span>
+        <span class="cms-products-kicker">QUẢN TRỊ <span aria-hidden="true">/</span> TÀI CHÍNH</span>
         <h1>Quản lý giao dịch</h1>
-        <p>Theo dõi và đối soát các giao dịch thanh toán của đơn hàng.</p>
+        <p>Lịch sử các giao dịch chuyển tiền thành công của khách hàng qua VietQR &amp; SePay.</p>
       </div>
-      <span class="cms-transactions-status">Chờ tích hợp</span>
+      <span class="cms-accounts-total" th:text="|${transactions.totalElements} giao dịch|"></span>
     </header>
 
     <section class="cms-accounts-panel cms-transactions-panel" aria-labelledby="transactions-title">
       <div class="cms-accounts-panel__heading">
         <div>
-          <h2 id="transactions-title">Danh sách giao dịch</h2>
-          <p>Thông tin giao dịch sẽ xuất hiện sau khi phân hệ thanh toán được kết nối.</p>
+          <h2 id="transactions-title">Nhật ký giao dịch chuyển khoản</h2>
+          <p>Tất cả các dòng tiền thực nhận đã được đối soát qua hệ thống tự động hoặc nhân viên xác nhận.</p>
         </div>
       </div>
-      <div class="cms-transactions-empty" role="status">
-        <span class="cms-transactions-empty__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19M6 15h4"/></svg>
-        </span>
-        <strong>Chưa có dữ liệu giao dịch</strong>
-        <p>Trang này sẽ hiển thị mã giao dịch, đơn hàng, phương thức và trạng thái thanh toán khi chức năng thanh toán hoàn tất.</p>
+
+      <!-- Filter bar: thiết kế đẹp, đồng bộ với hệ thống CMS -->
+      <form method="get" th:action="@{/cms/transactions}" class="cms-order-filter cms-transactions-filter" style="grid-template-columns: 1fr auto auto; gap: 16px; align-items: end;">
+        <div>
+          <label for="transaction-search">Tìm kiếm giao dịch</label>
+          <div style="position: relative;">
+            <input id="transaction-search" type="search" name="search" th:value="${search}" placeholder="Mã giao dịch NH, mã đơn LN... hoặc tên khách hàng" maxlength="60"/>
+          </div>
+        </div>
+        <button class="cms-order-button" type="submit" style="display: inline-flex; align-items: center; gap: 8px;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          Tìm kiếm
+        </button>
+        <a th:if="${search != ''}" th:href="@{/cms/transactions}" class="cms-order-link" style="padding: 11px 16px; border: 1px solid #dfd2d7; border-radius: 10px; background: #fff; font-size: 13px; text-decoration: none;">Đặt lại</a>
+      </form>
+
+      <div class="cms-accounts-table-scroll" role="region" aria-label="Danh sách giao dịch" tabindex="0">
+        <table class="cms-accounts-table cms-order-table">
+          <thead>
+            <tr>
+              <th scope="col">Mã GD ngân hàng</th>
+              <th scope="col">Thời gian chuyển tiền</th>
+              <th scope="col">Khách hàng</th>
+              <th scope="col">Đơn hàng liên quan</th>
+              <th scope="col">Số tiền nhận</th>
+              <th scope="col">Kênh ghi nhận</th>
+              <th scope="col" style="text-align: right;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="t : ${transactions.content}">
+              <td>
+                <a th:href="@{/cms/transactions/{id}(id=${t.paymentId})}" class="cms-order-code" style="font-family: monospace; font-size: 13px; font-weight: 700; text-decoration: underline;" th:text="${t.bankReference != null ? t.bankReference : 'TXN-' + t.paymentId}"></a>
+              </td>
+              <td>
+                <span class="font-medium text-neutral-800" th:text="${#temporals.format(t.paidAt != null ? t.paidAt : t.createdAt, 'dd/MM/yyyy · HH:mm')}"></span>
+              </td>
+              <td>
+                <strong th:text="${t.customerName}"></strong>
+              </td>
+              <td>
+                <a class="cms-order-code" th:href="@{/cms/orders/{id}(id=${t.orderId})}" th:text="${t.orderCode}"></a>
+              </td>
+              <td class="cms-order-money" style="color: #2e7d32; font-size: 15px; font-weight: 700;">
+                <span th:text="|+ ${#numbers.formatDecimal(t.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></span>
+              </td>
+              <td>
+                <span th:if="${t.confirmedByName != null}" class="cms-badge" style="background: #e8f3ec; color: #2b6844; font-size: 11px; padding: 4px 8px; border-radius: 999px;">
+                  Nhân viên: <strong th:text="${t.confirmedByName}"></strong>
+                </span>
+                <span th:if="${t.confirmedByName == null}" class="cms-badge" style="background: #eff6ff; color: #1d4ed8; font-size: 11px; padding: 4px 8px; border-radius: 999px;">
+                  ⚡ SePay Webhook
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <a class="cms-order-link" th:href="@{/cms/transactions/{id}(id=${t.paymentId})}" th:aria-label="|Xem chi tiết giao dịch ${t.bankReference}|" style="display: inline-flex; align-items: center; gap: 4px;">
+                  Xem chi tiết →
+                </a>
+              </td>
+            </tr>
+            <tr th:if="${transactions.empty}">
+              <td colspan="7" class="cms-order-empty" style="text-align: center; padding: 48px 24px;">
+                <div style="font-size: 15px; font-weight: 600; color: var(--order-ink); margin-bottom: 6px;">Không tìm thấy giao dịch nào.</div>
+                <div style="color: var(--order-muted); font-size: 13px;">Chưa có giao dịch chuyển tiền thành công hoặc không khớp từ khóa tìm kiếm.</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+
+      <nav class="cms-order-pagination" th:if="${transactions.totalPages > 1}" aria-label="Phân trang giao dịch">
+        <a th:if="${transactions.hasPrevious()}" th:href="@{/cms/transactions(page=${transactions.number - 1},search=${search})}">← Trang trước</a>
+        <span th:text="|Trang ${transactions.number + 1} / ${transactions.totalPages}|"></span>
+        <a th:if="${transactions.hasNext()}" th:href="@{/cms/transactions(page=${transactions.number + 1},search=${search})}">Trang sau →</a>
+      </nav>
     </section>
   </div>
 </main>

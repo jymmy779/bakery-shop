@@ -45,6 +45,20 @@
     };
   }
 
+  document.addEventListener('submit', async event => {
+    const form = event.target.closest('form[data-confirm-logout]');
+    if (!form || form.dataset.confirming === 'true') return;
+    event.preventDefault();
+    const confirmed = await window.AppConfirm?.open({
+      heading: form.dataset.confirmHeading || 'Đăng xuất?',
+      text: form.dataset.confirmText || 'Bạn sẽ cần đăng nhập lại để tiếp tục.',
+      confirmLabel: form.dataset.confirmLabel || 'Đăng xuất'
+    });
+    if (!confirmed) return;
+    form.dataset.confirming = 'true';
+    form.submit();
+  });
+
   if (toast && !window.AppToast) {
     const message = toast.querySelector('[data-toast-message]');
     const icon = toast.querySelector('[data-toast-icon]');

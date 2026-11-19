@@ -12,6 +12,7 @@ public class OrderItemResponse {
 
   private Long productId;
   private String productName;
+  private String imagePath;
   private BigDecimal unitPrice;
   private int quantity;
   private BigDecimal lineTotal;

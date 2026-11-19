@@ -62,7 +62,7 @@ class ProductQueryServiceTest {
     product.setName("Tiramisu");
     product.setCategory(category);
     product.setStatus(com.bakery.catalog.entity.ProductStatus.SELLING);
-    when(products.searchByNameOrDescription("%TIRA%"))
+    when(products.searchByNameOrCategory("%TIRA%"))
         .thenReturn(List.of(product));
     when(images.findByProductIdInOrderByDisplayOrderAscIdAsc(List.of(10L))).thenReturn(List.of());
 
@@ -78,12 +78,12 @@ class ProductQueryServiceTest {
     when(products.findAll(any(Sort.class))).thenReturn(List.of());
     assertTrue(service.list("   ").isEmpty());
     verify(products).findAll(Sort.by("name", "id"));
-    verify(products, never()).searchByNameOrDescription(anyString());
+    verify(products, never()).searchByNameOrCategory(anyString());
   }
 
   @Test
   void noSearchMatchesReturnsEmptyList() {
-    when(products.searchByNameOrDescription("%missing%"))
+    when(products.searchByNameOrCategory("%missing%"))
         .thenReturn(List.of());
     assertTrue(service.list("missing").isEmpty());
     verifyNoInteractions(images);
@@ -91,16 +91,16 @@ class ProductQueryServiceTest {
 
   @Test
   void treatsSqlWildcardsAsLiteralCharacters() {
-    when(products.searchByNameOrDescription("%50!%!_!!%")).thenReturn(List.of());
+    when(products.searchByNameOrCategory("%50!%!_!!%")).thenReturn(List.of());
     assertTrue(service.list("50%_!").isEmpty());
-    verify(products).searchByNameOrDescription("%50!%!_!!%");
+    verify(products).searchByNameOrCategory("%50!%!_!!%");
   }
 
   @Test
   void normalizesVietnameseDInBothCases() {
-    when(products.searchByNameOrDescription("%Dậu do%")).thenReturn(List.of());
+    when(products.searchByNameOrCategory("%Dậu do%")).thenReturn(List.of());
     service.list("Đậu đo");
-    verify(products).searchByNameOrDescription("%Dậu do%");
+    verify(products).searchByNameOrCategory("%Dậu do%");
   }
 
   @Test

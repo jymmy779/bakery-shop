@@ -4,6 +4,7 @@ import com.bakery.common.exception.ResourceNotFoundException;
 import com.bakery.order.dto.AdminOrderDetailResponse;
 import com.bakery.order.dto.OrderStatusHistoryResponse;
 import com.bakery.order.dto.OrderSummaryResponse;
+import com.bakery.order.dto.TransactionSummaryResponse;
 import com.bakery.order.entity.OrderStatus;
 import com.bakery.order.entity.PaymentMethod;
 import com.bakery.order.entity.PaymentStatus;
@@ -73,5 +74,57 @@ public class AdminOrderQueryServiceImpl {
     }).toList());
     return new AdminOrderDetailResponse(order, entity.getStatus() == OrderStatus.PENDING
         && payment.getStatus() == PaymentStatus.PENDING && payment.getMethod() == PaymentMethod.BANK_TRANSFER);
+  }
+
+  public Page<TransactionSummaryResponse> findTransactions(Long staffId, String search, int page) {
+    staffAccess.requireActiveStaff(staffId);
+    String term = search == null ? "" : search.trim();
+    var sort = Sort.by(Sort.Direction.DESC, "paidAt", "id");
+    var found = payments.findAdminTransactions(term, PageRequest.of(Math.max(0, page), 15, sort));
+    int lastPage = Math.max(0, found.getTotalPages() - 1);
+    if (found.getNumber() > lastPage) {
+      found = payments.findAdminTransactions(term, PageRequest.of(lastPage, 15, sort));
+    }
+    return found.map(row -> {
+      var result = new TransactionSummaryResponse();
+      result.setPaymentId(row.getPaymentId());
+      result.setOrderId(row.getOrderId());
+      result.setOrderCode(row.getOrderCode());
+      result.setCustomerName(row.getCustomerName());
+      result.setMethod(row.getMethod());
+      result.setPaymentStatus(row.getPaymentStatus());
+      result.setOrderStatus(row.getOrderStatus());
+      result.setAmount(row.getAmount());
+      result.setBankReference(row.getBankReference());
+      result.setPaidAt(row.getPaidAt());
+      result.setCreatedAt(row.getCreatedAt());
+      result.setConfirmedByName(row.getConfirmedByName());
+      return result;
+    });
+  }
+
+  public com.bakery.order.dto.TransactionDetailResponse getTransactionDetail(Long staffId, Long paymentId) {
+    staffAccess.requireActiveStaff(staffId);
+    var payment = payments.findById(paymentId)
+        .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giao dịch thanh toán."));
+    var order = payment.getOrder();
+    var detail = new com.bakery.order.dto.TransactionDetailResponse();
+    detail.setPaymentId(payment.getId());
+    detail.setOrderId(order.getId());
+    detail.setOrderCode(order.getOrderCode());
+    detail.setAmount(payment.getAmount());
+    detail.setMethod(payment.getMethod());
+    detail.setStatus(payment.getStatus());
+    detail.setBankReference(payment.getBankReference());
+    detail.setPaidAt(payment.getPaidAt());
+    detail.setCreatedAt(payment.getCreatedAt());
+    detail.setConfirmedByName(payment.getConfirmedBy() != null ? payment.getConfirmedBy().getFullName() : null);
+
+    detail.setCustomerName(order.getReceiverName());
+    detail.setCustomerPhone(order.getReceiverPhone());
+    detail.setCustomerEmail(order.getReceiverEmail());
+    detail.setReceiverAddress(order.getReceiverAddress());
+    detail.setOrderStatus(order.getStatus());
+    return detail;
   }
 }

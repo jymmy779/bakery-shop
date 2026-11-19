@@ -45,7 +45,7 @@
   // Keep the ordinary HTML form usable when dialogs or JavaScript are unavailable.
   const dialog = document.createElement('dialog');
   if (typeof dialog.showModal !== 'function') return;
-  dialog.className = 'orders-cancel__dialog';
+  dialog.className = 'app-dialog orders-cancel__dialog';
   dialog.setAttribute('aria-labelledby', 'cancel-order-title');
   dialog.append(panel);
   root.append(dialog);
