@@ -110,14 +110,14 @@
             <div class="checkout-fields">
               <div class="checkout-field"><label for="receiverName">Họ tên người nhận <span
                     aria-hidden="true">*</span></label>
-                <input th:field="*{receiverName}" autocomplete="shipping name" required maxlength="100"
+                <input id="receiverName" th:field="*{receiverName}" autocomplete="shipping name" required maxlength="100"
                   placeholder="Họ và tên người nhận" aria-describedby="receiverName-error" />
                 <small class="checkout-field-error" id="receiverName-error" th:errors="*{receiverName}"
                   th:hidden="${!#fields.hasErrors('receiverName')}"></small>
               </div>
               <div class="checkout-field"><label for="receiverPhone">Số điện thoại <span
                     aria-hidden="true">*</span></label>
-                <input th:field="*{receiverPhone}" type="tel" autocomplete="shipping tel" inputmode="tel" required
+                <input id="receiverPhone" th:field="*{receiverPhone}" type="tel" autocomplete="shipping tel" inputmode="tel" required
                   maxlength="12" pattern="(0|\+84)[0-9]{9}" placeholder="Số điện thoại nhận bánh"
                   aria-describedby="receiverPhone-error" />
                 <small class="checkout-field-error" id="receiverPhone-error" th:errors="*{receiverPhone}"
@@ -125,7 +125,7 @@
               </div>
               <div class="checkout-field checkout-field--wide"><label for="receiverAddress">Địa chỉ nhận bánh <span
                     aria-hidden="true">*</span></label>
-                <textarea th:field="*{receiverAddress}" autocomplete="shipping street-address" required maxlength="500"
+                <textarea id="receiverAddress" th:field="*{receiverAddress}" autocomplete="shipping street-address" required maxlength="500"
                   rows="2" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"
                   aria-describedby="receiverAddress-error"></textarea>
                 <small class="checkout-field-error" id="receiverAddress-error" th:errors="*{receiverAddress}"
@@ -133,7 +133,7 @@
               </div>
               <div class="checkout-field checkout-field--wide"><label for="receiverEmail">Email nhận thông tin <span
                     class="checkout-optional">(không bắt buộc)</span></label>
-                <input th:field="*{receiverEmail}" type="email" autocomplete="email" maxlength="150"
+                <input id="receiverEmail" th:field="*{receiverEmail}" type="email" autocomplete="email" maxlength="150"
                   placeholder="Email để nhận thông tin đơn hàng"
                   aria-describedby="receiverEmail-hint receiverEmail-error" />
                 <small id="receiverEmail-hint">Bạn vẫn có thể theo dõi đơn hàng trên website khi không nhập
@@ -169,13 +169,13 @@
               </div>
               <div class="checkout-field"><label for="deliveryTime">Giờ mong muốn <span class="checkout-optional">(tùy
                     chọn)</span></label>
-                <input th:field="*{deliveryTime}" type="time" aria-describedby="deliveryTime-hint deliveryTime-error" />
+                <input id="deliveryTime" th:field="*{deliveryTime}" type="time" aria-describedby="deliveryTime-hint deliveryTime-error" />
                 <small id="deliveryTime-hint">LUNE sẽ liên hệ để thống nhất giờ giao phù hợp.</small>
                 <small class="checkout-field-error" id="deliveryTime-error" hidden></small>
               </div>
               <div class="checkout-field checkout-field--wide"><label for="note">Lời nhắn cho LUNE <span
                     class="checkout-optional">(tùy chọn)</span></label>
-                <textarea th:field="*{note}" rows="3" maxlength="200" data-note-counter="order-note-count"
+                <textarea id="note" th:field="*{note}" rows="3" maxlength="200" data-note-counter="order-note-count"
                   placeholder="Ví dụ: Gọi cho mình trước khi giao bánh nhé."
                   aria-describedby="note-error order-note-count"></textarea>
                 <span class="checkout-field__footer"><small class="checkout-field-error" id="note-error"
@@ -201,8 +201,8 @@
                     th:text="${item.quantity}"></span></div>
                 <div class="checkout-product__info">
                   <h3 th:text="${item.productName}"></h3><span
-                    th:text="|${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} ₫ / bánh|"></span>
-                  <strong th:text="|${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} ₫|"></strong>
+                    th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'POINT', 0, 'COMMA')} + ' ₫ / bánh'"></span>
+                  <strong th:text="${#numbers.formatDecimal(item.lineTotal, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></strong>
                   <small th:if="${!item.available}" class="checkout-product__warning"
                     th:text="${item.availabilityMessage}"></small>
                 </div>
@@ -224,11 +224,11 @@
           </ul>
           <div class="checkout-totals">
             <div><span>Tạm tính</span><strong
-                th:text="|${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong>
+                th:text="${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></strong>
             </div>
             <p>Tổng tiền được tính theo số lượng và giá bánh trong giỏ.</p>
             <div class="checkout-total"><span>Tổng tiền bánh</span><strong
-                th:text="|${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong>
+                th:text="${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></strong>
             </div>
           </div>
           <section class="checkout-card checkout-payment" aria-labelledby="payment-title">
@@ -265,31 +265,31 @@
         <dl class="checkout-review-details">
           <div>
             <dt>Người nhận</dt>
-            <dd id="review-receiver"></dd>
+            <dd id="review-receiver-value"></dd>
           </div>
           <div>
             <dt>Số điện thoại</dt>
-            <dd id="review-phone"></dd>
+            <dd id="review-phone-value"></dd>
           </div>
           <div>
             <dt>Địa chỉ</dt>
-            <dd id="review-address"></dd>
+            <dd id="review-address-value"></dd>
           </div>
           <div>
             <dt>Ngày, giờ mong muốn</dt>
-            <dd id="review-delivery"></dd>
+            <dd id="review-delivery-value"></dd>
           </div>
           <div>
             <dt>Email</dt>
-            <dd id="review-email"></dd>
+            <dd id="review-email-value"></dd>
           </div>
           <div>
             <dt>Lời nhắn</dt>
-            <dd id="review-note"></dd>
+            <dd id="review-note-value"></dd>
           </div>
           <div>
             <dt>Tổng tiền bánh</dt>
-            <dd th:text="|${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} ₫|"></dd>
+            <dd th:text="${#numbers.formatDecimal(checkout.cart.totalAmount, 0, 'POINT', 0, 'COMMA')} + ' ₫'"></dd>
           </div>
         </dl>
         <div class="checkout-dialog__actions"><button type="button" class="checkout-button checkout-button--secondary"
