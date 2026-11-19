@@ -11,14 +11,12 @@ import org.springframework.data.repository.query.Param;
 
 public interface AccountCartRepository extends JpaRepository<AccountCart, Long> {
 
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("SELECT c FROM AccountCart c WHERE c.account.id = :accountId")
   Optional<AccountCart> findForCheckout(@Param("accountId") Long accountId);
 
   @EntityGraph(attributePaths = {"items", "items.product"})
   Optional<AccountCart> findByAccount_Id(Long accountId);
 
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
   @EntityGraph(attributePaths = {"items", "items.product"})
   Optional<AccountCart> findWithItemsByAccount_Id(Long accountId);
 }

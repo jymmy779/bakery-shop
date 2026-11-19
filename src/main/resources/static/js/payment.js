@@ -117,4 +117,38 @@
     });
     check(false);
   });
+
+  // Countdown timer cho các trang có thời hạn thanh toán (5 phút kể từ createdAt)
+  document.querySelectorAll('[data-order-countdown]').forEach(countdownEl => {
+    const createdAtStr = countdownEl.dataset.orderCreated;
+    if (!createdAtStr) return;
+
+    // createdAt ISO string
+    const createdAt = new Date(createdAtStr).getTime();
+    const expireTime = createdAt + 5 * 60 * 1000;
+    const timeDisplay = countdownEl.querySelector('[data-countdown-time]');
+
+    const updateTimer = () => {
+      const now = Date.now();
+      const remainingMs = expireTime - now;
+
+      if (remainingMs <= 0) {
+        if (timeDisplay) timeDisplay.textContent = '00:00';
+        countdownEl.classList.add('is-expired');
+        // Khi hết hạn, reload lại trang để server xác nhận trạng thái CANCELLED
+        setTimeout(() => window.location.reload(), 1500);
+        return;
+      }
+
+      const totalSeconds = Math.floor(remainingMs / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      if (timeDisplay) {
+        timeDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }
+      setTimeout(updateTimer, 1000);
+    };
+
+    updateTimer();
+  });
 })();

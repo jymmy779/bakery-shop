@@ -40,7 +40,10 @@
   </th:block>
   <div th:if="${order.status.name() == 'PENDING' and order.payment.status.name() == 'PENDING'}"
        class="bank-transfer__tracking" data-payment-tracking>
-    <p>Đang chờ cửa hàng đối soát. Trang sẽ tự cập nhật sau khi Staff/Admin xác nhận đã nhận tiền.</p>
+    <p class="bank-transfer__live-status">
+      <span class="bank-transfer__live-dot" aria-hidden="true"></span>
+      <span>Hệ thống đang tự động lắng nghe giao dịch. Trang sẽ tự cập nhật ngay khi bạn hoàn tất chuyển khoản.</span>
+    </p>
     <button type="button" class="bank-transfer__check" data-check-payment>Kiểm tra thanh toán</button>
     <p class="bank-transfer__feedback" role="status" aria-live="polite" data-payment-feedback> </p>
   </div>

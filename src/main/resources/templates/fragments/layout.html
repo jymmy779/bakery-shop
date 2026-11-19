@@ -655,23 +655,15 @@
             aria-label="Đăng nhập"
             sec:authorize="isAnonymous()"
             ><span class="material-symbols-outlined">account_circle</span></a
-          ><details
-            class="sf-header__account sf-header__action--account"
+          ><a
+            class="sf-header__action sf-header__action--account"
+            th:href="@{/profile}"
+            href="/profile"
+            aria-label="Hồ sơ của tôi"
             sec:authorize="hasRole('CUSTOMER')"
-          >
-            <summary class="sf-header__action" aria-label="Mở menu tài khoản"
-                     th:classappend="${activePage == 'orders'} ? 'is-active'">
-              <span class="material-symbols-outlined" aria-hidden="true">account_circle</span>
-            </summary>
-            <nav class="sf-header__account-menu" aria-label="Tài khoản của tôi">
-              <a th:href="@{/profile}" href="/profile"><span class="material-symbols-outlined" aria-hidden="true">account_circle</span>Hồ sơ của tôi</a>
-              <a th:href="@{/orders}" href="/orders"
-                 th:classappend="${activePage == 'orders'} ? 'is-active'"
-                 th:attr="aria-current=${activePage == 'orders'} ? 'page'">
-                <span class="material-symbols-outlined" aria-hidden="true">receipt_long</span>Đơn hàng của tôi
-              </a>
-            </nav>
-          </details><a
+            th:classappend="${activePage == 'orders' or activePage == 'profile'} ? 'is-active'"
+            ><span class="material-symbols-outlined">account_circle</span></a
+          ><a
             class="sf-header__action sf-header__cart"
             th:href="@{/cart}"
             href="/cart"

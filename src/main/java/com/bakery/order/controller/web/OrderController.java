@@ -1,6 +1,7 @@
 package com.bakery.order.controller.web;
 
 import com.bakery.account.security.CustomUserDetails;
+import com.bakery.account.service.AccountService;
 import com.bakery.order.entity.OrderStatus;
 import com.bakery.order.dto.CustomerPaymentStatusResponse;
 import com.bakery.order.dto.CancelOrderRequest;
@@ -24,6 +25,7 @@ public class OrderController {
 
   private final CustomerOrderQueryServiceImpl orders;
   private final BankTransferServiceImpl bankTransfers;
+  private final AccountService accountService;
 
   @GetMapping("/{orderId}/payment-status")
   public ResponseEntity<CustomerPaymentStatusResponse> paymentStatus(
@@ -38,6 +40,7 @@ public class OrderController {
       @RequestParam(defaultValue = "0") int page, Model model) {
     model.addAttribute("orders", orders.findCustomerOrders(customer.getAccountId(), status, page));
     model.addAttribute("selectedStatus", status);
+    model.addAttribute("profile", accountService.getById(customer.getAccountId()));
     return "order/list";
   }
 

@@ -49,6 +49,34 @@
 .cms-order-confirm > small { display: block; margin-top: 12px; color: var(--order-muted); line-height: 1.7; font-size: 11px; }
 .cms-order-payment-notice { margin: 20px 0 0; padding: 14px; background: #f6f1f3; border-radius: 10px; font-size: 12px; line-height: 1.8; }
 .cms-order-recipient { padding: 4px 24px 12px; }
+.cms-order-recipient-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+  padding: 24px 26px;
+  margin: 0;
+}
+.cms-order-recipient-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.cms-order-recipient-item--full {
+  grid-column: 1 / -1;
+}
+.cms-order-recipient-item dt {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--order-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.cms-order-recipient-item dd {
+  margin: 0;
+  font-size: 13px;
+  color: var(--order-ink);
+  line-height: 1.6;
+}
 .cms-order-message { border-radius: 12px; padding: 16px 20px; margin: 0 0 24px; font-size: 13px; line-height: 1.7; }
 .cms-order-message.is-success { background: #e8f3ec; color: #2b6844; }
 .cms-order-message.is-error { background: #fae9ec; color: #93384b; }

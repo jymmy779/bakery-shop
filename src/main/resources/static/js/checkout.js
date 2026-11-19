@@ -92,6 +92,10 @@
         updateCount(field);
       });
       selectedAddress = radio.value;
+      if (radio.value === 'manual') {
+        const targetField = document.getElementById('receiverAddress') || document.getElementById('receiverName');
+        targetField?.focus();
+      }
     });
   });
 

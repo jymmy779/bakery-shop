@@ -19,13 +19,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
   Optional<Order> findByIdAndAccount_Id(Long orderId, Long accountId);
 
+  Optional<Order> findByOrderCode(String orderCode);
+
   Optional<Order> findByOrderCodeAndAccount_Id(String orderCode, Long accountId);
 
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT o FROM Order o WHERE o.status = :status AND o.createdAt <= :createdBefore")
+  java.util.List<Order> findExpiredPendingOrders(
+      @Param("status") OrderStatus status,
+      @Param("createdBefore") LocalDateTime createdBefore);
+
   @Query("SELECT o FROM Order o WHERE o.id = :orderId")
   Optional<Order> findForPaymentConfirmation(@Param("orderId") Long orderId);
 
-  @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("SELECT o FROM Order o WHERE o.id = :orderId AND o.account.id = :accountId")
   Optional<Order> findForCustomerCancellation(@Param("orderId") Long orderId,
       @Param("accountId") Long accountId);
