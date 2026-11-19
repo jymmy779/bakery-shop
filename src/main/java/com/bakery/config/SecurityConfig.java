@@ -33,7 +33,9 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .authorizeHttpRequests(auth -> auth
+      .csrf(csrf -> csrf.ignoringRequestMatchers("/api/webhooks/**"))
+      .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/webhooks/**").permitAll()
             .requestMatchers(
                 "/",
                 "/products",
@@ -56,7 +58,7 @@ public class SecurityConfig {
             .requestMatchers("/checkout/**", "/orders/**", "/profile/**")
             .hasRole("CUSTOMER")
             .requestMatchers("/cms/login").permitAll()
-        .requestMatchers("/cms/accounts/**", "/cms/staff/**", "/cms/transactions", "/cms/transactions/**")
+            .requestMatchers("/cms/accounts/**", "/cms/staff/**", "/cms/transactions", "/cms/transactions/**")
             .hasRole("ADMIN")
             .requestMatchers("/cms/**")
             .hasAnyRole("STAFF", "ADMIN")
@@ -68,6 +70,16 @@ public class SecurityConfig {
                   ? "/cms/login"
                   : "/login";
               response.sendRedirect(request.getContextPath() + loginPage);
+            })
+            .accessDeniedHandler((request, response, accessDeniedException) -> {
+              String requestPath = request.getRequestURI().substring(request.getContextPath().length());
+              if (requestPath.equals("/cms") || requestPath.startsWith("/cms/")) {
+                // Customer hoặc người không đủ quyền vào CMS -> chuyển về trang chủ storefront
+                response.sendRedirect(request.getContextPath() + "/?forbidden");
+              } else {
+                // Vào các trang dành riêng cho Customer (/orders, /profile...) nhưng không có quyền
+                response.sendRedirect(request.getContextPath() + "/login?forbidden");
+              }
             }))
         .formLogin(form -> form
             .loginPage("/cms/login")

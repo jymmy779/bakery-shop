@@ -6,6 +6,8 @@ import com.bakery.account.dto.AccountAddressRequest;
 import com.bakery.account.service.AccountAddressService;
 import com.bakery.account.security.CustomUserDetails;
 import com.bakery.account.service.AccountService;
+import com.bakery.order.service.impl.CustomerOrderQueryServiceImpl;
+import com.bakery.order.dto.OrderSummaryResponse;
 import com.bakery.common.exception.InvalidOperationException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class ProfileController {
 
   private final AccountService accountService;
   private final AccountAddressService accountAddressService;
+  private final CustomerOrderQueryServiceImpl customerOrderQueryService;
 
   @GetMapping("/profile")
   public String profile(
@@ -39,6 +42,25 @@ public class ProfileController {
     request.setDateOfBirth(profile.getDateOfBirth());
     model.addAttribute("profileUpdateRequest", request);
     model.addAttribute("profileEditMode", edit);
+
+    var ordersPage = customerOrderQueryService.findCustomerOrders(userDetails.getAccountId(), null, 0);
+    model.addAttribute("orderCount", ordersPage.getTotalElements());
+
+    // The service returns orders newest first; the profile preview must show that order
+    // regardless of status, including a newly placed PENDING order.
+    OrderSummaryResponse chosenOrder = ordersPage.getContent().stream().findFirst().orElse(null);
+
+    if (chosenOrder != null) {
+      try {
+        var latestOrderDetail = customerOrderQueryService.getCustomerOrder(userDetails.getAccountId(), chosenOrder.getId());
+        model.addAttribute("latestOrder", latestOrderDetail);
+      } catch (Exception e) {
+        model.addAttribute("latestOrder", null);
+      }
+    } else {
+      model.addAttribute("latestOrder", null);
+    }
+
     return "account/profile";
   }
 

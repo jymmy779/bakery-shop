@@ -2,10 +2,13 @@ package com.bakery.order.repository;
 
 import com.bakery.order.entity.Payment;
 import java.math.BigDecimal;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
+
+  Optional<Payment> findByOrder_Id(Long orderId);
 
   @Query(value = """
       SELECT COALESCE(SUM(p.amount), 0)

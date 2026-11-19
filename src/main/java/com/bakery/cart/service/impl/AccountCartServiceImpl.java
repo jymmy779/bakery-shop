@@ -34,9 +34,10 @@ public class AccountCartServiceImpl {
     return cartRules.getCart(toModel(carts.findByAccount_Id(accountId).orElse(null)));
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public Cart getModel(Long accountId) {
-    return toModel(carts.findByAccount_Id(accountId).orElse(null));
+    // Checkout must lock before reading items; the surrounding transaction also creates the order.
+    return toModel(carts.findForCheckout(accountId).orElse(null));
   }
 
   @Transactional
