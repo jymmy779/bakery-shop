@@ -10,6 +10,7 @@ import com.bakery.order.entity.OrderStatusHistory;
 import com.bakery.order.entity.PaymentMethod;
 import com.bakery.order.entity.PaymentStatus;
 import com.bakery.order.repository.CheckoutReferenceRepository;
+import com.bakery.order.repository.OrderDetailRepository;
 import com.bakery.order.repository.OrderRepository;
 import com.bakery.order.repository.OrderStatusHistoryRepository;
 import com.bakery.order.repository.PaymentRepository;
@@ -27,11 +28,13 @@ public class PaymentServiceImpl implements PaymentService {
 
   private final PaymentStaffAccess staffAccess;
   private final OrderRepository orders;
+  private final OrderDetailRepository details;
   private final PaymentRepository payments;
   private final OrderStatusHistoryRepository history;
   private final CheckoutReferenceRepository references;
   private final CheckoutOrderMapper mapper;
   private final Validator validator;
+  private final OrderConfirmationNotifier notifications;
 
   @Override
   @Transactional
@@ -74,6 +77,8 @@ public class PaymentServiceImpl implements PaymentService {
     event.setNote("Đã đối soát và xác nhận nhận đủ tiền chuyển khoản.");
     // Flush all three writes together; a failure rolls back payment, order and history.
     history.saveAndFlush(event);
+    var orderDetails = details.findByOrder_IdOrderByIdAsc(order.getId());
+    notifications.afterPaymentConfirmed(mapper.map(order, orderDetails, payment));
     return mapper.mapPayment(payment);
   }
 }

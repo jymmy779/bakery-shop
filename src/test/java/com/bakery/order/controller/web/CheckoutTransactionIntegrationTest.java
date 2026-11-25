@@ -84,43 +84,13 @@ class CheckoutTransactionIntegrationTest {
   @MockitoBean OrderConfirmationMailSender mailSender;
 
   @Test
-  void emailRunsAfterCommitWithCommittedCartAndOnlyOnceOnReplay() throws Exception {
+  void checkoutDoesNotSendEmailBeforePaymentIsConfirmed() throws Exception {
     var fixture = fixture(null, 5, 2); String token = token(fixture);
-    var checked = new CountDownLatch(1);
-    var failure = new java.util.concurrent.atomic.AtomicReference<Throwable>();
-    doAnswer(invocation -> {
-      try {
-        var mail = invocation.getArgument(0, OrderConfirmationMail.class);
-        assertEquals("customer@example.test", mail.recipient());
-        assertTrue(Thread.currentThread().getName().startsWith("order-mail-"));
-        assertFalse(org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive());
-        var saved = orders.findByOrderCodeAndAccount_Id(
-            com.bakery.order.service.impl.CheckoutQuoteStore.orderCode(token), fixture.account().getId()).orElseThrow();
-        assertEquals(OrderStatus.PENDING, saved.getStatus());
-        assertTrue(carts.findByAccount_Id(fixture.account().getId()).orElseThrow().getItems().isEmpty());
-        assertTrue(mail.body().contains(saved.getOrderCode()));
-        assertTrue(mail.body().contains("900.000 VND"));
-      } catch (Throwable error) { failure.set(error); }
-      finally { checked.countDown(); }
-      return null;
-    }).when(mailSender).send(any());
     mvc.perform(place(fixture, token, "customer@example.test")).andExpect(status().is3xxRedirection());
-    assertTrue(checked.await(10, TimeUnit.SECONDS));
-    if (failure.get() != null) throw new AssertionError("After-commit mail assertions", failure.get());
     mvc.perform(place(fixture, token, "customer@example.test")).andExpect(status().is3xxRedirection());
-    verify(mailSender, times(1)).send(any());
-  }
-
-  @Test
-  void smtpFailureDoesNotRollBackOrderOrRestorePurchasedCart() throws Exception {
-    var fixture = fixture(null, 5, 2);
-    doThrow(new org.springframework.mail.MailSendException("simulated SMTP failure")).when(mailSender).send(any());
-    mvc.perform(place(fixture, token(fixture), "customer@example.test")).andExpect(status().is3xxRedirection());
-    verify(mailSender, timeout(5000)).send(any());
+    verifyNoInteractions(mailSender);
     assertEquals(3, products.findById(fixture.product().getId()).orElseThrow().getStockQuantity());
     assertTrue(carts.findByAccount_Id(fixture.account().getId()).orElseThrow().getItems().isEmpty());
-    assertEquals(1, orders.findCustomerOrders(fixture.account().getId(), null,
-        org.springframework.data.domain.PageRequest.of(0, 6)).getTotalElements());
   }
 
   @Test

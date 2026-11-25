@@ -4,6 +4,7 @@ import com.bakery.order.dto.SepayWebhookRequest;
 import com.bakery.order.entity.OrderStatus;
 import com.bakery.order.entity.OrderStatusHistory;
 import com.bakery.order.entity.PaymentStatus;
+import com.bakery.order.repository.OrderDetailRepository;
 import com.bakery.order.repository.OrderRepository;
 import com.bakery.order.repository.OrderStatusHistoryRepository;
 import com.bakery.order.repository.PaymentRepository;
@@ -26,8 +27,11 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
 
   private static final Pattern ORDER_CODE_PATTERN = Pattern.compile("LN[A-Za-z0-9]+");
   private final OrderRepository orderRepository;
+  private final OrderDetailRepository orderDetailRepository;
   private final PaymentRepository paymentRepository;
   private final OrderStatusHistoryRepository historyRepository;
+  private final CheckoutOrderMapper checkoutOrderMapper;
+  private final OrderConfirmationNotifier notifications;
 
   @Override
   @Transactional
@@ -84,6 +88,8 @@ public class SepayWebhookServiceImpl implements SepayWebhookService {
     paymentRepository.save(payment);
     orderRepository.save(order);
     historyRepository.save(history);
+    var orderDetails = orderDetailRepository.findByOrder_IdOrderByIdAsc(order.getId());
+    notifications.afterPaymentConfirmed(checkoutOrderMapper.map(order, orderDetails, payment));
     log.info("Đã cập nhật đơn hàng {} thành công sang CONFIRMED và PAID!", orderCode);
 
   }
