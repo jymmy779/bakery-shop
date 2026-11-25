@@ -1,7 +1,32 @@
 package com.bakery.account.controller.web;
 
+import com.bakery.account.dto.AccountProfileResponse;
+import com.bakery.account.dto.ChangePasswordRequest;
+import com.bakery.account.dto.ProfileUpdateRequest;
+import com.bakery.account.entity.Account;
+import com.bakery.account.entity.AccountStatus;
+import com.bakery.account.entity.Role;
+import com.bakery.account.security.CustomUserDetails;
+import com.bakery.account.service.AccountAddressService;
+import com.bakery.account.service.AccountService;
+import com.bakery.order.service.impl.CustomerOrderQueryServiceImpl;
+import java.time.LocalDate;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.MethodParameter;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,41 +36,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import com.bakery.account.dto.AccountProfileResponse;
-import com.bakery.account.dto.ChangePasswordRequest;
-import com.bakery.account.dto.ProfileUpdateRequest;
-import com.bakery.account.entity.Account;
-import com.bakery.account.entity.AccountStatus;
-import com.bakery.account.entity.Role;
-import com.bakery.account.security.CustomUserDetails;
-import com.bakery.account.service.AccountService;
-import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.core.MethodParameter;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.method.support.ModelAndViewContainer;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-
 @ExtendWith(MockitoExtension.class)
 class ProfileControllerTest {
 
   @Mock AccountService accountService;
+  @Mock com.bakery.account.service.AccountAddressService accountAddressService;
+  @Mock com.bakery.order.service.impl.CustomerOrderQueryServiceImpl customerOrderQueryService;
 
   private MockMvc mvc;
   private CustomUserDetails userDetails;
 
   @BeforeEach
   void setUp() {
-    ProfileController controller = new ProfileController(accountService);
+    // Stub findCustomerOrders để GET /profile không NullPointerException
+    when(customerOrderQueryService.findCustomerOrders(any(), any(), anyInt()))
+        .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of()));
+
+    ProfileController controller = new ProfileController(accountService, accountAddressService, customerOrderQueryService);
     LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
     validator.afterPropertiesSet();
     mvc = MockMvcBuilders.standaloneSetup(controller)

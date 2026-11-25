@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{cms/order/fragments :: head('Chi tiết giao dịch')}"></head>
+<body>
+<th:block th:replace="~{fragments/cms-sidebar :: nav('transactions')}"></th:block>
+<main class="cms-page cms-accounts-page cms-order-page">
+  <div class="wrap cms-accounts-wrap">
+    <a class="cms-order-back" th:href="@{/cms/transactions}">← Quay lại danh sách giao dịch</a>
+
+    <header class="cms-accounts-header">
+      <div>
+        <span class="cms-products-kicker">QUẢN TRỊ <span aria-hidden="true">/</span> TÀI CHÍNH <span aria-hidden="true">/</span> CHI TIẾT</span>
+        <h1 th:text="${transaction.bankReference != null ? transaction.bankReference : 'TXN-' + transaction.paymentId}"></h1>
+        <p class="cms-accounts-desc" th:text="|Thời gian ghi nhận: ${#temporals.format(transaction.paidAt != null ? transaction.paidAt : transaction.createdAt, 'dd/MM/yyyy · HH:mm:ss')}|"></p>
+      </div>
+      <div class="cms-order-badges">
+        <span class="cms-badge" style="background: #e8f5e9; color: #2e7d32; font-weight: 700; padding: 6px 14px; border-radius: 999px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Giao dịch thành công
+        </span>
+      </div>
+    </header>
+
+    <div class="cms-order-grid">
+      <div class="cms-order-main">
+        <!-- Thông tin giao dịch tài chính -->
+        <section class="cms-accounts-panel">
+          <div class="cms-accounts-panel__heading">
+            <h2>Biên nhận chuyển khoản</h2>
+            <span style="font-weight: 600; color: #2e7d32;">Đã thu tiền vào tài khoản</span>
+          </div>
+          <dl class="cms-order-recipient-grid">
+            <div class="cms-order-recipient-item">
+              <dt>Mã tham chiếu ngân hàng</dt>
+              <dd>
+                <strong style="font-family: monospace; font-size: 15px; color: var(--order-wine);" th:text="${transaction.bankReference != null ? transaction.bankReference : 'Chưa có'}"></strong>
+              </dd>
+            </div>
+            <div class="cms-order-recipient-item">
+              <dt>Số tiền thực nhận</dt>
+              <dd>
+                <strong style="font-size: 20px; color: #2e7d32;" th:text="|+ ${#numbers.formatDecimal(transaction.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></strong>
+              </dd>
+            </div>
+            <div class="cms-order-recipient-item">
+              <dt>Phương thức thanh toán</dt>
+              <dd>
+                <span>Chuyển khoản VietQR / Ngân hàng</span>
+              </dd>
+            </div>
+            <div class="cms-order-recipient-item">
+              <dt>Cơ chế xác nhận</dt>
+              <dd>
+                <span th:if="${transaction.confirmedByName != null}" th:text="|Nhân viên: ${transaction.confirmedByName}|"></span>
+                <span th:if="${transaction.confirmedByName == null}" style="color: #1d4ed8; font-weight: 600;">⚡ SePay Webhook (Tự động)</span>
+              </dd>
+            </div>
+            <div class="cms-order-recipient-item">
+              <dt>Thời gian thanh toán</dt>
+              <dd th:text="${#temporals.format(transaction.paidAt, 'dd/MM/yyyy · HH:mm:ss')}"></dd>
+            </div>
+            <div class="cms-order-recipient-item">
+              <dt>Thời gian tạo yêu cầu</dt>
+              <dd th:text="${#temporals.format(transaction.createdAt, 'dd/MM/yyyy · HH:mm:ss')}"></dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- Thông tin đơn hàng liên quan -->
+        <section class="cms-accounts-panel">
+          <div class="cms-accounts-panel__heading">
+            <h2>Đơn hàng liên kết</h2>
+            <a th:href="@{/cms/orders/{id}(id=${transaction.orderId})}" class="cms-order-link">Mở toàn bộ đơn hàng →</a>
+          </div>
+          <dl class="cms-order-recipient-grid">
+            <div class="cms-order-recipient-item">
+              <dt>Mã đơn hàng</dt>
+              <dd>
+                <a th:href="@{/cms/orders/{id}(id=${transaction.orderId})}" class="cms-order-code" style="font-size: 14px;" th:text="${transaction.orderCode}"></a>
+              </dd>
+            </div>
+            <div class="cms-order-recipient-item">
+              <dt>Trạng thái đơn hàng</dt>
+              <dd>
+                <span th:replace="~{order/fragments :: statusBadge(${transaction.orderStatus})}"></span>
+              </dd>
+            </div>
+            <div class="cms-order-recipient-item">
+              <dt>Khách hàng người nhận</dt>
+              <dd><strong th:text="${transaction.customerName}"></strong></dd>
+            </div>
+            <div class="cms-order-recipient-item">
+              <dt>Số điện thoại</dt>
+              <dd><span th:text="${transaction.customerPhone}"></span></dd>
+            </div>
+            <div class="cms-order-recipient-item cms-order-recipient-item--full" th:if="${transaction.customerEmail != null}">
+              <dt>Email</dt>
+              <dd th:text="${transaction.customerEmail}"></dd>
+            </div>
+            <div class="cms-order-recipient-item cms-order-recipient-item--full">
+              <dt>Địa chỉ nhận bánh</dt>
+              <dd th:text="${transaction.receiverAddress}"></dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+
+      <!-- Cột phải: Thao tác & Tóm tắt nhanh -->
+      <aside class="cms-order-aside">
+        <section class="cms-accounts-panel" style="padding: 24px;">
+          <h2 style="font-size: 16px; margin: 0 0 16px; color: var(--order-ink);">Đối soát tài khoản</h2>
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+            <div style="font-size: 12px; color: var(--order-muted); text-transform: uppercase; margin-bottom: 6px;">Tổng ghi có (VND)</div>
+            <div style="font-size: 26px; font-weight: 700; color: #2e7d32;" th:text="|+ ${#numbers.formatDecimal(transaction.amount, 0, 'POINT', 0, 'COMMA')} ₫|"></div>
+            <div style="font-size: 12px; color: #4b5563; margin-top: 8px;">Tài khoản nhận: <strong>Ngân hàng VietinBank (LUNE Bakery)</strong></div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a th:href="@{/cms/orders/{id}(id=${transaction.orderId})}" class="cms-order-button" style="text-align: center; text-decoration: none;">
+              Xem chi tiết đơn hàng
+            </a>
+            <a th:href="@{/cms/transactions}" style="text-align: center; text-decoration: none; padding: 12px; font-size: 13px; font-weight: 600; color: var(--order-muted);">
+              ← Quay lại danh sách
+            </a>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+</main>
+<th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+</body>
+</html>

@@ -6,12 +6,35 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.domain.Sort;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
+
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  @Query("""
+      UPDATE Product p SET p.stockQuantity = p.stockQuantity - :quantity,
+        p.version = p.version + 1
+      WHERE p.id = :productId
+        AND p.status = com.bakery.catalog.entity.ProductStatus.SELLING
+        AND p.price = :expectedPrice AND p.stockQuantity >= :quantity
+      """)
+  int deductCheckoutStock(@Param("productId") Long productId,
+      @Param("quantity") int quantity, @Param("expectedPrice") BigDecimal expectedPrice);
+
+  @Modifying(flushAutomatically = true)
+  @Query("""
+      UPDATE Product p SET p.stockQuantity = p.stockQuantity + :quantity,
+        p.version = p.version + 1
+      WHERE p.id = :productId AND p.stockQuantity >= 0
+        AND p.stockQuantity <= :maxStockBeforeReturn
+      """)
+  int restoreCancelledStock(@Param("productId") Long productId, @Param("quantity") int quantity,
+      @Param("maxStockBeforeReturn") int maxStockBeforeReturn);
+
   long countByCategoryId(Long categoryId);
 
   @Query("""
@@ -39,24 +62,24 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
   List<Product> findAll(Sort sort);
 
   @Query(value = """
-      SELECT p.* FROM products p
+      SELECT p.* FROM products p JOIN categories c ON c.id = p.category_id
       WHERE REPLACE(REPLACE(CONVERT(p.name USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
                 COLLATE utf8mb4_unicode_ci LIKE :pattern ESCAPE '!'
-         OR REPLACE(REPLACE(CONVERT(p.description USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
+         OR REPLACE(REPLACE(CONVERT(c.name USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
                 COLLATE utf8mb4_unicode_ci LIKE :pattern ESCAPE '!'
       ORDER BY p.name, p.id
       """, nativeQuery = true)
-  List<Product> searchByNameOrDescription(@Param("pattern") String pattern);
+  List<Product> searchByNameOrCategory(@Param("pattern") String pattern);
 
   String FILTER_WHERE = """
-      FROM products p WHERE p.status = 'SELLING'
+      FROM products p JOIN categories c ON c.id = p.category_id WHERE p.status = 'SELLING'
         AND (:categoryId IS NULL OR p.category_id = :categoryId)
         AND (:minPrice IS NULL OR p.price >= :minPrice)
         AND (:maxPrice IS NULL OR p.price <= :maxPrice)
         AND (:pattern IS NULL OR
           REPLACE(REPLACE(CONVERT(p.name USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
             COLLATE utf8mb4_unicode_ci LIKE :pattern ESCAPE '!'
-          OR REPLACE(REPLACE(CONVERT(p.description USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
+          OR REPLACE(REPLACE(CONVERT(c.name USING utf8mb4), 'đ', 'd'), 'Đ', 'D')
             COLLATE utf8mb4_unicode_ci LIKE :pattern ESCAPE '!')
       """;
 

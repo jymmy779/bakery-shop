@@ -5,6 +5,9 @@ import com.bakery.account.dto.AccountStatusUpdateRequest;
 import com.bakery.account.dto.ChangePasswordRequest;
 import com.bakery.account.dto.CmsProfileUpdateRequest;
 import com.bakery.account.dto.ProfileUpdateRequest;
+import com.bakery.account.dto.StaffCreateRequest;
+import com.bakery.account.dto.StaffUpdateRequest;
+import com.bakery.account.entity.AccountStatus;
 import com.bakery.account.security.CustomUserDetails;
 import com.bakery.account.service.AccountService;
 import com.bakery.common.exception.InvalidOperationException;
@@ -16,8 +19,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -39,7 +44,7 @@ public class AdminAccountController {
   @PostMapping("/profile")
   public String updateProfile(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @Valid CmsProfileUpdateRequest request,
+      @ModelAttribute("profileUpdateRequest") @Valid CmsProfileUpdateRequest request,
       BindingResult bindingResult,
       Model model,
       RedirectAttributes redirectAttributes) {
@@ -90,8 +95,15 @@ public class AdminAccountController {
   }
 
   @GetMapping("/accounts")
-  public String accounts(Pageable pageable, Model model) {
-    model.addAttribute("accounts", accountService.findAll(pageable));
+  public String accounts(
+      @RequestParam(defaultValue = "") String search,
+      @RequestParam(required = false) AccountStatus status,
+      @RequestParam(defaultValue = "newest") String order,
+      Pageable pageable,
+      Model model) {
+    String selectedOrder = normalizeOrder(order);
+    model.addAttribute("accounts", accountService.findAll(search, status, selectedOrder, pageable));
+    addAccountFilters(model, search, status, selectedOrder);
     return "cms/account/list";
   }
 
@@ -116,8 +128,115 @@ public class AdminAccountController {
   }
 
   @GetMapping("/staff")
-  public String staff() {
+  public String staff(
+      @RequestParam(defaultValue = "") String search,
+      @RequestParam(required = false) AccountStatus status,
+      @RequestParam(defaultValue = "newest") String order,
+      Pageable pageable,
+      Model model) {
+    String selectedOrder = normalizeOrder(order);
+    model.addAttribute("staffPage", accountService.findStaff(search, status, selectedOrder, pageable));
+    addAccountFilters(model, search, status, selectedOrder);
     return "cms/staff/list";
+  }
+
+  private void addAccountFilters(Model model, String search, AccountStatus status, String order) {
+    model.addAttribute("search", search == null ? "" : search.trim());
+    model.addAttribute("selectedStatus", status == null ? "" : status.name());
+    model.addAttribute("selectedOrder", order);
+    model.addAttribute("hasFilters", (search != null && !search.isBlank()) || status != null);
+  }
+
+  private String normalizeOrder(String order) {
+    if ("oldest".equals(order) || "name_asc".equals(order) || "name_desc".equals(order)) {
+      return order;
+    }
+    return "newest";
+  }
+
+  @GetMapping("/staff/add")
+  public String newStaff(Model model) {
+    populateStaffForm(model, false, null, new StaffCreateRequest());
+    return "cms/staff/form";
+  }
+
+  @GetMapping("/staff/{id}/edit")
+  public String editStaff(@PathVariable Long id, Model model) {
+    var staff = accountService.getStaffById(id);
+    StaffUpdateRequest request = new StaffUpdateRequest();
+    request.setFullName(staff.getFullName());
+    request.setEmail(staff.getEmail());
+    request.setPhone(staff.getPhone());
+    model.addAttribute("staff", staff);
+    populateStaffForm(model, true, id, request);
+    return "cms/staff/form";
+  }
+
+  @PostMapping("/staff")
+  public String createStaff(
+      @ModelAttribute("staffRequest") @Valid StaffCreateRequest request,
+      BindingResult bindingResult,
+      Model model,
+      RedirectAttributes redirectAttributes) {
+    if (bindingResult.hasErrors()) {
+      populateStaffForm(model, false, null, request);
+      return "cms/staff/form";
+    }
+
+    try {
+      accountService.createStaff(request);
+      redirectAttributes.addFlashAttribute("successMessage", "Đã thêm nhân viên.");
+    } catch (RuntimeException exception) {
+      populateStaffForm(model, false, null, request);
+      model.addAttribute("errorMessage", exception.getMessage());
+      return "cms/staff/form";
+    }
+    return "redirect:/cms/staff";
+  }
+
+  @PostMapping("/staff/{id}/update")
+  public String updateStaff(
+      @PathVariable Long id,
+      @ModelAttribute("staffRequest") @Valid StaffUpdateRequest request,
+      BindingResult bindingResult,
+      Model model,
+      RedirectAttributes redirectAttributes) {
+    if (bindingResult.hasErrors()) {
+      model.addAttribute("staff", accountService.getStaffById(id));
+      populateStaffForm(model, true, id, request);
+      return "cms/staff/form";
+    }
+
+    try {
+      accountService.updateStaff(id, request);
+      redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật thông tin nhân viên.");
+    } catch (RuntimeException exception) {
+      model.addAttribute("staff", accountService.getStaffById(id));
+      populateStaffForm(model, true, id, request);
+      model.addAttribute("errorMessage", exception.getMessage());
+      return "cms/staff/form";
+    }
+    return "redirect:/cms/staff";
+  }
+
+  @PostMapping("/staff/{id}/status")
+  public String updateStaffStatus(
+      @PathVariable Long id,
+      @Valid AccountStatusUpdateRequest request,
+      BindingResult bindingResult,
+      RedirectAttributes redirectAttributes) {
+    if (bindingResult.hasErrors()) {
+      redirectAttributes.addFlashAttribute("errorMessage", "Trạng thái tài khoản không hợp lệ.");
+      return "redirect:/cms/staff";
+    }
+
+    try {
+      accountService.updateStaffStatus(id, request);
+      redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật trạng thái nhân viên.");
+    } catch (RuntimeException exception) {
+      redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
+    }
+    return "redirect:/cms/staff";
   }
 
   private CmsProfileUpdateRequest toUpdateRequest(AccountProfileResponse profile) {
@@ -125,5 +244,11 @@ public class AdminAccountController {
     request.setFullName(profile.getFullName());
     request.setPhone(profile.getPhone());
     return request;
+  }
+
+  private void populateStaffForm(Model model, boolean editing, Long staffId, Object request) {
+    model.addAttribute("isEdit", editing);
+    model.addAttribute("staffId", staffId);
+    model.addAttribute("staffRequest", request);
   }
 }

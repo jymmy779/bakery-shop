@@ -12,6 +12,6 @@ import lombok.Setter;
 public class CancelOrderRequest {
 
   @NotBlank(message = "Vui lòng nhập lý do hủy đơn")
-  @Size(max = 500)
+  @Size(max = 500, message = "Lý do hủy tối đa 500 ký tự")
   private String reason;
 }

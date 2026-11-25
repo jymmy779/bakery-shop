@@ -181,6 +181,7 @@
   </div>
 </div>
 <th:block th:replace="~{fragments/cms-layout :: scripts}"></th:block>
+<th:block th:replace="~{fragments/layout :: appToast}"></th:block>
 <div th:replace="~{fragments/cms-sidebar :: image-preview}"></div>
 <th:block th:replace="~{fragments/cms-sidebar :: image-preview-script}"></th:block>
 <script>
@@ -302,7 +303,7 @@ function setupImagePicker(inputId, previewId, maxFiles) {
       }
     });
     if (currentNew.length >= maxFiles && selectedFiles.length > currentNew.length) {
-      window.alert('Chỉ được chọn tối đa ' + maxFiles + ' ảnh mới.');
+      window.AppToast?.show('Chỉ được chọn tối đa ' + maxFiles + ' ảnh mới.', 'error');
     }
     render();
   });

@@ -6,6 +6,8 @@ import com.bakery.catalog.service.CategoryAdminService;
 import com.bakery.catalog.service.ProductAdminService;
 import com.bakery.dashboard.dto.CmsDashboardResponse;
 import com.bakery.dashboard.service.CmsDashboardService;
+import com.bakery.order.dto.OrderMetricsResponse;
+import com.bakery.order.service.OrderMetricsService;
 import com.bakery.order.service.RevenueQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,7 @@ public class CmsDashboardServiceImpl implements CmsDashboardService {
   private final CategoryAdminService categories;
   private final AccountMetricsService accounts;
   private final RevenueQueryService revenue;
+  private final OrderMetricsService orderMetrics;
 
   @Override
   @Transactional(readOnly = true)
@@ -31,7 +34,17 @@ public class CmsDashboardServiceImpl implements CmsDashboardService {
     long stoppedProducts =
         products.search("", null, ProductStatus.STOPPED, "newest", countOnly).getTotalElements();
 
-    return new CmsDashboardResponse(totalProducts, sellingProducts, stoppedProducts,
-        categories.findAll().size(), accounts.countUsers(), revenue.deliveredPaidRevenue());
+    OrderMetricsResponse orders = orderMetrics.getOrderMetrics();
+
+    return new CmsDashboardResponse(
+        totalProducts,
+        sellingProducts,
+        stoppedProducts,
+        categories.findAll().size(),
+        accounts.countStaff(),
+        revenue.deliveredPaidRevenue(),
+        orders.pendingCount(),
+        orders.confirmedCount(),
+        orders.deliveringCount());
   }
 }

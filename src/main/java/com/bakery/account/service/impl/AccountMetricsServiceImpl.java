@@ -1,6 +1,7 @@
 package com.bakery.account.service.impl;
 
 import com.bakery.account.repository.AccountRepository;
+import com.bakery.account.entity.Role;
 import com.bakery.account.service.AccountMetricsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,5 +17,11 @@ public class AccountMetricsServiceImpl implements AccountMetricsService {
   @Transactional(readOnly = true)
   public long countUsers() {
     return accountRepository.count();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public long countStaff() {
+    return accountRepository.countByRole(Role.ROLE_STAFF);
   }
 }
