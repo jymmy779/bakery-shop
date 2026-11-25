@@ -121,15 +121,7 @@
             </tbody>
           </table>
         </div>
-        <nav class="cms-accounts-pagination" th:if="${accounts.totalPages > 1}" aria-label="Phân trang tài khoản">
-          <a th:if="${accounts.hasPrevious()}"
-            th:href="@{/cms/accounts(page=${accounts.number - 1},size=${accounts.size},search=${search},status=${selectedStatus},order=${selectedOrder})}">←
-            Trước</a>
-          <span th:text="${'Trang ' + (accounts.number + 1) + ' / ' + accounts.totalPages}">Trang 1 / 1</span>
-          <a th:if="${accounts.hasNext()}"
-            th:href="@{/cms/accounts(page=${accounts.number + 1},size=${accounts.size},search=${search},status=${selectedStatus},order=${selectedOrder})}">Sau
-            →</a>
-        </nav>
+        <nav th:replace="~{fragments/cms-layout :: pagination(${accounts}, @{/cms/accounts(page=${accounts.number - 1},size=${accounts.size},search=${search},status=${selectedStatus},order=${selectedOrder})}, @{/cms/accounts(page=${accounts.number + 1},size=${accounts.size},search=${search},status=${selectedStatus},order=${selectedOrder})}, 'cms-accounts-pagination', 'Phân trang tài khoản')}"></nav>
       </section>
     </div>
   </main>

@@ -91,11 +91,7 @@
         </table>
       </div>
 
-      <nav class="cms-order-pagination" th:if="${transactions.totalPages > 1}" aria-label="Phân trang giao dịch">
-        <a th:if="${transactions.hasPrevious()}" th:href="@{/cms/transactions(page=${transactions.number - 1},search=${search})}">← Trang trước</a>
-        <span th:text="|Trang ${transactions.number + 1} / ${transactions.totalPages}|"></span>
-        <a th:if="${transactions.hasNext()}" th:href="@{/cms/transactions(page=${transactions.number + 1},search=${search})}">Trang sau →</a>
-      </nav>
+      <nav th:replace="~{fragments/cms-layout :: pagination(${transactions}, @{/cms/transactions(page=${transactions.number - 1},search=${search})}, @{/cms/transactions(page=${transactions.number + 1},search=${search})}, 'cms-order-pagination', 'Phân trang giao dịch')}"></nav>
     </section>
   </div>
 </main>

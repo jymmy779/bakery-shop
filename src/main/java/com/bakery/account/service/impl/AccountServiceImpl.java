@@ -216,6 +216,7 @@ public class AccountServiceImpl implements AccountService {
     response.setDateOfBirth(account.getDateOfBirth());
     response.setRole(account.getRole());
     response.setStatus(account.getStatus());
+    response.setCreatedAt(account.getCreatedAt());
     return response;
   }
 

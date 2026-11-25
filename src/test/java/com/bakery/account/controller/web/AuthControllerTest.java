@@ -24,12 +24,13 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 class AuthControllerTest {
 
   @Mock AccountService accountService;
+  @Mock com.bakery.account.service.PasswordResetService passwordResetService;
 
   private MockMvc mvc;
 
   @BeforeEach
   void setUp() {
-    AuthController controller = new AuthController(accountService);
+    AuthController controller = new AuthController(accountService, passwordResetService);
     LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
     validator.afterPropertiesSet();
     mvc = MockMvcBuilders.standaloneSetup(controller).setValidator(validator).build();

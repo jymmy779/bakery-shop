@@ -30,13 +30,26 @@ public class ProfileController {
   private final AccountAddressService accountAddressService;
   private final CustomerOrderQueryServiceImpl customerOrderQueryService;
 
+  private void populateAccountHeader(Long accountId, Model model) {
+    var profile = accountService.getById(accountId);
+    model.addAttribute("profile", profile);
+    model.addAttribute("orderCount", customerOrderQueryService.countCustomerOrders(accountId));
+    model.addAttribute("activeOrders", customerOrderQueryService.countCustomerActiveOrders(accountId));
+    if (profile.getCreatedAt() != null) {
+      model.addAttribute("memberSince",
+          profile.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("MM/yyyy")));
+    } else {
+      model.addAttribute("memberSince", "11/2026");
+    }
+  }
+
   @GetMapping("/profile")
   public String profile(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestParam(name = "edit", defaultValue = "false") boolean edit,
       Model model) {
-    var profile = accountService.getById(userDetails.getAccountId());
-    model.addAttribute("profile", profile);
+    populateAccountHeader(userDetails.getAccountId(), model);
+    var profile = (com.bakery.account.dto.AccountProfileResponse) model.getAttribute("profile");
     ProfileUpdateRequest request = new ProfileUpdateRequest();
     request.setFullName(profile.getFullName());
     request.setPhone(profile.getPhone());
@@ -45,7 +58,6 @@ public class ProfileController {
     model.addAttribute("profileEditMode", edit);
 
     var ordersPage = customerOrderQueryService.findCustomerOrders(userDetails.getAccountId(), null, 0);
-    model.addAttribute("orderCount", ordersPage.getTotalElements());
 
     // Ưu tiên hiện đơn đang cần xử lý (PENDING hoặc CONFIRMED) để khách dễ theo dõi.
     // Nếu không có đơn nào đang chờ, fallback về đơn tạo mới nhất.
@@ -75,8 +87,8 @@ public class ProfileController {
       @RequestParam(name = "edit", required = false) Long editId,
       @RequestParam(name = "add", defaultValue = "false") boolean add,
       Model model) {
-    var profile = accountService.getById(userDetails.getAccountId());
-    model.addAttribute("profile", profile);
+    populateAccountHeader(userDetails.getAccountId(), model);
+    var profile = (com.bakery.account.dto.AccountProfileResponse) model.getAttribute("profile");
     var addresses = accountAddressService.findByAccountId(userDetails.getAccountId());
     model.addAttribute("addresses", addresses);
     model.addAttribute("editingAddressId", editId);
@@ -172,7 +184,7 @@ public class ProfileController {
   public String security(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       Model model) {
-    model.addAttribute("profile", accountService.getById(userDetails.getAccountId()));
+    populateAccountHeader(userDetails.getAccountId(), model);
     model.addAttribute("changePasswordRequest", new ChangePasswordRequest());
     return "account/security";
   }

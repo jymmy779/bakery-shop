@@ -119,5 +119,14 @@
   </div>
   <small>© 2026 LUNE Bakery</small>
 </aside>
+
+<nav th:fragment="pagination(pageObj, prevUrl, nextUrl, navClass, ariaLabel)"
+     th:if="${pageObj.totalPages > 1}"
+     th:class="${navClass}"
+     th:aria-label="${ariaLabel}">
+  <a th:if="${pageObj.hasPrevious()}" th:href="${prevUrl}">← Trang trước</a>
+  <span th:text="|Trang ${pageObj.number + 1} / ${pageObj.totalPages}|">Trang 1 / 1</span>
+  <a th:if="${pageObj.hasNext()}" th:href="${nextUrl}">Trang sau →</a>
+</nav>
 </body>
 </html>

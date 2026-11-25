@@ -31,13 +31,7 @@
 
           <strong class="checkout-receipt__code" th:text="${order.orderCode}"></strong>
           <div class="checkout-receipt__badges">
-            <span th:switch="${order.status.name()}">
-              <th:block th:case="'PENDING'">Chờ xử lý</th:block>
-              <th:block th:case="'CONFIRMED'">Đã xác nhận</th:block>
-              <th:block th:case="'DELIVERING'">Đang giao</th:block>
-              <th:block th:case="'DELIVERED'">Đã giao</th:block>
-              <th:block th:case="'CANCELLED'">Đã hủy</th:block>
-            </span>
+            <span th:replace="~{order/fragments :: statusLabel(${order.status})}"></span>
             <span class="badge--pending">Chờ thanh toán</span>
           </div>
 
@@ -49,7 +43,7 @@
               </div>
               <div class="checkout-receipt__countdown"
                    data-order-countdown
-                   th:attr="data-order-created=${order.createdAt}">
+                   th:attr="data-order-created=${order.createdAt != null ? #temporals.format(order.createdAt, 'yyyy-MM-dd''T''HH:mm:ss') + '+07:00' : ''}">
                 <span class="material-symbols-outlined" aria-hidden="true">timer</span>
                 <span>Thời gian giữ đơn: <strong data-countdown-time>05:00</strong> (Đơn tự hủy nếu chưa thanh toán)</span>
               </div>
@@ -95,13 +89,7 @@
       <p>Thông tin đặt bánh đã được lưu. Bạn có thể xem lại đơn tại trang này.</p>
       <strong class="checkout-receipt__code" th:text="${order.orderCode}"></strong>
       <div class="checkout-receipt__badges">
-        <span th:switch="${order.status.name()}">
-          <th:block th:case="'PENDING'">Chờ xử lý</th:block>
-          <th:block th:case="'CONFIRMED'">Đã xác nhận</th:block>
-          <th:block th:case="'DELIVERING'">Đang giao</th:block>
-          <th:block th:case="'DELIVERED'">Đã giao</th:block>
-          <th:block th:case="'CANCELLED'">Đã hủy</th:block>
-        </span>
+        <span th:replace="~{order/fragments :: statusLabel(${order.status})}"></span>
         <span class="badge--paid">Đã thanh toán</span>
       </div>
       <div class="checkout-receipt__alert-banner checkout-receipt__alert-banner--success">

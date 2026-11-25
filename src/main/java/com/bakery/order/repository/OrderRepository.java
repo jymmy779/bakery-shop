@@ -25,6 +25,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
   long countByStatus(OrderStatus status);
 
+  long countByAccount_Id(Long accountId);
+
+  long countByAccount_IdAndStatusIn(Long accountId, java.util.Collection<OrderStatus> statuses);
+
   @Query("SELECT o FROM Order o WHERE o.status = :status AND o.createdAt <= :createdBefore")
   java.util.List<Order> findExpiredPendingOrders(
       @Param("status") OrderStatus status,

@@ -17,4 +17,4 @@ COPY uploads ./uploads
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Dserver.port=${PORT:8080}", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Ho_Chi_Minh", "-Dserver.port=${PORT:8080}", "-jar", "app.jar"]

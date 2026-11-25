@@ -20,4 +20,5 @@ public class AccountProfileResponse {
   private LocalDate dateOfBirth;
   private Role role;
   private AccountStatus status;
+  private java.time.LocalDateTime createdAt;
 }

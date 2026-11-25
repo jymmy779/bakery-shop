@@ -48,10 +48,6 @@ class ProfileControllerTest {
 
   @BeforeEach
   void setUp() {
-    // Stub findCustomerOrders để GET /profile không NullPointerException
-    when(customerOrderQueryService.findCustomerOrders(any(), any(), anyInt()))
-        .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of()));
-
     ProfileController controller = new ProfileController(accountService, accountAddressService, customerOrderQueryService);
     LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
     validator.afterPropertiesSet();
@@ -72,6 +68,8 @@ class ProfileControllerTest {
   @Test
   void loadsCurrentCustomerProfile() throws Exception {
     when(accountService.getById(7L)).thenReturn(profile());
+    when(customerOrderQueryService.findCustomerOrders(any(), any(), anyInt()))
+        .thenReturn(new org.springframework.data.domain.PageImpl<>(java.util.List.of()));
 
     var result = mvc.perform(get("/profile"))
         .andExpect(status().isOk())
@@ -112,6 +110,7 @@ class ProfileControllerTest {
 
   @Test
   void loadsPasswordSecurityPage() throws Exception {
+    when(accountService.getById(7L)).thenReturn(profile());
     mvc.perform(get("/profile/security"))
         .andExpect(status().isOk())
         .andExpect(view().name("account/security"))

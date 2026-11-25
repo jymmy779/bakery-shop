@@ -73,4 +73,13 @@ public class CustomerOrderQueryServiceImpl {
         }).toList());
     return order;
   }
+
+  public long countCustomerOrders(Long accountId) {
+    return orders.countByAccount_Id(accountId);
+  }
+
+  public long countCustomerActiveOrders(Long accountId) {
+    return orders.countByAccount_IdAndStatusIn(
+        accountId, java.util.List.of(OrderStatus.CONFIRMED, OrderStatus.DELIVERING));
+  }
 }

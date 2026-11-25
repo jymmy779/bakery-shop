@@ -38,9 +38,19 @@ public class OrderController {
   public String list(@AuthenticationPrincipal CustomUserDetails customer,
       @RequestParam(required = false) OrderStatus status,
       @RequestParam(defaultValue = "0") int page, Model model) {
-    model.addAttribute("orders", orders.findCustomerOrders(customer.getAccountId(), status, page));
+    Long accountId = customer.getAccountId();
+    var profile = accountService.getById(accountId);
+    model.addAttribute("orders", orders.findCustomerOrders(accountId, status, page));
     model.addAttribute("selectedStatus", status);
-    model.addAttribute("profile", accountService.getById(customer.getAccountId()));
+    model.addAttribute("profile", profile);
+    model.addAttribute("orderCount", orders.countCustomerOrders(accountId));
+    model.addAttribute("activeOrders", orders.countCustomerActiveOrders(accountId));
+    if (profile.getCreatedAt() != null) {
+      model.addAttribute("memberSince",
+          profile.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("MM/yyyy")));
+    } else {
+      model.addAttribute("memberSince", "11/2026");
+    }
     return "order/list";
   }
 

@@ -32,26 +32,36 @@ public class OrderConfirmationNotifier {
   }
 
   public void afterCheckout(OrderDetailResponse order) {
-    if (!enabled || order.getReceiverEmail() == null || order.getReceiverEmail().isBlank()) return;
+    if (!enabled || order.getReceiverEmail() == null || order.getReceiverEmail().isBlank())
+      return;
     String code = order.getOrderCode();
     try {
-      // Build a complete immutable snapshot while checkout still has all saved order data.
+      // Build a complete immutable snapshot while checkout still has all saved order
+      // data.
       var mail = compose(order);
       if (!TransactionSynchronizationManager.isActualTransactionActive()
           || !TransactionSynchronizationManager.isSynchronizationActive()) {
         throw new IllegalStateException("Order mail must be registered inside checkout transaction");
       }
       TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-        @Override public void afterCommit() {
+        @Override
+        public void afterCommit() {
           try {
             executor.execute(() -> {
-              try { sender.send(mail); }
-              catch (RuntimeException failure) { report(code, failure); }
+              try {
+                sender.send(mail);
+              } catch (RuntimeException failure) {
+                report(code, failure);
+              }
             });
-          } catch (RuntimeException failure) { report(code, failure); }
+          } catch (RuntimeException failure) {
+            report(code, failure);
+          }
         }
       });
-    } catch (RuntimeException failure) { report(code, failure); }
+    } catch (RuntimeException failure) {
+      report(code, failure);
+    }
   }
 
   private void report(String code, RuntimeException failure) {
@@ -69,23 +79,29 @@ public class OrderConfirmationNotifier {
       body.append("- ").append(item.getProductName()).append(" | SL: ").append(item.getQuantity())
           .append(" | Đơn giá: ").append(money.format(item.getUnitPrice())).append(" VND")
           .append(" | Thành tiền: ").append(money.format(item.getLineTotal())).append(" VND\n");
-      if (item.getNote() != null) body.append("  Lời nhắn: ").append(item.getNote()).append('\n');
+      if (item.getNote() != null)
+        body.append("  Lời nhắn: ").append(item.getNote()).append('\n');
     }
     body.append("\nTổng tiền: ").append(money.format(order.getTotalAmount())).append(" VND\n\nTHÔNG TIN NHẬN BÁNH\n")
-        .append("Người nhận: ").append(order.getReceiverName()).append("\nĐiện thoại: ").append(order.getReceiverPhone())
+        .append("Người nhận: ").append(order.getReceiverName()).append("\nĐiện thoại: ")
+        .append(order.getReceiverPhone())
         .append("\nĐịa chỉ: ").append(order.getReceiverAddress()).append("\nNgày nhận: ")
         .append(order.getDeliveryDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-    if (order.getDeliveryTime() != null) body.append(" lúc ").append(order.getDeliveryTime().format(DateTimeFormatter.ofPattern("HH:mm")));
-    if (order.getNote() != null) body.append("\nGhi chú đơn: ").append(order.getNote());
+    if (order.getDeliveryTime() != null)
+      body.append(" lúc ").append(order.getDeliveryTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+    if (order.getNote() != null)
+      body.append("\nGhi chú đơn: ").append(order.getNote());
     body.append("\n\nTHANH TOÁN CHUYỂN KHOẢN\n");
     if (!bank.getBankName().isBlank() && !bank.getAccountNumber().isBlank() && !bank.getAccountName().isBlank()) {
       body.append("Ngân hàng: ").append(bank.getBankName()).append("\nSố tài khoản: ").append(bank.getAccountNumber())
           .append("\nChủ tài khoản: ").append(bank.getAccountName()).append("\nSố tiền: ")
           .append(money.format(order.getTotalAmount())).append(" VND\nNội dung: ").append(order.getOrderCode())
           .append("\nVui lòng chuyển đúng số tiền và nội dung. Cửa hàng sẽ đối soát và xác nhận đã nhận tiền.\n");
-    } else body.append("Thông tin chuyển khoản đang được cập nhật. Vui lòng xem lại trên website trước khi chuyển tiền.\n");
+    } else
+      body.append("Thông tin chuyển khoản đang được cập nhật. Vui lòng xem lại trên website trước khi chuyển tiền.\n");
     body.append("\nĐây là email xác nhận đã đặt đơn, không phải xác nhận đã thanh toán.")
         .append("\nĐăng nhập website LUNE → Đơn hàng của tôi để xem QR và trạng thái mới nhất.");
-    return new OrderConfirmationMail(order.getReceiverEmail().trim(), "LUNE Bakery — Xác nhận đơn " + order.getOrderCode(), body.toString());
+    return new OrderConfirmationMail(order.getReceiverEmail().trim(),
+        "LUNE Bakery — Xác nhận đơn " + order.getOrderCode(), body.toString());
   }
 }

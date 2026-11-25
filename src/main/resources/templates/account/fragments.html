@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <!-- Shared Account Header Bento Component -->
+    <section th:fragment="accountHeader"
+      class="mb-space-xl bg-surface-container-low rounded-xl p-space-lg shadow-sm relative overflow-hidden">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg relative z-10">
+        <!-- Personalized Greeting -->
+        <div class="space-y-space-xs">
+          <div class="flex flex-wrap items-center gap-space-sm">
+            <h1 class="font-headline-md text-headline-md text-on-surface tracking-tight"
+              th:text="|Xin chào, ${profile != null ? profile.fullName : 'bạn'}|">
+              Xin chào, quý khách
+            </h1>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">
+            Cảm ơn bạn đã đồng hành cùng hương vị bơ mộc và bánh nướng tươi thủ công mỗi sớm mai tại Lune Bakery.
+          </p>
+        </div>
+        <!-- Quick Metrics Ribbon -->
+        <div
+          class="grid grid-cols-3 gap-space-md w-full lg:w-auto bg-surface-container-lowest/80 backdrop-blur-sm rounded-xl p-space-md shadow-sm">
+          <div class="text-center px-space-sm">
+            <span class="block font-headline-sm text-headline-sm text-primary"
+              th:text="${orderCount != null ? (orderCount < 10 ? '0' + orderCount : orderCount) : '00'}">00</span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Đã đặt</span>
+          </div>
+          <div class="text-center px-space-sm">
+            <span class="block font-headline-sm text-headline-sm text-secondary"
+              th:text="${activeOrders != null ? (activeOrders < 10 ? '0' + activeOrders : activeOrders) : '00'}">00</span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Đang giao</span>
+          </div>
+          <div class="text-center px-space-sm">
+            <span class="block font-label-lg text-label-lg text-tertiary pt-1"
+              th:text="${memberSince} ?: '10/2023'">10/2023</span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Gia nhập</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shared Account Sidebar Component -->
+    <aside th:fragment="accountSidebar(activeTab)" class="lg:col-span-4 xl:col-span-3 space-y-space-md">
+      <!-- Navigation Menu Card -->
+      <div class="bg-surface-container-lowest rounded-xl p-space-sm shadow-sm">
+        <div
+          class="p-space-xs mb-space-xs font-label-sm text-label-sm tracking-wider uppercase text-on-surface-variant px-space-sm">
+          Quản trị tài khoản
+        </div>
+        <nav class="flex flex-col space-y-1">
+          <!-- Hồ sơ cá nhân -->
+          <a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors"
+            th:classappend="${activeTab == 'profile'} ? 'bg-primary-container text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'"
+            th:href="@{/profile}"
+            th:attr="aria-current=${activeTab == 'profile' ? 'page' : null}">
+            <span class="material-symbols-outlined text-[20px]"
+              style="font-variation-settings: 'FILL' 1;">person</span>
+            <span class="font-label-md text-label-md flex-1"
+              th:classappend="${activeTab == 'profile'} ? 'font-semibold' : ''">Thông tin cá nhân</span>
+            <span th:if="${activeTab == 'profile'}" class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </a>
+          <!-- Lịch sử đơn hàng -->
+          <a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors"
+            th:classappend="${activeTab == 'orders'} ? 'bg-primary-container text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'"
+            th:href="@{/orders}"
+            th:attr="aria-current=${activeTab == 'orders' ? 'page' : null}">
+            <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+            <span class="font-label-md text-label-md flex-1"
+              th:classappend="${activeTab == 'orders'} ? 'font-semibold' : ''">Lịch sử đơn hàng</span>
+            <span th:if="${activeTab == 'orders'}" class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </a>
+          <!-- Sổ địa chỉ giao hàng -->
+          <a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors"
+            th:classappend="${activeTab == 'address'} ? 'bg-primary-container text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'"
+            th:href="@{/profile/address}"
+            th:attr="aria-current=${activeTab == 'address' ? 'page' : null}">
+            <span class="material-symbols-outlined text-[20px]">local_shipping</span>
+            <span class="font-label-md text-label-md flex-1"
+              th:classappend="${activeTab == 'address'} ? 'font-semibold' : ''">Địa chỉ</span>
+            <span th:if="${activeTab == 'address'}" class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </a>
+          <!-- Mật khẩu & Bảo mật -->
+          <a class="flex items-center gap-space-sm px-space-md py-space-sm rounded-lg transition-colors"
+            th:classappend="${activeTab == 'security'} ? 'bg-primary-container text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'"
+            th:href="@{/profile/security}"
+            th:attr="aria-current=${activeTab == 'security' ? 'page' : null}">
+            <span class="material-symbols-outlined text-[20px]">shield</span>
+            <span class="font-label-md text-label-md flex-1"
+              th:classappend="${activeTab == 'security'} ? 'font-semibold' : ''">Bảo mật</span>
+            <span th:if="${activeTab == 'security'}" class="material-symbols-outlined text-[16px]">chevron_right</span>
+          </a>
+        </nav>
+        <div class="pt-space-md mt-space-sm px-space-xs">
+          <form th:action="@{/logout}" method="post" data-confirm-logout>
+            <button
+              class="cursor-pointer w-full flex items-center justify-center gap-space-xs py-space-xs px-space-md text-error hover:bg-error-container/40 rounded-lg transition-colors font-label-md text-label-md"
+              type="submit">
+              <span class="material-symbols-outlined text-[18px]">logout</span>
+              <span>Đăng xuất tài khoản</span>
+            </button>
+          </form>
+        </div>
+      </div>
+      <!-- Bakery Special Assistance Widget -->
+      <div class="bg-surface-container-high/60 rounded-xl p-space-md relative overflow-hidden">
+        <div class="flex items-start gap-space-sm">
+          <div
+            class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span class="material-symbols-outlined text-[18px]">cake</span>
+          </div>
+          <div class="space-y-1">
+            <h4 class="font-headline-sm text-[1rem] leading-snug text-tertiary">Bánh tiệc &amp; Đặt gấp</h4>
+            <p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Cần bánh nướng số lượng lớn cho sự kiện, tiệc trà hoặc chuẩn bị hộp quà sang trọng?
+            </p>
+            <a class="inline-flex items-center gap-1 pt-1 font-label-md text-label-md text-primary hover:text-primary-container"
+              href="tel:02838241955">
+              <span class="material-symbols-outlined text-[16px]">call</span>
+              <span>(028) 3824 1955</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </body>
+</html>

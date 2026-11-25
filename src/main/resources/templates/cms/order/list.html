@@ -39,11 +39,7 @@
           </tr><tr th:if="${orders.empty}"><td colspan="6" class="cms-order-empty">Không tìm thấy đơn hàng phù hợp. Hãy kiểm tra mã đơn hoặc đổi bộ lọc.</td></tr></tbody>
         </table>
       </div>
-      <nav class="cms-order-pagination" th:if="${orders.totalPages > 1}" aria-label="Phân trang đơn hàng">
-        <a th:if="${orders.hasPrevious()}" th:href="@{/cms/orders(page=${orders.number - 1},search=${search},status=${selectedStatus},paymentStatus=${selectedPaymentStatus})}">← Trang trước</a>
-        <span th:text="|Trang ${orders.number + 1} / ${orders.totalPages}|"></span>
-        <a th:if="${orders.hasNext()}" th:href="@{/cms/orders(page=${orders.number + 1},search=${search},status=${selectedStatus},paymentStatus=${selectedPaymentStatus})}">Trang sau →</a>
-      </nav>
+      <nav th:replace="~{fragments/cms-layout :: pagination(${orders}, @{/cms/orders(page=${orders.number - 1},search=${search},status=${selectedStatus},paymentStatus=${selectedPaymentStatus})}, @{/cms/orders(page=${orders.number + 1},search=${search},status=${selectedStatus},paymentStatus=${selectedPaymentStatus})}, 'cms-order-pagination', 'Phân trang đơn hàng')}"></nav>
     </section>
   </div>
 </main>

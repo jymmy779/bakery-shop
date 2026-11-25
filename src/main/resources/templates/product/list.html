@@ -13,40 +13,7 @@
     />
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script id="tailwind-config">
-      tailwind.config = {
-        darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              surface: "#fff8f6",
-              "surface-container": "#ffe9e3",
-              "surface-container-low": "#fff1ec",
-              "surface-container-lowest": "#ffffff",
-              primary: "#6c0c28",
-              secondary: "#536443",
-              "on-surface": "#261814",
-              "on-surface-variant": "#564244",
-              "primary-fixed": "#ffd9dd",
-              "on-primary-fixed": "#400013",
-            },
-            spacing: {
-              gutter: "1.5rem",
-              "space-md": "1rem",
-              "space-xl": "2.5rem",
-            },
-            fontFamily: {
-              "body-md": ["Plus Jakarta Sans"],
-              "headline-lg": ["Playfair Display"],
-            },
-            fontSize: {
-              "body-md": ["1rem", { lineHeight: "1.625rem" }],
-              "headline-lg": ["2.5rem", { lineHeight: "3rem", fontWeight: "600" }],
-            },
-          },
-        },
-      };
-    </script>
+    <script th:src="@{/js/tailwind-config.js}" src="/js/tailwind-config.js"></script>
     <style>
       :root {
         --paper: #fff8f6;

@@ -83,11 +83,7 @@
           </tbody>
         </table>
       </div>
-      <nav class="cms-accounts-pagination" th:if="${staffPage.totalPages > 1}" aria-label="Phân trang nhân viên">
-        <a th:if="${staffPage.hasPrevious()}" th:href="@{/cms/staff(page=${staffPage.number - 1},size=${staffPage.size},search=${search},status=${selectedStatus},order=${selectedOrder})}">← Trước</a>
-        <span th:text="${'Trang ' + (staffPage.number + 1) + ' / ' + staffPage.totalPages}">Trang 1 / 1</span>
-        <a th:if="${staffPage.hasNext()}" th:href="@{/cms/staff(page=${staffPage.number + 1},size=${staffPage.size},search=${search},status=${selectedStatus},order=${selectedOrder})}">Sau →</a>
-      </nav>
+      <nav th:replace="~{fragments/cms-layout :: pagination(${staffPage}, @{/cms/staff(page=${staffPage.number - 1},size=${staffPage.size},search=${search},status=${selectedStatus},order=${selectedOrder})}, @{/cms/staff(page=${staffPage.number + 1},size=${staffPage.size},search=${search},status=${selectedStatus},order=${selectedOrder})}, 'cms-accounts-pagination', 'Phân trang nhân viên')}"></nav>
     </section>
   </div>
 </main>
