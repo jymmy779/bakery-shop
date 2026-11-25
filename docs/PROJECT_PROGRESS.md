@@ -76,6 +76,12 @@ Mẫu một dòng cập nhật:
 
 ## Nhật ký công việc
 
+### 25/11/2026
+
+| Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |
+| --- | --- | --- | --- | --- | --- | --- |
+| Phạm Tấn Đạt | Quên mật khẩu bằng OTP | Hoàn thiện các bước gửi OTP email, xác minh OTP và đặt lại mật khẩu; lưu hash OTP/token, giới hạn thời hạn/số lần thử, thêm giao diện theo từng bước và SMTP EmailService | Đang làm | Branch `Dat`; PR/commit: Chưa có | Chưa chạy test hoặc demo giao diện; kiểm tra tĩnh và `git diff --check` | Cấu hình MAIL_* trong IntelliJ và demo luồng OTP với Gmail/App Password; chạy test account khi môi trường Maven khả dụng |
+
 ### 19/11/2026
 
 | Thành viên | Use case/phần việc | Kết quả cụ thể | Trạng thái | Branch/PR/commit | Test hoặc demo | Việc tiếp theo/vướng mắc |

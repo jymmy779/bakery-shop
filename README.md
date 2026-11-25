@@ -51,10 +51,11 @@ Không sử dụng VS Code cho project này.
    DB_USERNAME=root;DB_PASSWORD=<mat-khau-mysql>
    ```
 
-   Nếu MySQL không có mật khẩu, để `DB_PASSWORD` trống. Các biến email chưa bắt
-   buộc cho đến khi thực hiện use case gửi mail. Xem danh sách cấu hình tham khảo
-   tại `.env.example`; Spring Boot không tự đọc file này. Không commit mật khẩu
-   hoặc App Password.
+   Nếu MySQL không có mật khẩu, để `DB_PASSWORD` trống. Để dùng chức năng quên
+   mật khẩu, cấu hình thêm `MAIL_USERNAME`, `MAIL_PASSWORD` (Google App Password),
+   `MAIL_FROM`, `MAIL_HOST=smtp.gmail.com` và `MAIL_PORT=587` trong Environment
+   variables của IntelliJ. Xem tên biến tại `.env.example`; Spring Boot không tự
+   đọc file này. Không commit mật khẩu hoặc App Password.
 
 9. Bấm Run tại `BakeryShopApplication`.
 10. Truy cập `http://localhost:8080`.
