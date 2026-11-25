@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -54,9 +55,12 @@ public class AuthController {
   }
 
   @GetMapping("/forgot-password")
-  public String forgotPassword(Model model) {
+  public String forgotPassword(
+      @RequestParam(name = "source", required = false) String source,
+      Model model) {
     model.addAttribute("forgotPasswordRequest", new ForgotPasswordRequest());
     model.addAttribute("step", "email");
+    model.addAttribute("source", source);
     return "auth/forgot-password";
   }
 
@@ -64,7 +68,9 @@ public class AuthController {
   public String sendPasswordResetOtp(
       @Valid ForgotPasswordRequest request,
       BindingResult bindingResult,
+      @RequestParam(name = "source", required = false) String source,
       Model model) {
+    model.addAttribute("source", source);
     if (bindingResult.hasErrors()) {
       model.addAttribute("forgotPasswordRequest", request);
       model.addAttribute("step", "email");
@@ -90,7 +96,9 @@ public class AuthController {
   public String verifyPasswordResetOtp(
       @Valid VerifyOtpRequest request,
       BindingResult bindingResult,
+      @RequestParam(name = "source", required = false) String source,
       Model model) {
+    model.addAttribute("source", source);
     if (bindingResult.hasErrors()) {
       model.addAttribute("verifyOtpRequest", request);
       model.addAttribute("step", "otp");
@@ -114,7 +122,9 @@ public class AuthController {
   public String resetPassword(
       @Valid ResetPasswordRequest request,
       BindingResult bindingResult,
+      @RequestParam(name = "source", required = false) String source,
       Model model) {
+    model.addAttribute("source", source);
     if (bindingResult.hasErrors()) {
       model.addAttribute("resetPasswordRequest", request);
       model.addAttribute("step", "reset");
@@ -123,7 +133,9 @@ public class AuthController {
 
     try {
       passwordResetService.resetPassword(request);
-      return "redirect:/login?passwordReset";
+      return "cms".equalsIgnoreCase(source)
+          ? "redirect:/cms/login?passwordReset"
+          : "redirect:/login?passwordReset";
     } catch (InvalidOperationException exception) {
       ResetPasswordRequest retryRequest = new ResetPasswordRequest();
       retryRequest.setResetToken(request.getResetToken());
